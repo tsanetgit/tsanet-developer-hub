@@ -38,8 +38,8 @@
     <h1>Case attachments and the direct-push model</h1>
     <p class="abstract">File transfer on TSANet Connect is a direct push between members: the platform brokers the exchange but never stores the file. That single design choice determines everything an integrator has to build, and it is the reason attachments require setup on both sides before they work at all. This document specifies the model, the responsibilities it leaves to the connector, and what to expect while enablement is still rolling out.</p>
     <div class="meta-table">
-      <div class="meta-cell"><b>Date</b><span>2026-08-15</span></div>
-      <div class="meta-cell"><b>Version</b><span>0.1</span></div>
+      <div class="meta-cell"><b>Date</b><span>2026-08-25</span></div>
+      <div class="meta-cell"><b>Version</b><span>0.2</span></div>
       <div class="meta-cell"><b>Audience</b><span>Member integrators</span></div>
       <div class="meta-cell"><b>Status</b><span>Rolling out per member</span></div>
     </div>
@@ -55,6 +55,7 @@
       <b>Consequence</b>
       Attachments are not a feature you enable in your own connector alone. The receiving side must have somewhere for files to land, registered in advance. Until that exists for a given member, forwards to them cannot succeed.
     </div>
+    <p>The design guidance around this model — the sending paths, the receiver patterns, and the operational decisions a receiving member has to make — is the subject of the companion topic page, <a href="../topics/file-sharing.html">Moving files between members</a>. This document stays at the specification level.</p>
 
     <h2><span class="sec-no">2</span>The four endpoints</h2>
     <table class="doc">
@@ -150,6 +151,7 @@
     <h2><span class="sec-no">6</span>Revision history</h2>
     <table class="doc">
       <tr><th>Version</th><th>Date</th><th>Change</th></tr>
+      <tr><td>0.2</td><td>2026-08-25</td><td>Cross-link the companion topic page (Moving files between members), which carries the design guidance around this specification.</td></tr>
       <tr><td>0.1</td><td>2026-08-15</td><td>Initial draft covering the published attachment surface and the connector-side responsibilities it implies.</td></tr>
     </table>
 
@@ -159,7 +161,7 @@
 <footer>
   <div class="wrap">
     <div>TSANet Connect Platform Engineering · <a href="../index.html">Developer Hub</a></div>
-    <div class="mono">TSANET-2026-002 · v0.1</div>
+    <div class="mono">TSANET-2026-002 · v0.2</div>
   </div>
 </footer>
 

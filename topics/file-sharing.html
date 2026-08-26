@@ -108,7 +108,7 @@
     <p>Sending is a single API call on the collaboration case: attach one or more files (multipart) to the case token you already hold. The platform resolves the receiving side's configuration and does the rest. The official reference is the <a href="https://tsanet.gitbook.io/connect/api-reference/case-attachments">case attachments documentation</a>.</p>
     <ul class="tight">
       <li><strong>Your connector does it.</strong> On platforms with a shipped <a href="../connectors/index.html">connector</a>, attachment support arrives as connector functionality — no member code involved.</li>
-      <li><strong>The Connect SDK.</strong> The <a href="../connectors/connect-sdk.html">Java SDK</a> carries attachment forwarding as a library call, for members building their own integration.</li>
+      <li><strong>The Connect SDK.</strong> The <a href="../connectors/connect-sdk.html">Java SDK</a> carries attachment forwarding as a library call, for members building their own integration — and the <a href="../connectors/connect-gateway.html">Connect Gateway</a> sends through the same library, so gateway-class connectors inherit attachment sending rather than reimplementing it.</li>
       <li><strong>Direct REST.</strong> The endpoint is the contract; any stack that can make an authenticated multipart request can send. Nothing requires the SDK.</li>
     </ul>
     <p>Delivery is per destination: with two configured stores on a case, each gets its own attempt and the response distinguishes complete from partial success. There is <strong>one attempt per destination — no automatic retries</strong> — so a failure is loud for the caller and invisible to everyone else until someone acts on it.</p>

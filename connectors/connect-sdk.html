@@ -44,9 +44,9 @@
     <h1>Connect SDK</h1>
     <p class="lede">A Java client for the TSANet Connect API, generated from the API's own OpenAPI specification and wrapped in eight typed facades — plus a console app, an attachment receiver and a web demo that show it working end to end. If you are building a custom integration on the JVM, this is the shortest path that is not hand-rolled HTTP.</p>
     <div class="meta-row">
-      <span><b>Version</b> v0.1.0</span>
-      <span><b>Released</b> 2026-08-11</span>
-      <span><b>Language</b> Java 21</span>
+      <span><b>Version</b> v1.0.0 · <a href="https://github.com/tsanetgit/Connect_SDK/releases/latest">latest release</a></span>
+      <span><b>Released</b> 2026-08-28</span>
+      <span><b>Runtime</b> Java 21 · Spring Boot 4.1 · Jackson 3</span>
       <span><b>Repo</b> tsanetgit/Connect_SDK</span>
     </div>
     <div class="toc">
@@ -70,8 +70,8 @@
     <h2>What it is, and what it is not yet</h2>
     <div class="status-band">
       <h3>Read the version number before you plan around it</h3>
-      <p>This is <strong>v0.1.0</strong>, released 2026-08-11, and the repository describes itself as a demonstration of integration with the TSANet API in Java. That is not a disclaimer to skim past: it is a real, working, tested client — the TSANet-built gateway consumes it in production paths — but it is early, the surface can still move, and there is one release to date.</p>
-      <p style="margin-top:12px">Treat it as the reference implementation of how to talk to the Connect API correctly, and as a dependency you pin rather than float.</p>
+      <p>This is <strong>v1.0.0</strong>, released 2026-08-28 — the third release in as many weeks after v0.1.0 (2026-08-11) and v0.2.0 (2026-08-27). The major version marks a runtime change, not an API freeze: 1.0.0 moves the library from Spring Boot 3.3, now past its supported life, to <strong>Spring Boot 4.1 and Jackson 3</strong>. The facade signatures did not change across that upgrade, and the two TSANet-built consumers — the <a href="connect-gateway.html">Connect Gateway</a> and the <a href="fin-intercom.html">Fin / Intercom</a> connector — compiled and ran their suites against the release before it was cut. The repository still describes itself as a demonstration, and the pre-0.1.0 create signatures that silently made test cases remain as deprecated defaults awaiting removal.</p>
+      <p style="margin-top:12px">Treat it as the reference implementation of how to talk to the Connect API correctly, and as a dependency you pin rather than float. If your service is still on Jackson 2, stay on 0.2.0 until you are not.</p>
     </div>
     <p style="margin-top:22px">The value is not that it saves you HTTP calls — it is that the Connect API has a number of behaviours that are easy to get wrong on a first integration, and the client encodes the right answers. Request shapes are validated before they go out, the process-form field types are modelled rather than guessed at, both authentication modes are handled behind one session object, and webhook payloads and attachment configuration have types instead of being maps of strings.</p>
   </div>
@@ -83,13 +83,13 @@
     <h2>Eight facades over one session</h2>
     <p>Everything hangs off <code>TsaNetApi</code> and <code>TsaNetApiSession</code>. The facades divide the API the way the API actually divides, which makes them easy to hold in your head:</p>
     <div class="obj-grid">
-      <div class="obj"><h4>AuthFacade</h4><p>Login and session establishment across both supported credential modes.</p></div>
-      <div class="obj"><h4>PartnersFacade</h4><p>Partner search and selection, plus the process-form template for a chosen partner.</p></div>
-      <div class="obj"><h4>CollaborationRequestsFacade</h4><p>The core lifecycle: create, fetch, list, approve, reject, request and send information, close.</p></div>
-      <div class="obj"><h4>CaseNotesFacade</h4><p>Notes on a case, in both directions.</p></div>
-      <div class="obj"><h4>CaseResponsesFacade</h4><p>The formal response records — approvals, rejections, information exchanges.</p></div>
-      <div class="obj"><h4>WebhooksFacade</h4><p>Subscription management plus inbound event and delivery types.</p></div>
-      <div class="obj"><h4>AttachmentsFacade</h4><p>Attachment configuration, forwarding, and the HTTPS push arrangement.</p></div>
+      <div class="obj"><h4>AuthFacade</h4><p>Login across both credential modes, token expiry, current identity, logout. A 401 mid-session re-mints the token and retries once.</p></div>
+      <div class="obj"><h4>PartnersFacade</h4><p>Partner search by name and by semantic query, with the last results kept locally.</p></div>
+      <div class="obj"><h4>CollaborationRequestsFacade</h4><p>List, create and fetch cases; the partner's process-form template by company, department or document; a sync of everything the account can see.</p></div>
+      <div class="obj"><h4>CaseNotesFacade</h4><p>The notes timeline per case or across all cases, and note creation with a priority.</p></div>
+      <div class="obj"><h4>CaseResponsesFacade</h4><p>The lifecycle actions: approve, reject, request and send information, close — plus the response history they produce.</p></div>
+      <div class="obj"><h4>WebhooksFacade</h4><p>Subscriptions and their delivery logs, and an inbound receiver that verifies the signature and refreshes the affected case.</p></div>
+      <div class="obj"><h4>AttachmentsFacade</h4><p>Attachment configuration, forwarding local files to a case, and the HTTPS push arrangement.</p></div>
       <div class="obj"><h4>UserFacade</h4><p>Identity and company context for the authenticated account.</p></div>
     </div>
     <p style="margin-top:18px">Alongside the facades sit typed DTOs for every payload — form templates and field types, case status, notes, responses, webhook deliveries, attachment configuration — and a validation layer that checks a request before it is sent rather than letting the API reject it. On an API where a validation failure may arrive as an HTTP 500 unless you opt into <a href="zendesk.html#auth">problem+json</a>, catching the problem client-side is worth more than it sounds.</p>
@@ -148,7 +148,7 @@
       </div>
       <figcaption>The generated layer is regenerated from the API's own specification at build time, so the wire types cannot drift from the contract. The facades are hand-written on top, which is what gives the library a surface that stays stable while the generated code underneath changes with the spec.</figcaption>
     </figure>
-    <div class="note">One consequence of wrapping the generated client by hand: the library currently spans both API versions. List reads call <code>/v2/collaboration-requests/list</code>, but webhook subscribe and list go through <code>/v1/webhooks</code> — deprecated, sunset 2027-01-01 — and the generated v2 webhook client is present with nothing calling it. Where every shipped integration stands is tracked in <a href="../api/index.html#versions">Deprecation clocks</a>.</div>
+    <div class="note">One consequence of wrapping the generated client by hand: the library currently spans both API versions. List reads call <code>/v2/collaboration-requests/list</code>, but webhook subscribe and list go through <code>/v1/webhooks</code> — deprecated, sunset 2027-01-01 — and the generated v2 webhook client is present with nothing calling it. The inbound receiver reads the v1 payload shape too — a flat <code>eventType</code> and request token, not a CloudEvent. Re-verified against the v1.0.0 source and its generated client. Where every shipped integration stands is tracked in <a href="../api/index.html#versions">Deprecation clocks</a>.</div>
   </div>
 </section>
 
@@ -161,10 +161,10 @@
         <thead><tr><th>Module</th><th>What it is</th></tr></thead>
         <tbody>
           <tr><td><code>connect-library</code></td><td><strong>The client.</strong> This is the one you take as a dependency; everything else is demonstration and tooling around it.</td></tr>
-          <tr><td><code>TSANet-integration-app</code></td><td>A console application with an executor per operation — create, approve, reject, information request and response, notes, close, attachments. Useful as a worked example and as a way to exercise the API by hand.</td></tr>
-          <tr><td><code>TSANet-integration-demo</code></td><td>Scripted demo scenarios over the same facades.</td></tr>
-          <tr><td><code>attachment-receiver</code></td><td>The receiving endpoint for the HTTPS attachment push arrangement — the piece both sides need before file transfer works.</td></tr>
-          <tr><td><code>demo-ui</code></td><td>A branded web demo over the SDK facades, with its own runbook and hosting notes.</td></tr>
+          <tr><td><code>TSANet-integration-app</code></td><td>A console shell with a command per operation — create, approve, reject, information request and response, notes, close, attachments, webhooks — and an optional endpoint that receives webhooks into the local store. Useful as a worked example and as a way to exercise the API by hand.</td></tr>
+          <tr><td><code>TSANet-integration-demo</code></td><td>Scripted two-party scenarios over the same facades, plus a scheduled poll for accounts that cannot receive webhooks.</td></tr>
+          <tr><td><code>attachment-receiver</code></td><td>The storage half of receiving files: a streaming storage interface with AWS S3, Azure Files and Google Cloud Storage adapters, an encrypted per-member configuration store, and a go-live check that proves the storage and CRM credentials before anything is registered. <strong>The HTTPS endpoint that accepts the push is not built yet</strong>; it waits on the platform side of the push contract.</td></tr>
+          <tr><td><code>demo-ui</code></td><td>A branded web demo over the SDK facades — dashboard, partner search, the partner's form rendered live, every lifecycle action, webhook management — with its own runbook and hosting notes. The create → approve → close round trip has been run end to end against a TSANet test environment.</td></tr>
         </tbody>
       </table>
     </div>
@@ -180,12 +180,13 @@
 
     <h3>The path that works: consume the published library</h3>
     <p><code>connect-library</code> is published to GitHub Packages as a <strong>public</strong> package, so you can depend on it without building anything:</p>
-    <pre><code><span class="c">&lt;!-- com.tsanet:connect-library:0.1.0 --&gt;</span>
+    <pre><code><span class="c">&lt;!-- com.tsanet:connect-library — check the latest release for the current version --&gt;</span>
 &lt;<span class="k">dependency</span>&gt;
   &lt;<span class="k">groupId</span>&gt;com.tsanet&lt;/<span class="k">groupId</span>&gt;
   &lt;<span class="k">artifactId</span>&gt;connect-library&lt;/<span class="k">artifactId</span>&gt;
-  &lt;<span class="k">version</span>&gt;0.1.0&lt;/<span class="k">version</span>&gt;
+  &lt;<span class="k">version</span>&gt;1.0.0&lt;/<span class="k">version</span>&gt;
 &lt;/<span class="k">dependency</span>&gt;</code></pre>
+    <p>Three versions are published: 0.1.0, 0.2.0 and 1.0.0. <strong>1.0.0 requires Jackson 3</strong> (<code>tools.jackson.core</code>) and is built on the Spring Boot 4.1 line; a service still on Jackson 2 should take 0.2.0, which is the same facade surface with the older runtime. Two upgrade traps worth knowing: Jackson 3's parse exceptions are unchecked, so a <code>catch (IOException)</code> around a mapper call compiles and silently stops catching malformed JSON; and Jackson 3 rejects a missing primitive by default where Jackson 2 zero-filled it. The library's own cache reader keeps the old behaviour; your mappers inherit the new one unless you say otherwise.</p>
     <p>One wrinkle that catches everyone: <strong>GitHub Packages requires authentication for Maven even on public packages.</strong> You need a token with <code>read:packages</code> in your <code>settings.xml</code> against the <code>github</code> server, or the resolve fails in a way that looks like the artifact does not exist.</p>
 
     <h3>The path that does not work from outside TSANet: build from source</h3>
@@ -217,7 +218,7 @@
   <div class="wrap">
     <p class="eyebrow">Local state</p>
     <h2>A storage layer for what you fetched</h2>
-    <p>The library ships storage services paralleling the facades — collaboration requests and their form templates, notes, responses, partner selections, user context, webhook subscriptions and inbound events, attachment configuration and forward results. Backed by SQLite in the demo, they give an integration somewhere to keep what it has already retrieved.</p>
+    <p>The library ships storage services paralleling the facades — collaboration requests and their form templates, notes, responses, partner selections, user context, webhook subscriptions and inbound events, attachment configuration and forward results. Backed by SQLite, they give an integration somewhere to keep what it has already retrieved. Since 0.2.0 the store can also forget: an age-based sweep evicts closed and rejected cases older than a window you choose, never touches an open case, and leaves attachment forward results alone because nothing upstream can re-supply them.</p>
     <p>This matters more than it first appears on an API where inbound events are thin. When a webhook tells you only that <em>something</em> changed on a token, the fetch is what establishes truth — and having a local record of what you last saw is how you work out what actually changed, and how you avoid re-notifying on every redelivery. Every connector on this hub ends up building some version of this; here it comes with the client.</p>
   </div>
 </section>
@@ -243,7 +244,7 @@
           <li>A custom JVM integration against a platform with no TSANet connector</li>
           <li>A middleware or translation service between the Connect API and an in-house system</li>
           <li>Learning the API's real shape before committing to a design — the console app exercises every operation</li>
-          <li>Anything needing attachments, where the receiver module saves building the endpoint yourself</li>
+          <li>Anything sending attachments, where forwarding a file to a case is a library call</li>
         </ul>
       </div>
       <div>
@@ -251,7 +252,7 @@
         <ul class="tight">
           <li>Your platform already has a connector — use <a href="salesforce.html">Salesforce</a>, <a href="zendesk.html">Zendesk</a> or <a href="dynamics.html">Dynamics</a> rather than rebuilding</li>
           <li>You are not on the JVM — there is no port yet</li>
-          <li>You need a frozen, long-supported API surface; this is v0.1.0 and will move</li>
+          <li>You need a frozen, long-supported API surface; the facades have held across three releases, but the library is weeks old and still carries deprecated signatures scheduled for removal</li>
           <li>You cannot pin dependencies and need something that floats safely</li>
         </ul>
       </div>

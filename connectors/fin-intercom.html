@@ -665,7 +665,7 @@
         <ul class="tight">
           <li><strong>First full design-level security review</strong> against the connector security taxonomy (supply chain, credential lifecycle, authentication boundaries, data flow and retention, audit, untrusted-content rendering), with the authentication boundary live-probed. Findings are filed as <code>security</code>-labelled issues in the repository; several of the items below are its outcomes.</li>
           <li><strong>Hardened deployment profile:</strong> no webhook topics (verified functionally free), tickets-only mode, verified-minimum grants with a documented provision-then-revoke step — all in the deployment skill's <code>intercom-setup.md</code>.</li>
-          <li><strong>SDK-cache retention sweep:</strong> age-based eviction of terminal-case content on a per-deployment window, default off (see the persistence table).</li>
+          <li><strong>SDK-cache retention sweep:</strong> age-based eviction of terminal-case content on a per-deployment window, default off (see the persistence table). The eviction itself now lives in <code>connect-library</code> (0.2.0); the connector keeps only the schedule and the window, and its interim hand-rolled sweep is retired.</li>
           <li><strong>Backups gained history:</strong> hourly dated snapshots on a 48-hour window beside the 5-minute latest copy, with a delete-first restore procedure that survives a snapshot lacking a WAL file.</li>
           <li><strong>Build provenance:</strong> the deployable image is built in CI from a repository commit and pushed with a secretless, registry-scoped identity (no admin credential); images are addressed by digest. Dependency updates are automated; workflow actions are SHA-pinned.</li>
         </ul>
@@ -674,7 +674,6 @@
         <h3>Tracked next (not promises)</h3>
         <ul class="tight">
           <li><strong>Registry pull by managed identity</strong> and retirement of the registry admin credential — the live-touching half of the provenance work.</li>
-          <li><strong>Retention upstream:</strong> a first-class eviction API in <code>connect-library</code> so the adapter's sweep collapses into a library call (tracked in the SDK repository).</li>
           <li><strong>Notes in both directions and status sync</strong> still wait on estate-wide decisions shared with the Zendesk connector: a note summary convention, severity mapping, and a platform direction field on notes.</li>
           <li><strong>Outbound closure policy</strong> — see Known gaps.</li>
         </ul>

@@ -320,7 +320,7 @@ catch (<span class="good-v">GatewayException</span> rejected)        { surfaceTo
     <ul class="tight">
       <li><strong>One artifact, two hosting modes.</strong> The attachment receiver ships once and runs either TSANet-hosted multi-tenant (the default — members deploy nothing) or member-deployed, for members whose policy requires files to touch only their own infrastructure. The mode is a deployment decision, never a code fork.</li>
       <li><strong>Transit-only compute.</strong> In hosted mode, bytes stream from the push to the tenant's own storage backend — nothing is spooled to gateway disk. That property is what keeps "files are never stored on TSANet Connect" defensible while TSANet operates the compute.</li>
-      <li><strong>Storage at rest is member-owned.</strong> Production tenants configure their own S3 or Azure Files targets; credential custody stays with the member and revocation is always member-side.</li>
+      <li><strong>Storage at rest is member-owned.</strong> Production tenants configure their own S3, Azure Blob Storage, or Azure Files targets; credential custody stays with the member and revocation is always member-side.</li>
       <li><strong>Storage alone earns the 2xx.</strong> The platform pushes exactly once, so the receiver acknowledges when the bytes are secured in storage — never contingent on delivery into the member's platform, which runs after and apart. A failed delivery leaves the file in storage and surfaces to the member; it is never silently dropped.</li>
       <li><strong>Per-file outcomes are data, not exceptions.</strong> On the outbound side, one file's failure cannot masquerade as a whole-call failure.</li>
     </ul>

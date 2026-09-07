@@ -42,7 +42,7 @@
   <div class="wrap">
     <div class="crumb"><a href="../index.html">Hub</a> / <a href="index.html">Connectors</a> / Connect SDK</div>
     <h1>Connect SDK</h1>
-    <p class="lede">A Java client for the TSANet Connect API, generated from the API's own OpenAPI specification and wrapped in eight typed facades — plus a console app, an attachment receiver and a web demo that show it working end to end. If you are building a custom integration on the JVM, this is the shortest path that is not hand-rolled HTTP.</p>
+    <p class="lede">A Java client for the TSANet Connect API, generated from the API's own OpenAPI specification and wrapped in nine typed facades — plus a console app, an attachment receiver and a web demo that show it working end to end. If you are building a custom integration on the JVM, this is the shortest path that is not hand-rolled HTTP.</p>
     <div class="meta-row">
       <span><b>Version</b> v1.0.0 · <a href="https://github.com/tsanetgit/Connect_SDK/releases/latest">latest release</a></span>
       <span><b>Released</b> 2026-08-28</span>
@@ -51,7 +51,7 @@
     </div>
     <div class="toc">
       <a href="#what">What it is</a>
-      <a href="#surface">The eight facades</a>
+      <a href="#surface">The nine facades</a>
       <a href="#layers">How it fits together</a>
       <a href="#modules">Modules</a>
       <a href="#getting">Getting it</a>
@@ -80,19 +80,20 @@
 <section id="surface">
   <div class="wrap">
     <p class="eyebrow">API surface</p>
-    <h2>Eight facades over one session</h2>
+    <h2>Nine facades over one session</h2>
     <p>Everything hangs off <code>TsaNetApi</code> and <code>TsaNetApiSession</code>. The facades divide the API the way the API actually divides, which makes them easy to hold in your head:</p>
     <div class="obj-grid">
-      <div class="obj"><h4>AuthFacade</h4><p>Login across both credential modes, token expiry, current identity, logout. A 401 mid-session re-mints the token and retries once.</p></div>
+      <div class="obj"><h4>AuthFacade</h4><p>Login across both credential modes, with the token renewed before expiry in both when the credentials are configured; the company and user behind the session, fetched from <code>/v1/me</code> at login; logout. A 401 mid-session re-mints the token and retries once, and concurrent callers share one renewal.</p></div>
       <div class="obj"><h4>PartnersFacade</h4><p>Partner search by name and by semantic query, with the last results kept locally.</p></div>
       <div class="obj"><h4>CollaborationRequestsFacade</h4><p>List, create and fetch cases; the partner's process-form template by company, department or document; a sync of everything the account can see.</p></div>
       <div class="obj"><h4>CaseNotesFacade</h4><p>The notes timeline per case or across all cases, and note creation with a priority.</p></div>
       <div class="obj"><h4>CaseResponsesFacade</h4><p>The lifecycle actions: approve, reject, request and send information, close — plus the response history they produce.</p></div>
       <div class="obj"><h4>WebhooksFacade</h4><p>Subscriptions and their delivery logs, and an inbound receiver that verifies the signature and refreshes the affected case.</p></div>
       <div class="obj"><h4>AttachmentsFacade</h4><p>Attachment configuration, forwarding local files to a case, and the HTTPS push arrangement.</p></div>
+      <div class="obj"><h4>AttachmentsV2Facade</h4><p>Direct delivery: the file goes straight into the partner's store, streamed from disk one part at a time in whichever upload mode the grant names, and the outcome is the platform's recorded word, not the client's. Built against a draft grant/complete contract; the platform endpoint is not live yet.</p></div>
       <div class="obj"><h4>UserFacade</h4><p>Identity and company context for the authenticated account.</p></div>
     </div>
-    <p style="margin-top:18px">Alongside the facades sit typed DTOs for every payload — form templates and field types, case status, notes, responses, webhook deliveries, attachment configuration — and a validation layer that checks a request before it is sent rather than letting the API reject it. On an API where a validation failure may arrive as an HTTP 500 unless you opt into <a href="zendesk.html#auth">problem+json</a>, catching the problem client-side is worth more than it sounds.</p>
+    <p style="margin-top:18px">Alongside the facades sit typed DTOs for every payload — form templates and field types, case status, notes, responses, webhook deliveries, attachment configuration — and a validation layer that checks a request before it is sent rather than letting the API reject it. On an API where a validation failure may arrive as an HTTP 500 unless you opt into <a href="zendesk.html#auth">problem+json</a>, catching the problem client-side is worth more than it sounds. The library opts in on every call and surfaces whatever the API answers as one typed exception carrying the API's own title and detail, never the URL or a token.</p>
   </div>
 </section>
 
@@ -102,7 +103,7 @@
     <h2>Generated from the spec, wrapped by hand</h2>
     <figure>
       <div class="diagram">
-        <svg viewBox="0 0 1020 330" style="min-width:900px" role="img" aria-label="Layering: your integration calls the eight facades, which call a generated OpenAPI client, which calls the TSANet Connect API. The OpenAPI specification is a build-time input to code generation, not a runtime dependency.">
+        <svg viewBox="0 0 1020 330" style="min-width:900px" role="img" aria-label="Layering: your integration calls the nine facades, which call a generated OpenAPI client, which calls the TSANet Connect API. The OpenAPI specification is a build-time input to code generation, not a runtime dependency.">
           <defs><marker id="sdA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--slate)"/></marker></defs>
 
           <rect class="bx-ext" x="20" y="126" width="180" height="70" rx="8"/>
@@ -114,7 +115,7 @@
           <rect class="bx-acc" x="262" y="96" width="230" height="130" rx="8"/>
           <text class="tt" x="276" y="120">connect-library</text>
           <text class="ts" x="276" y="140">TsaNetApi · TsaNetApiSession</text>
-          <text class="ts" x="276" y="158">eight typed facades</text>
+          <text class="ts" x="276" y="158">nine typed facades</text>
           <text class="ts" x="276" y="176">DTOs + request validation</text>
           <text class="ts" x="276" y="194">auth modes · account registry</text>
           <text class="tl" x="276" y="214">hand-written — the stable surface</text>
@@ -206,7 +207,7 @@
         <thead><tr><th>Mode</th><th>Use</th></tr></thead>
         <tbody>
           <tr><td>Client credentials</td><td>The OAuth 2.0 server-to-server path. Tokens are re-minted from a long-lived credential, so there is no static token to refresh — the arrangement described on the <a href="zendesk.html#auth">Zendesk</a> and <a href="salesforce.html#auth">Salesforce</a> pages.</td></tr>
-          <tr><td>Password</td><td>The legacy login that exchanges a username and password for a JWT lasting about an hour.</td></tr>
+          <tr><td>Password</td><td>The legacy login that exchanges a username and password for a JWT lasting about an hour. The library tracks the lifetime the login states and, for configured credentials, logs in again before it runs out.</td></tr>
         </tbody>
       </table>
     </div>
@@ -227,7 +228,7 @@
   <div class="wrap">
     <p class="eyebrow">Other languages</p>
     <h2>Java today; Python and TypeScript scoped, not started</h2>
-    <p>There is no Python, JavaScript or TypeScript client. A scoping note exists and is honest that the work has not begun. What it establishes is that the shape is well understood: each target needs a generated client from the same specification, a thin facade layer reproducing the same eight-facade surface so parity is auditable, and a local cache equivalent to the SQLite store.</p>
+    <p>There is no Python, JavaScript or TypeScript client. A scoping note exists and is honest that the work has not begun. What it establishes is that the shape is well understood: each target needs a generated client from the same specification, a thin facade layer reproducing the same nine-facade surface so parity is auditable, and a local cache equivalent to the SQLite store.</p>
     <p>No new code-generation infrastructure is required — the same generator already supports Python and TypeScript targets — so the cost is the facade layer and the tests, not the plumbing. Python is the stated first choice, driven by a real integration need rather than by demo convenience.</p>
     <div class="note">If you are building on a non-JVM stack today, you are writing against the REST API directly. The <a href="fin-intercom.html#taxonomy">submit-outcome taxonomy</a> and the polling-cursor guidance elsewhere on this hub are the parts worth copying, because they are the parts that are easy to get subtly wrong.</div>
   </div>

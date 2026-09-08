@@ -38,8 +38,13 @@ a{color:inherit;text-decoration:none}
 /* ---- nav ----
    White header matching tsanet.org: the wordmark carries the brand colour, the
    links are petrol, and hover/current draw the orange 2px rule underneath —
-   the same mechanism tsanet.org uses (border-bottom transparent -> --orange). */
-nav{position:sticky;top:0;z-index:50;background:var(--panel);border-bottom:1px solid var(--line)}
+   the same mechanism tsanet.org uses (border-bottom transparent -> --orange).
+
+   Scoped to `body > nav`, never a bare `nav`. The footer's section list is also
+   a <nav> (.foot-nav), so a bare selector paints it — and sticks it — too. That
+   was invisible while this bar was petrol on a petrol footer, and shipped as a
+   white block behind the footer links the moment it went white. */
+body > nav{position:sticky;top:0;z-index:50;background:var(--panel);border-bottom:1px solid var(--line)}
 .nav-in{display:flex;align-items:center;gap:28px;height:76px}
 .brand{display:flex;align-items:center;flex:none}
 .brand-img{height:48px;width:auto;display:block}

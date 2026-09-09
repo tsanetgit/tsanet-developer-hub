@@ -47,7 +47,7 @@
     <p class="lede">One shared TSANet-facing core with thin per-platform adapters, for members whose platform has no native connector. This is the machinery behind <a href="fin-intercom.html">Fin&nbsp;/&nbsp;Intercom</a> and the gateway-class connectors that follow it — and the contract a member or platform vendor builds against to write an adapter of their own.</p>
     <div class="meta-row">
       <span><b>Status</b> <span class="pill warn">Work in progress</span></span>
-      <span><b>Certification pin</b> v0.1.2</span>
+      <span><b>Latest release</b> v1.0.0</span>
       <span><b>First adapter</b> Fin / Intercom (early access)</span>
       <span><b>Class</b> Gateway</span>
     </div>
@@ -69,7 +69,8 @@
     <h2>What it is, and how far along</h2>
     <p>Members on Salesforce, Dynamics and Zendesk install a connector into their own tenant. Members on platforms that will not host member code — Intercom today; Pylon, DevRev and the like are the obvious candidates — need the integration to run somewhere else. The Connect Gateway is that somewhere: a TSANet-facing engine that owns everything on the Connect side, embedded by a thin adapter that owns everything on the platform side. Why a platform lands in this class at all is a property of the platform, not a choice — the <a href="../topics/connector-classes.html">connector classes topic</a> has the procedure.</p>
     <p>The engine was not designed on paper. It was built and verified end to end inside the Fin&nbsp;/&nbsp;Intercom connector first, and extraction into its own repository deliberately waited until a second platform committed — so the module boundary was fixed by two real consumers rather than one and a guess. The Fin connector now consumes the published engine artifact like any other adapter.</p>
-    <p><strong>Where it stands:</strong> the contract, the engine, the conformance harness and the worked example are real, published, and pinned at <code>v0.1.2</code> — a tag cut only after the engine suite ran green including a live contract run against Beta. Around that pinned core, plenty is still moving; the <a href="#moving">last section</a> is honest about what.</p>
+    <p><strong>Where it stands:</strong> the contract, the engine, the conformance harness and the worked example are real and published. The current release is <strong>v1.0.0</strong> (2026-08-28), which moved the whole reactor onto <strong>Spring Boot 4.1.1 and Jackson 3</strong> and took <a href="connect-sdk.html">connect-library</a> 1.0.0 with it; all four modules — <code>connector-core</code>, <code>conformance</code>, <code>gateway-engine</code> and the parent — publish at <code>1.0.0</code>. It is a runtime change and nothing else: the <code>TsanetGateway</code> contract and the conformance suite are unchanged, and the engine's exception-mapping path is verbatim. Since the release, main has taken <code>connect-library</code> <strong>2.0.0</strong> (2026-09-08) — classifying a failed login and moving that login outside the operation's wall-clock budget — which is not in a tagged release yet. Around that core, plenty is still moving; the <a href="#moving">last section</a> is honest about what.</p>
+    <div class="note"><strong>The pin label has not caught up with the artifacts.</strong> <code>v0.1.2</code> was cut only after the engine suite ran green <em>including</em> a live contract run against Beta (9/9), and the repository still calls it <em>the certification pin</em> — the README and the adapter-author onboarding reference both still send authors to <code>0.1.2</code>. But the <code>v1.0.0</code> commit touched only poms and engine code; no document moved with it, and its verification ran both profiles green at the pre-migration test counts with the live Beta run among the nine environment-gated tests <em>skipped</em>. So the certified behaviour is still <code>v0.1.2</code>'s, carried forward unchanged by a release that did not touch the contract — while the artifacts you actually resolve are <code>1.0.0</code>. Consume <code>1.0.0</code>, and read the repository's pin language as lagging rather than as a second opinion about which version to take.</div>
     <div class="note">The repository (<code>tsanetgit/Connect_Gateway</code>) is currently private. Adapter authors get access at onboarding, along with the published artifacts and a self-contained authoring kit — <a href="../community/index.html">start with membership</a> if that is you.</div>
   </div>
 </section>
@@ -226,18 +227,18 @@
     <div class="grid g2">
       <div class="mod"><h4>connector-core</h4><p>The <code>TsanetGateway</code> contract, its DTOs and its two exception types. Zero dependencies, compile-scope — your adapter's own code is written against it.</p></div>
       <div class="mod"><h4>gateway-engine</h4><p>The TSANet-facing engine an adapter embeds: the contract implementation over the Connect API, the per-member session registry, and a Spring configuration the embedding service imports. Configuration under <code>gateway.tsanet.*</code>.</p></div>
-      <div class="mod"><h4>conformance</h4><p>The harness an adapter author runs to prove their adapter survives Connect's failure modes, plus the live certification suite the pin itself is cut against.</p></div>
+      <div class="mod"><h4>conformance</h4><p>The harness an adapter author runs to prove their adapter survives Connect's failure modes, plus the live certification suite the certification pin was cut against.</p></div>
       <div class="mod"><h4>example-adapter &amp; example-service</h4><p>A complete runnable worked example: adapter over the contract, in-memory platform, conformance suite green, and a bootable service embedding the real engine. Fake mode runs the whole story with zero credentials.</p></div>
     </div>
-    <p style="margin-top:16px">There is also a TSANet-internal admin console (read and validate, not operate) over a versioned admin contract every adapter exposes. All published modules ship from the repository's package registry at the version matching the certification pin.</p>
+    <p style="margin-top:16px">There is also a TSANet-internal admin console (read and validate, not operate) over a versioned admin contract every adapter exposes. All four modules ship from the repository's package registry at the release version — <code>1.0.0</code> since 2026-08-28, alongside the older <code>0.1.2</code>.</p>
   </div>
 </section>
 
 <section id="contract">
   <div class="wrap">
     <p class="eyebrow">Contract</p>
-    <h2>Eight methods, and an error model that does the hard part for you</h2>
-    <p>The surface is deliberately small. Outbound: <code>searchPartners</code>, <code>form</code> (fetched fresh per submission, never cached), <code>submit</code>, and <code>findSubmission</code> for reconciling by your own case number. Inbound: <code>fetchByToken</code> and <code>listInboundUpdatedSince</code> for the poll behind the push. Files: <code>forwardAttachments</code> outbound, and an <code>AttachmentDeliveryHandler</code> seam for inbound delivery.</p>
+    <h2>Eleven methods, and an error model that does the hard part for you</h2>
+    <p>The surface is deliberately small. Outbound: <code>searchPartners</code>, <code>form</code> (fetched fresh per submission, never cached), <code>submit</code>, and <code>findSubmission</code> for reconciling by your own case number. Inbound: <code>fetchByToken</code> and <code>listInboundUpdatedSince</code> for the poll behind the push, plus the three response actions an adapter calls when its own user answers — <code>approve</code>, <code>reject</code> and <code>requestInformation</code>, each taking the request token and the responding engineer's identity. Files: <code>forwardAttachments</code> outbound, and an <code>AttachmentDeliveryHandler</code> seam for inbound delivery. One more, <code>healthy</code>, for readiness.</p>
     <p>The centre of the design is the exception model. <a href="../api/index.html#cases">Submitting a collaboration case is not idempotent and there is no idempotency key</a> — a submit that fails may still have created a case at your partner, and a blind retry pages a second real engineer. So the contract splits every failure into exactly two kinds:</p>
     <div class="twrap">
       <table>
@@ -408,8 +409,9 @@ catch (<span class="good-v">GatewayException</span> rejected)        { surfaceTo
       <table>
         <thead><tr><th>Area</th><th>State</th></tr></thead>
         <tbody>
-          <tr><td>The contract, its exception model, the conformance checks</td><td><span class="pill ok">settled</span> — pinned at v0.1.2, certified against a live Beta run</td></tr>
-          <tr><td>The engine and the worked example</td><td><span class="pill ok">settled</span> — published artifacts; the Fin connector consumes them like any other adapter</td></tr>
+          <tr><td>The contract, its exception model, the conformance checks</td><td><span class="pill ok">settled</span> — unchanged through v1.0.0; certified against a live Beta run at v0.1.2, whose sources they carry forward</td></tr>
+          <tr><td>The engine and the worked example</td><td><span class="pill ok">settled</span> — published artifacts at <code>1.0.0</code>; the Fin connector consumes them like any other adapter</td></tr>
+          <tr><td>The runtime line</td><td><span class="pill warn">moving</span> — v1.0.0 took Spring Boot 4.1.1 and Jackson 3; main has since taken <code>connect-library</code> 2.0.0, untagged</td></tr>
           <tr><td>Adapters in production</td><td><span class="pill warn">one</span> — Fin / Intercom, in early access; patterns have not yet been stress-tested by a second shipped adapter</td></tr>
           <tr><td>Cross-integration conventions</td><td><span class="pill warn">converging</span> — the authoring kit keeps an explicit "not settled" list; those questions go to TSANet rather than being answered locally</td></tr>
           <tr><td>Attachment hosting</td><td><span class="pill warn">deciding</span> — self-service credential intake is the target state, not the day-one state, and whether TSANet ever offers production file storage is an open business decision</td></tr>
@@ -418,7 +420,7 @@ catch (<span class="good-v">GatewayException</span> rejected)        { surfaceTo
       </table>
     </div>
     <p>This page is deliberately ahead of the estate it describes — that is what the work-in-progress marker means. Expect it to change as the second and third adapters land, and read the <a href="fin-intercom.html">Fin&nbsp;/&nbsp;Intercom page</a> for what operating the first one actually looks like.</p>
-    <p class="gotcha" style="border-left-color:var(--blue)">Verified against <code>tsanetgit/Connect_Gateway</code> at the <code>v0.1.2</code> certification pin and main (2026-08-14): the repository README, the gateway decision log, the conformance harness documentation, both adapter-authoring kits, the wiki's lessons-learned log (2026-08-13), and the as-built architecture reference (2026-08-13).</p>
+    <p class="gotcha" style="border-left-color:var(--blue)">Verified against <code>tsanetgit/Connect_Gateway</code> at the <code>v1.0.0</code> release and main (2026-09-08): the release notes, the published package versions on GitHub Packages, the module poms, the repository README, the gateway decision log, the conformance harness documentation, both adapter-authoring kits, the wiki's lessons-learned log (2026-08-13), and the as-built architecture reference (2026-08-13). The pin-label drift noted <a href="#what">above</a> was confirmed by diffing the <code>v1.0.0</code> commit, which touches no document.</p>
   </div>
 </section>
 

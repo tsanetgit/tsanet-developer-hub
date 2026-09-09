@@ -8,7 +8,7 @@ No build step, no framework, no dependencies. Plain HTML and CSS, deployable as-
 
 ## Where this lives
 
-Public at `tsanetgit/tsanet-developer-hub`, with the site served by GitHub Pages at <https://tsanetgit.github.io/tsanet-developer-hub/>. The repo was transferred there from `shawn-tsanet` on 2026-08-21 as a whole-repo ownership transfer, which carried history, Discussions (all seven categories and the threads in them), and settings across intact. GitHub Discussions is enabled and linked throughout the site's Community section.
+Public at `tsanetgit/tsanet-developer-hub`, with the site served by GitHub Pages at <https://developer.tsanet.org/> (the `tsanetgit.github.io/tsanet-developer-hub/` URL redirects there). The repo was transferred there from `shawn-tsanet` on 2026-08-21 as a whole-repo ownership transfer, which carried history, Discussions (all seven categories and the threads in them), and settings across intact. GitHub Discussions is enabled and linked throughout the site's Community section.
 
 Two consequences of the transfer worth knowing:
 
@@ -112,11 +112,13 @@ Visual inspection is not sufficient — this check found four defects on pages t
 
 ## Deploying
 
-Live: Pages deploys from `main` / root on every push — no action needed beyond pushing. The repo location is now settled, so the custom domain is the next step: point `developer.tsanet.org` at `tsanetgit.github.io` in DNS and set it as the custom domain in Pages settings. Changing Pages settings needs repo admin, which in the `tsanetgit` org means an org owner (or an explicit admin grant on this repo).
+Live: Pages deploys from `main` / root on every push — no action needed beyond pushing.
+
+**Custom domain.** `developer.tsanet.org` is set by the `CNAME` file in the repo root — Pages reads it on every branch build, so keep that file and do not add a second line to it. DNS is a Cloudflare record in the `tsanet.org` zone: `developer` → `CNAME tsanetgit.github.io`, **DNS-only (grey cloud, not proxied)** so GitHub can verify the domain and issue its certificate. That record overrides the zone's `*.tsanet.org` wildcard, which points every unclaimed subdomain at the Connect web app. *Enforce HTTPS* is a Pages setting that needs repo admin (in the `tsanetgit` org, an org owner or an explicit admin grant).
 
 ## Open items
 
-- **Custom domain** — `developer.tsanet.org` is not yet set on Pages (see *Deploying*). Until it is, the canonical URL is `tsanetgit.github.io/tsanet-developer-hub`.
+- **Enforce HTTPS on the custom domain** — tick it in Pages settings once GitHub has issued the certificate for `developer.tsanet.org` (repo admin).
 - **v1 → v2 migration** is now published: the API page's *Deprecation clocks* section carries the per-connector table, and the SDK page notes its own split posture (reads on `/v2/collaboration-requests/list`, webhook management on deprecated `/v1/webhooks` — verified against SDK source and its generated client). Dynamics has since been probed against `MS_Power_App` release v2.13.0.1: it registers on v2 with prefixed types (creation and note events only; responses and closures ride the poll), and its endpoint never matches type strings, so it cannot hit the no-op trap. Still open: the Zendesk CloudEvents migration has not shipped yet.
 - **Dynamics user guide** describes the Case form integration as a "Lightning Web Component". That is Salesforce terminology; the solution ships an HTML web resource. The hub notes the discrepancy; the source doc is still wrong.
 - **API reference drift** — the GitBook reference shows `description` as a query parameter on the attachment forward call; the spec has it as a required multipart form field (re-verified against `openapi.yaml`). The hub now flags it in the API page's attachments section; the GitBook reference itself is still wrong.

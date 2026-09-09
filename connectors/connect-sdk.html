@@ -44,8 +44,8 @@
     <h1>Connect SDK</h1>
     <p class="lede">A Java client for the TSANet Connect API, generated from the API's own OpenAPI specification and wrapped in nine typed facades — plus a console app, an attachment receiver and a web demo that show it working end to end. If you are building a custom integration on the JVM, this is the shortest path that is not hand-rolled HTTP.</p>
     <div class="meta-row">
-      <span><b>Version</b> v1.0.0 · <a href="https://github.com/tsanetgit/Connect_SDK/releases/latest">latest release</a></span>
-      <span><b>Released</b> 2026-08-28</span>
+      <span><b>Version</b> v2.0.0 · <a href="https://github.com/tsanetgit/Connect_SDK/releases/latest">latest release</a></span>
+      <span><b>Released</b> 2026-09-08</span>
       <span><b>Runtime</b> Java 21 · Spring Boot 4.1 · Jackson 3</span>
       <span><b>Repo</b> tsanetgit/Connect_SDK</span>
     </div>
@@ -70,8 +70,8 @@
     <h2>What it is, and what it is not yet</h2>
     <div class="status-band">
       <h3>Read the version number before you plan around it</h3>
-      <p>This is <strong>v1.0.0</strong>, released 2026-08-28 — the third release in as many weeks after v0.1.0 (2026-08-11) and v0.2.0 (2026-08-27). The major version marks a runtime change, not an API freeze: 1.0.0 moves the library from Spring Boot 3.3, now past its supported life, to <strong>Spring Boot 4.1 and Jackson 3</strong>. The facade signatures did not change across that upgrade, and the two TSANet-built consumers — the <a href="connect-gateway.html">Connect Gateway</a> and the <a href="fin-intercom.html">Fin / Intercom</a> connector — compiled and ran their suites against the release before it was cut. The repository still describes itself as a demonstration, and the pre-0.1.0 create signatures that silently made test cases remain as deprecated defaults awaiting removal.</p>
-      <p style="margin-top:12px">Treat it as the reference implementation of how to talk to the Connect API correctly, and as a dependency you pin rather than float. If your service is still on Jackson 2, stay on 0.2.0 until you are not.</p>
+      <p>This is <strong>v2.0.0</strong>, released 2026-09-08 — the fourth release in a month, after v0.1.0 (2026-08-11), v0.2.0 (2026-08-27) and v1.0.0 (2026-08-28). The 1.0.0 major marked a runtime change (Spring Boot 3.3, past its supported life, to <strong>Spring Boot 4.1 and Jackson 3</strong>); this one marks a contract change on the same runtime. Every failure the API answers now arrives as one typed, value-free exception instead of Spring's; every login is validated against <code>/v1/me</code> and configured credentials renew in both modes; the V2 direct-delivery attachment client ships against a draft contract; and the pre-0.1.0 create signatures that silently made test cases, deprecated since 0.1.0, are gone. Of the two TSANet-built consumers, the <a href="connect-gateway.html">Connect Gateway</a> classifies errors on Spring's exception types and needs a migration before it takes 2.0.0 (<code>tsanetgit/Connect_Gateway#37</code>); it stays on 1.0.0, which remains published, until then. The <a href="fin-intercom.html">Fin / Intercom</a> connector consumes the gateway engine and follows it. The repository still describes itself as a demonstration.</p>
+      <p style="margin-top:12px">Treat it as the reference implementation of how to talk to the Connect API correctly, and as a dependency you pin rather than float. If your service is still on Jackson 2, stay on 0.2.0 until you are not. If your code catches Spring's <code>HttpClientErrorException</code> or <code>RestClientResponseException</code> around library calls, read the 2.0.0 upgrade note before bumping: those catches compile unchanged and stop matching.</p>
     </div>
     <p style="margin-top:22px">The value is not that it saves you HTTP calls — it is that the Connect API has a number of behaviours that are easy to get wrong on a first integration, and the client encodes the right answers. Request shapes are validated before they go out, the process-form field types are modelled rather than guessed at, both authentication modes are handled behind one session object, and webhook payloads and attachment configuration have types instead of being maps of strings.</p>
   </div>
@@ -180,14 +180,14 @@
     <p>This is the most important practical thing on the page, because the obvious approach does not work for most people.</p>
 
     <h3>The path that works: consume the published library</h3>
-    <p><code>connect-library</code> is published to GitHub Packages as a <strong>public</strong> package, so you can depend on it without building anything:</p>
+    <p><code>connect-library</code> is published to GitHub Packages as a <strong>public</strong> package, so you can depend on it without building anything. From 2.0.0 the <code>attachment-receiver</code> module (the storage SPI and its four cloud adapters, a plain library with no main class) is published alongside it at the same version:</p>
     <pre><code><span class="c">&lt;!-- com.tsanet:connect-library — check the latest release for the current version --&gt;</span>
 &lt;<span class="k">dependency</span>&gt;
   &lt;<span class="k">groupId</span>&gt;com.tsanet&lt;/<span class="k">groupId</span>&gt;
   &lt;<span class="k">artifactId</span>&gt;connect-library&lt;/<span class="k">artifactId</span>&gt;
-  &lt;<span class="k">version</span>&gt;1.0.0&lt;/<span class="k">version</span>&gt;
+  &lt;<span class="k">version</span>&gt;2.0.0&lt;/<span class="k">version</span>&gt;
 &lt;/<span class="k">dependency</span>&gt;</code></pre>
-    <p>Three versions are published: 0.1.0, 0.2.0 and 1.0.0. <strong>1.0.0 requires Jackson 3</strong> (<code>tools.jackson.core</code>) and is built on the Spring Boot 4.1 line; a service still on Jackson 2 should take 0.2.0, which is the same facade surface with the older runtime. Two upgrade traps worth knowing: Jackson 3's parse exceptions are unchecked, so a <code>catch (IOException)</code> around a mapper call compiles and silently stops catching malformed JSON; and Jackson 3 rejects a missing primitive by default where Jackson 2 zero-filled it. The library's own cache reader keeps the old behaviour; your mappers inherit the new one unless you say otherwise.</p>
+    <p>Four versions are published: 0.1.0, 0.2.0, 1.0.0 and 2.0.0. <strong>1.0.0 and later require Jackson 3</strong> (<code>tools.jackson.core</code>) and are built on the Spring Boot 4.1 line; a service still on Jackson 2 should take 0.2.0, which is the same facade surface with the older runtime. <strong>2.0.0 changes what a failure looks like</strong> (<code>ConnectApiException</code> in place of Spring's exceptions) and removes the always-test create signatures; the upgrade note in the repository's consumption reference lists the sweep to do before bumping. Two upgrade traps worth knowing: Jackson 3's parse exceptions are unchecked, so a <code>catch (IOException)</code> around a mapper call compiles and silently stops catching malformed JSON; and Jackson 3 rejects a missing primitive by default where Jackson 2 zero-filled it. The library's own cache reader keeps the old behaviour; your mappers inherit the new one unless you say otherwise.</p>
     <p>One wrinkle that catches everyone: <strong>GitHub Packages requires authentication for Maven even on public packages.</strong> You need a token with <code>read:packages</code> in your <code>settings.xml</code> against the <code>github</code> server, or the resolve fails in a way that looks like the artifact does not exist.</p>
 
     <h3>The path that does not work from outside TSANet: build from source</h3>

@@ -57,14 +57,14 @@
       <span><b>Beta</b> connect2.tsanet.net</span>
     </div>
     <div class="toc">
-      <a href="#reference">Endpoint reference</a>
-      <a href="#errors">Error modes</a>
+      <a href="#reference">Endpoint Reference</a>
+      <a href="#errors">Error Modes</a>
       <a href="#auth">Authentication</a>
-      <a href="#partners">Partners &amp; forms</a>
-      <a href="#cases">Collaboration requests</a>
-      <a href="#content">Notes &amp; attachments</a>
+      <a href="#partners">Partners &amp; Forms</a>
+      <a href="#cases">Collaboration Requests</a>
+      <a href="#content">Notes &amp; Attachments</a>
       <a href="#webhooks">Webhooks</a>
-      <a href="#versions">Deprecation clocks</a>
+      <a href="#versions">Deprecation Clocks</a>
     </div>
   </div>
 </header>
@@ -88,7 +88,7 @@
 <section id="errors">
   <div class="wrap">
     <p class="eyebrow">Error modes</p>
-    <h2>The one header that changes how every failure reaches you</h2>
+    <h2>The One Header That Changes How Every Failure Reaches You</h2>
     <p>If you read nothing else here, read this. By default, most business-rule, validation and authorization rejections come back as <strong>HTTP 500</strong> with a <code>{"message": "..."}</code> body. Not 400, not 422 — 500. An integration written against the defaults cannot distinguish "you sent a bad email domain" from "the platform is broken", and will retry things it should not.</p>
     <p>This is deliberate and permanent, locked in for backward compatibility with clients built before the alternative existed. The fix is one header:</p>
     <pre><code>Accept: application/json, application/problem+json</code></pre>
@@ -139,7 +139,7 @@
 <section id="auth">
   <div class="wrap">
     <p class="eyebrow">Authentication</p>
-    <h2>Two schemes, one of them legacy</h2>
+    <h2>Two Schemes, One of Them Legacy</h2>
     <div class="twrap">
       <table>
         <thead><tr><th>Scheme</th><th>Lifetime</th><th>Notes</th></tr></thead>
@@ -174,7 +174,7 @@
 <section id="partners">
   <div class="wrap">
     <p class="eyebrow">Partners &amp; forms</p>
-    <h2>The process form is not static, and neither are its field types</h2>
+    <h2>The Process Form Is Not Static, and Neither Are Its Field Types</h2>
     <div class="gotcha">
       <h4>Fetch the form fresh, every time</h4>
       <p>Partners change their own forms. The <code>documentId</code> you must submit with a case comes from that fetch, so a cached form means a stale <code>documentId</code> and a rejected submission. Cache it for the duration of one submission flow, never longer.</p>
@@ -195,7 +195,7 @@
 <section id="cases">
   <div class="wrap">
     <p class="eyebrow">Collaboration requests</p>
-    <h2>The lifecycle, and the four rules that catch people</h2>
+    <h2>The Lifecycle, and the Four Rules That Catch People</h2>
     <div class="gotcha">
       <h4>What you send is not what you read back</h4>
       <p>The write model and the read model use <strong>different names for the same fields</strong>. You POST <code>problemSummary</code> and <code>problemDescription</code>; you GET <code>summary</code> and <code>description</code>. Your own case number goes out as <code>internalCaseNumber</code> and comes back as <code>submitterCaseNumber</code> or <code>receiverCaseNumber</code> depending on which side you are. Contact details go out under <code>submitterContactDetails</code> and come back flattened onto the case.</p>
@@ -242,7 +242,7 @@
 <section id="content">
   <div class="wrap">
     <p class="eyebrow">Notes &amp; attachments</p>
-    <h2>Two fields, rendered twice</h2>
+    <h2>Two Fields, Rendered Twice</h2>
     <div class="gotcha">
       <h4>Never copy <code>summary</code> into <code>description</code></h4>
       <p><code>summary</code> is required and capped at 500 characters; <code>description</code> is optional and capped at 5,000. The web UI renders both as separate labelled sections, so posting identical values displays the text twice. It looks like a duplication bug and it is intentional rendering. Present two fields — Subject and Details — and send <code>description</code> only when it has content.</p>
@@ -269,7 +269,7 @@
 <section id="webhooks">
   <div class="wrap">
     <p class="eyebrow">Webhooks</p>
-    <h2>Two versions that both accept your subscription</h2>
+    <h2>Two Versions That Both Accept Your Subscription</h2>
     <div class="note" style="border-left-color:var(--red)"><strong>This is the trap that fails silently.</strong> Both <code>/v1/webhooks</code> and <code>/v2/webhooks</code> accept a subscription. They deliver different event type strings — v1 sends bare names like <code>collaboration-request.created</code>, v2 sends CloudEvents with <code>org.tsanet.connect.</code> prefixes. A consumer written for one and subscribed to the other returns 200 to every delivery and does nothing at all, with no error anywhere to find.</div>
     <div class="twrap">
       <table>
@@ -318,7 +318,7 @@ org.tsanet.connect.collaboration-request.note.created</code></pre>
 <section id="versions">
   <div class="wrap">
     <p class="eyebrow">Deprecation clocks</p>
-    <h2>What is on a timer</h2>
+    <h2>What Is on a Timer</h2>
     <p>Three paths carry <code>deprecated: true</code> and an explicit <code>x-sunset</code> in the specification. If you are starting now, start on the successors.</p>
     <div class="twrap">
       <table>

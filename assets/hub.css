@@ -189,6 +189,7 @@ footer a:hover{text-decoration:underline}
 .hub-asst-launch:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
 .hub-asst-launch svg{color:var(--orange)}
 .hub-asst-panel{position:fixed;right:22px;bottom:80px;z-index:61;width:min(420px,calc(100vw - 44px));height:min(620px,calc(100vh - 110px));display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:0 18px 48px rgba(9,61,86,.22);overflow:hidden;opacity:1;transform:none}
+.hub-asst-panel[hidden]{display:none}
 .hub-asst-panel.in{animation:hub-asst-in .18s ease-out}
 @keyframes hub-asst-in{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
 .hub-asst-head{display:flex;align-items:center;gap:12px;padding:12px 12px 12px 16px;border-bottom:1px solid var(--line);background:var(--wash)}

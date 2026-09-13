@@ -26,7 +26,8 @@ assets/
   *.png                 Brand assets, generated from the TSANet Logo Suite
                         (2026 identity; the suite itself stays untracked)
 connectors/index.html   Section landing: routing table + comparison matrix
-connectors/*.html       One page per platform, plus the SDK and the Connect Gateway
+connectors/*.html       One page per platform, plus the SDK, the Connect Gateway,
+                        and two assessments (ServiceNow, Copilot Studio)
 api/index.html          Behaviour and pitfalls; deliberately NOT an endpoint reference
 docs/index.html         Design-document library index + authoring conventions
 docs/tsanet-2026-*.html Numbered design documents
@@ -119,4 +120,5 @@ Live: Pages deploys from `main` / root on every push — no action needed beyond
 - **Custom domain** — `developer.tsanet.org` is not yet set on Pages (see *Deploying*). Until it is, the canonical URL is `tsanetgit.github.io/tsanet-developer-hub`.
 - **v1 → v2 migration** is now published: the API page's *Deprecation clocks* section carries the per-connector table, and the SDK page notes its own split posture (reads on `/v2/collaboration-requests/list`, webhook management on deprecated `/v1/webhooks` — verified against SDK source and its generated client). Dynamics has since been probed against `MS_Power_App` release v2.13.0.1: it registers on v2 with prefixed types (creation and note events only; responses and closures ride the poll), and its endpoint never matches type strings, so it cannot hit the no-op trap. Still open: the Zendesk CloudEvents migration has not shipped yet.
 - **Dynamics user guide** describes the Case form integration as a "Lightning Web Component". That is Salesforce terminology; the solution ships an HTML web resource. The hub notes the discrepancy; the source doc is still wrong.
+- **Copilot Studio assessment** (`connectors/copilot-studio.html`) is documented-only, against Microsoft Learn pages dated in the page's *Verified against* table. Microsoft's model tables change monthly; re-read them before citing the page. Claude Haiku is not offered in Copilot Studio — the page is written around Claude Sonnet 4.6 / Sonnet 5.
 - **API reference drift** — the GitBook reference shows `description` as a query parameter on the attachment forward call; the spec has it as a required multipart form field (re-verified against `openapi.yaml`). The hub now flags it in the API page's attachments section; the GitBook reference itself is still wrong.

@@ -26,14 +26,15 @@ assets/
   *.png                 Brand assets, generated from the TSANet Logo Suite
                         (2026 identity; the suite itself stays untracked)
 connectors/index.html   Section landing: routing table + comparison matrix
-connectors/*.html       One page per platform, plus the SDK, the Connect Gateway,
-                        and two assessments (ServiceNow, Copilot Studio)
+connectors/*.html       One page per platform, plus the SDK and the Connect Gateway
 api/index.html          Behaviour and pitfalls; deliberately NOT an endpoint reference
 docs/index.html         Design-document library index + authoring conventions
 docs/tsanet-2026-*.html Numbered design documents
 docs/tsanet-design-doc-template.html   Copy this to start a new document
 topics/index.html       Section landing
-topics/*.html           Cross-connector write-ups
+topics/*.html           Cross-connector write-ups, including agentic-usage.html
+                        (skills, the hub assistant, provider comparison, Copilot Studio)
+assets/assistant.js     The hub assistant launcher — inert until embedUrl is set
 community/index.html    Where to take what: issue trackers, membership, discussions
 scripts/check.sh        Static checks — run before every commit
 ```
@@ -120,5 +121,6 @@ Live: Pages deploys from `main` / root on every push — no action needed beyond
 - **Custom domain** — `developer.tsanet.org` is not yet set on Pages (see *Deploying*). Until it is, the canonical URL is `tsanetgit.github.io/tsanet-developer-hub`.
 - **v1 → v2 migration** is now published: the API page's *Deprecation clocks* section carries the per-connector table, and the SDK page notes its own split posture (reads on `/v2/collaboration-requests/list`, webhook management on deprecated `/v1/webhooks` — verified against SDK source and its generated client). Dynamics has since been probed against `MS_Power_App` release v2.13.0.1: it registers on v2 with prefixed types (creation and note events only; responses and closures ride the poll), and its endpoint never matches type strings, so it cannot hit the no-op trap. Still open: the Zendesk CloudEvents migration has not shipped yet.
 - **Dynamics user guide** describes the Case form integration as a "Lightning Web Component". That is Salesforce terminology; the solution ships an HTML web resource. The hub notes the discrepancy; the source doc is still wrong.
-- **Copilot Studio assessment** (`connectors/copilot-studio.html`) is documented-only, against Microsoft Learn pages dated in the page's *Verified against* table. Microsoft's model tables change monthly; re-read them before citing the page. Claude Haiku is not offered in Copilot Studio — the page is written around Claude Sonnet 4.6 / Sonnet 5.
+- **Hub assistant** — the launcher (`assets/assistant.js`, styles at the end of `hub.css`) is shipped but inert: it renders nothing until `embedUrl` holds the Copilot Studio custom-website iframe URL. The agent has to be created in TSANet's Microsoft tenant; the recipe is on `topics/agentic-usage.html#assistant`. Bump the script's `?v=` when you set the URL.
+- **Copilot Studio assessment** (in `topics/agentic-usage.html`) is documented-only, against Microsoft Learn pages dated in the page's *Verified against* table. Microsoft's model tables change monthly; re-read them before citing the page. Claude Haiku is not offered in Copilot Studio — the page is written around Claude Sonnet 4.6 / Sonnet 5.
 - **API reference drift** — the GitBook reference shows `description` as a query parameter on the attachment forward call; the spec has it as a required multipart form field (re-verified against `openapi.yaml`). The hub now flags it in the API page's attachments section; the GitBook reference itself is still wrong.

@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agentic usage with TSANet Connect — TSANet Connect Developer Hub</title>
+<link rel="icon" href="../assets/tsanet-favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/hub.css?v=20260913">
+<style>
+  pre{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--ink);margin:16px 0}
+  pre code{background:none;padding:0;font-size:inherit}
+  .c{color:var(--mute)}
+  .status-band{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--orange);border-radius:12px;padding:24px 26px;margin-top:26px}
+  .status-band h2{font-size:20px;margin-bottom:10px}
+  .status-band p{max-width:76ch}
+  .status-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:18px}
+  .status-item{border:1px solid var(--line);border-radius:9px;padding:13px 15px;background:var(--paper)}
+  .status-item b{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--slate);margin-bottom:5px}
+  .status-item span{font-size:13.5px;color:var(--ink)}
+  .tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;border-radius:4px;padding:2px 6px;white-space:nowrap;margin-left:4px;display:inline-block;vertical-align:1px}
+  .tag.doc{color:var(--deep);background:rgba(0,91,130,.07);border:1px solid rgba(0,91,130,.22)}
+  .tag.ship{color:var(--green);background:rgba(31,157,107,.08);border:1px solid rgba(31,157,107,.28)}
+  .tag.probe{color:var(--orange);background:rgba(204,78,11,.08);border:1px solid rgba(204,78,11,.3)}
+  .tag.comm{color:var(--slate);background:var(--wash);border:1px solid var(--line)}
+  .legend-key{display:flex;gap:20px;flex-wrap:wrap;margin:18px 0 0;font-size:13px;color:var(--slate)}
+  .route{display:grid;grid-template-columns:2.6rem 1fr;gap:0;border:1px solid var(--line);border-radius:13px;background:var(--panel);overflow:hidden;margin-top:18px}
+  .route > div{padding:16px 18px;border-bottom:1px solid var(--line)}
+  .route > div:nth-last-child(-n+2){border-bottom:none}
+  .route .k{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--deep);background:var(--wash);text-align:center}
+  .route h3{font-size:16px;margin:0 0 8px}
+  .route p{font-size:13.5px;color:var(--slate);margin:0 0 8px;max-width:none}
+  .route p:last-child{margin-bottom:0}
+  .steps{list-style:none;counter-reset:s;display:grid;gap:14px;margin-top:16px}
+  .steps li{counter-increment:s;position:relative;padding-left:44px;font-size:14px;color:var(--slate);line-height:1.6}
+  .steps li::before{content:counter(s);position:absolute;left:0;top:1px;width:28px;height:28px;border-radius:50%;background:var(--blue);color:#fff;font-family:var(--mono);font-size:12px;font-weight:700;display:grid;place-items:center}
+  .steps li b{color:var(--ink)}
+  h3.sub{font-size:18px;margin:34px 0 10px}
+  .src td:first-child{white-space:nowrap}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-in">
+    <a class="brand" href="../index.html"><img class="brand-img" src="../assets/tsanet-devhub-horizontal.png" alt="TSANet Developer Hub"></a>
+    <div class="nav-links">
+      <a href="../connectors/index.html">Connectors</a>
+      <a href="../api/index.html">API</a>
+      <a href="../docs/index.html">Design Docs</a>
+      <a href="index.html" aria-current="page">Topics</a>
+      <a href="../community/index.html">Community</a>
+    </div>
+  </div>
+</nav>
+
+<header class="pagehead">
+  <div class="wrap">
+    <div class="crumb"><a href="../index.html">Hub</a> / <a href="index.html">Topics</a> / Agentic usage</div>
+    <h1>Agentic Usage with TSANet Connect</h1>
+    <p class="lede">Working on Connect with an AI agent rather than by hand — whichever provider's agent it is. The skills TSANet ships and how to load them into any assistant, the assistant embedded in this hub, what every provider's agent framework needs from the Connect API and where each one falls short, and a platform assessment of Microsoft Copilot Studio as one hosted way to build such an agent.</p>
+    <div class="meta-row">
+      <span><b>Shipped</b> Four agent skills · the hub assistant launcher</span>
+      <span><b>Assessed</b> Copilot Studio</span>
+      <span><b>Providers</b> Anthropic · Microsoft · OpenAI · Google</span>
+      <span><b>Updated</b> 2026-09-13</span>
+    </div>
+    <div class="toc">
+      <a href="#status">Where this stands</a>
+      <a href="#skills">Agent skills</a>
+      <a href="#assistant">The hub assistant</a>
+      <a href="#providers">Any provider's agent</a>
+      <a href="#rules">What no model changes</a>
+      <a href="#copilot">Copilot Studio</a>
+      <a href="#open">Open questions</a>
+      <a href="#sources">Verified against</a>
+    </div>
+  </div>
+</header>
+
+<section id="status">
+  <div class="wrap">
+    <div class="status-band">
+      <h2>Read this before you use anything below</h2>
+      <p>This page mixes three kinds of claim, and tags each one. Some of it is <strong>shipped</strong> — the agent skills exist, the connector pages were verified against them, and the hub assistant's launcher is in this site's source. Some of it is <strong>documented, not observed</strong> — read on a vendor's documentation, never watched working against Connect. And some is a <strong>known unknown</strong>. The bar everywhere else on the hub applies here: nothing below describes something as built unless it is.</p>
+      <div class="status-grid">
+        <div class="status-item"><b>Agent skills</b><span>Four shipped, in the connector repositories. Plain markdown; load into any assistant.</span></div>
+        <div class="status-item"><b>Hub assistant</b><span>Launcher and wiring shipped in this site. The Copilot Studio agent behind it is not yet created.</span></div>
+        <div class="status-item"><b>Copilot Studio</b><span>Assessed from Microsoft Learn. No TSANet agent, custom connector or MCP server exists.</span></div>
+        <div class="status-item"><b>MCP server for Connect</b><span>None. Every provider's hosted agent would want one; nobody has written it.</span></div>
+      </div>
+      <div class="legend-key">
+        <span><span class="tag ship">shipped</span> exists in a tsanetgit repository or this site</span>
+        <span><span class="tag doc">documented</span> read in vendor documentation or shipped source</span>
+        <span><span class="tag comm">community</span> reported in a forum, not by the vendor</span>
+        <span><span class="tag probe">needs probe</span> unverified, and known to be unverified</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="wrap">
+    <p class="eyebrow">Shipped</p>
+    <h2>Agent Skills: the Part That Already Exists</h2>
+    <p>An <strong>agent skill</strong> is a folder with a <code>SKILL.md</code> in it — name and description in frontmatter, instructions underneath, optionally reference files and scripts alongside. An assistant reads the description to decide when the skill applies and loads the full instructions only then. Anthropic released the format as an open standard on 18 December 2025; the specification lives at <a href="https://agentskills.io">agentskills.io</a>, and the site lists Claude, OpenAI Codex, Gemini CLI, GitHub Copilot, Cursor and VS Code among the tools that read it. <span class="tag doc">documented</span> That is why the connector pages can say "nothing in it is Claude-specific": the same folder loads into any of them.</p>
+    <p>TSANet ships four. Each was distilled from the production implementation it sits next to, and each connector page on this hub was verified against its skill's repository.</p>
+    <div class="twrap">
+      <table>
+        <thead><tr><th>Skill</th><th>Where</th><th>What it carries</th><th>Get it</th></tr></thead>
+        <tbody>
+          <tr><td>Zendesk connector</td><td><code>SKILL_TSANet_Connect.md</code> in <a href="https://github.com/tsanetgit/Zendesk_App">tsanetgit/Zendesk_App</a></td><td>The two-layer ZAF + ZIS architecture, the OAuth setup and its traps, the custom-field scheme, lifecycle rules, platform gotchas</td><td>Single file; <a href="../connectors/zendesk.html#skill">Zendesk → Build with an assistant</a></td></tr>
+          <tr><td>Connect SDK deployment</td><td><code>skills/connect-sdk-deploy</code> in <a href="https://github.com/tsanetgit/Connect_SDK">tsanetgit/Connect_SDK</a></td><td>Artifact-versus-source, the GitHub Packages token, both credential modes, the demo runbook, symptom-first troubleshooting</td><td>Folder with references; <a href="../connectors/connect-sdk.html#skill">SDK → Build with an assistant</a></td></tr>
+          <tr><td>Fin / Intercom deployment</td><td><code>skills/fin-intercom-deploy</code> in <a href="https://github.com/tsanetgit/Fin-Intercom_App">tsanetgit/Fin-Intercom_App</a></td><td>The adapter's invariants, Intercom workspace setup, the hardened permission profile, TSANet-side provisioning, the environment table</td><td>Folder with references; <a href="../connectors/fin-intercom.html#skill">Fin / Intercom → Build with an assistant</a></td></tr>
+          <tr><td>Gateway adapter author</td><td><code>skills/connect-adapter-author</code> in the Connect Gateway repository</td><td>The build order and rules for a member- or vendor-written adapter, binding semantics, onboarding, go-live, the vendored API spec</td><td>Granted with repository access at onboarding; <a href="../connectors/connect-gateway.html">Gateway page</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3 class="sub">Loading a skill, whichever assistant you use</h3>
+    <div class="cols">
+      <div>
+        <p><strong>Claude Code</strong> reads project skills from <code>.claude/skills/</code>. Copy the whole folder, because the references must ride along with the <code>SKILL.md</code> that cites them:</p>
+        <pre><code>git clone --depth 1 https://github.com/tsanetgit/Connect_SDK.git
+cp -R Connect_SDK/skills/connect-sdk-deploy  your-project/.claude/skills/</code></pre>
+      </div>
+      <div>
+        <p><strong>Any other assistant</strong> that reads the standard puts the same folder in its own skills directory — check the tool's documentation for the path. A tool that does not read skills at all still takes <code>SKILL.md</code> and its references as project instructions or a context attachment. The skill lives in the connector repository and evolves with it, so refresh your copy when you upgrade the connector.</p>
+      </div>
+    </div>
+    <div class="note" style="margin-top:18px"><strong>Two boundaries, whatever the tool.</strong> Client secrets, tokens, tenant ids and webhook signing keys never go into an assistant session — every skill is written against placeholders and never needs a real value. And a skill is distilled guidance, not the source of truth: where it seems to disagree with the repository, the repository is newer, and each connector page says what it was verified against.</div>
+  </div>
+</section>
+
+<section id="assistant">
+  <div class="wrap">
+    <p class="eyebrow">This site</p>
+    <h2>The Hub Assistant</h2>
+    <p>A chat assistant for developers working from these pages: ask it which connector fits a platform, what a status transition needs, why an auth call fails with a given code, and it answers from the hub, the <a href="https://tsanet.gitbook.io/connect/api-reference">API reference</a> and the public tsanetgit repositories, with a link to the page it drew on. It is a Microsoft Copilot Studio agent, running on Claude, embedded in every page of this site as an iframe.</p>
+    <p>Two halves. <strong>The site half is shipped</strong>: <code>assets/assistant.js</code> renders a launcher in the bottom-right corner and a panel that loads the agent on first open — but only once an embed URL is configured, so no launcher appears for an agent that does not exist. <span class="tag ship">shipped</span> <strong>The agent half is not yet created.</strong> It has to be built in TSANet's Microsoft tenant by someone with Copilot Studio maker rights, and the recipe below is exactly that job. <span class="tag probe">needs probe</span></p>
+    <h3 class="sub">Why Copilot Studio, for a static site</h3>
+    <p>This hub is plain HTML on GitHub Pages with no server. An assistant built directly on a provider's API — Anthropic's, OpenAI's, Google's — needs a hosted backend to hold the API key and run the retrieval; Copilot Studio hosts all of that and hands back a one-line iframe. It also lets TSANet pick the model in a dropdown, including Claude Sonnet 4.6, and change it later without touching this site. <span class="tag doc">documented</span> The trade is that the agent's cost and governance live in TSANet's Microsoft tenant, and the knowledge retrieval runs on Bing's index of these pages rather than on the pages themselves.</p>
+    <h3 class="sub">Building the agent</h3>
+    <ol class="steps">
+      <li><b>Admin switches first.</b> Claude appears in the model picker only after the <a href="#copilot-admin">three switches</a> below are on: Anthropic enabled as a subprocessor in the Microsoft 365 admin center (with the maker in the allowed users or groups), external models on for the environment in the Power Platform admin center, and data movement across regions if the tenant is outside the United States. Skip Claude, and the default GPT-4.1 needs none of them. <span class="tag doc">documented</span></li>
+      <li><b>Create the agent on the standard harness</b> and pick the model in the <strong>Model</strong> section of its Overview page. Claude Sonnet 4.6 is the general-category Claude that is GA there; Sonnet 5 needs the GitHub Copilot harness, which does not offer the custom-website embed this site uses. <span class="tag doc">documented</span></li>
+      <li><b>Instructions.</b> Something close to this, adjusted as testing shows:
+<pre><code>You help software developers integrate with TSANet Connect. Answer only from
+your knowledge sources: the TSANet Developer Hub, the Connect API reference on
+GitBook, and the public tsanetgit repositories. Link the page you used.
+If the sources do not cover a question, say so and point to the hub's
+Community page; do not invent endpoints, field names, status codes or limits.
+Never ask for or accept credentials, tokens or secrets; credential and
+membership matters go to membership@tsanet.org.
+Prefer the hub's wording where it flags a contradiction between sources, and
+repeat the contradiction rather than resolving it.</code></pre></li>
+      <li><b>Knowledge: public websites.</b> Add <code>https://tsanetgit.github.io/tsanet-developer-hub</code>, <code>https://tsanet.gitbook.io/connect</code> and <code>https://github.com/tsanetgit</code>. Public-website knowledge is retrieved through Grounding with Bing Search; the URL may be at most two path levels deep (all three are), the site must be public and <strong>indexed by Bing</strong>, and a generatively orchestrated agent may hold up to 25 such sources. <span class="tag doc">documented</span> Whether Bing has indexed this hub is unverified; if it has not, upload the pages as file knowledge instead until it has. <span class="tag probe">needs probe</span></li>
+      <li><b>Security → Authentication → No authentication.</b> This is what makes the custom-website embed available, and Microsoft's own caution applies verbatim: it "allows anyone who has the link to chat and interact with your bot or agent". That is the intended audience here, but it means the agent's Copilot Credits are spent by anyone who finds it. A Power Platform data policy that requires authentication removes this option entirely. <span class="tag doc">documented</span></li>
+      <li><b>Publish, then Channels → Custom website</b> and copy the iframe. Its <code>src</code> has the shape <code>https://copilotstudio.microsoft.com/environments/&lt;env&gt;/bots/&lt;bot&gt;/webchat?__version__=2</code> and the embed code is shown only while authentication is off. <span class="tag doc">documented</span> Microsoft's current Learn page shows the longer alternative — Bot Framework Web Chat with the token endpoint from Channels → Email — which this site does not need.</li>
+      <li><b>Wire it into the site.</b> Paste the <code>src</code> into <code>embedUrl</code> in <code>assets/assistant.js</code>, bump the <code>?v=</code> query on the script tag (the same asset-cache rule as the stylesheet), commit and push. The launcher appears on every page on the next deploy; the script refuses any URL that is not on <code>copilotstudio.microsoft.com</code>.</li>
+      <li><b>Test from the pages.</b> Ask the questions the hub answers well — the scope that looks right and fails, why <code>responded</code> gates the SLA, which note field a partner sees — and check the link it cites. Then ask something the hub does not cover and confirm it says so.</li>
+    </ol>
+    <div class="note" style="margin-top:18px"><strong>What to watch once it is live.</strong> Consumption: the agent bills Copilot Credits to TSANet's tenant per conversation, and there is no per-visitor cap on an unauthenticated agent. Model fallback: if an admin later revokes Anthropic, the agent silently moves to an internal model or errors out, so the instructions should read well on GPT-4.1 too. Drift: the hub's rule that two disagreeing sources are both reported is one an assistant will happily flatten; the instruction above is there to stop it.</div>
+  </div>
+</section>
+
+<section id="providers">
+  <div class="wrap">
+    <p class="eyebrow">Provider-agnostic</p>
+    <h2>Any Provider's Agent: What It Needs from Connect</h2>
+    <p>Strip away the branding and every agent framework needs the same two things to act on TSANet Connect: a <strong>tool definition</strong> it can read — an OpenAPI document or a JSON schema per operation — and an <strong>authentication path</strong> that produces the app-only token Connect expects. The first is easy everywhere. The second is where the frameworks split, because the Connect API's server-to-server path is <a href="../api/index.html#auth">OAuth 2.0 client credentials</a>: no user signs in, and the service principal is one TSANet provisions and maps to the member company.</p>
+    <div class="twrap">
+      <table>
+        <thead><tr><th>Provider · surface</th><th>Tool definition</th><th>Auth it can do on its own</th><th>App-only client credentials?</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Anthropic</strong> · Claude API tool use, Claude Code, Agent SDK</td><td>JSON schema per tool; your code executes the call</td><td>Whatever your code does — the model never holds a credential</td><td><span class="pill ok">Yes</span> your code mints the token. An MCP server can be attached directly through the API's MCP connector. <span class="tag doc">documented</span></td></tr>
+          <tr><td><strong>Anthropic</strong> · Managed Agents</td><td>Your custom tools, plus MCP servers declared on the agent</td><td>Vault credentials substituted at egress, never visible in the sandbox</td><td><span class="pill ok">Yes</span> via a vault credential or a custom tool your host runs. <span class="tag doc">documented</span></td></tr>
+          <tr><td><strong>Microsoft</strong> · Copilot Studio REST API tool</td><td>OpenAPI <strong>v2, JSON</strong> (v3 is translated on upload)</td><td>None · API key · OAuth 2.0 with an authorization URL and a consent card — a user-delegated flow</td><td><span class="pill bad">Not in the wizard</span> a custom connector reportedly accepts a client-credentials grant, and one thread reports delegated tokens sent regardless <span class="tag comm">community</span> <span class="tag probe">needs probe</span></td></tr>
+          <tr><td><strong>Microsoft</strong> · Copilot Studio MCP tool</td><td>An MCP server over Streamable HTTP</td><td>None · API key · OAuth 2.0 (dynamic discovery, dynamic, manual)</td><td><span class="pill info">Inside the server</span> the server holds the member credential; Copilot Studio authenticates to the server, not to Connect. <span class="tag doc">documented</span></td></tr>
+          <tr><td><strong>OpenAI</strong> · custom GPT Actions</td><td>OpenAPI document</td><td>None · API key · OAuth with an authorization URL — the <code>authorization_code</code> grant</td><td><span class="pill bad">No</span> client credentials is not among the documented options. <span class="tag doc">documented</span></td></tr>
+          <tr><td><strong>Google</strong> · Agent Development Kit <code>OpenAPIToolset</code></td><td>OpenAPI 3 document, YAML or JSON</td><td>API key · HTTP bearer · OAuth 2.0 · OpenID Connect · Google service account</td><td><span class="pill ok">Yes, by hand</span> the documented OAuth flow is the interactive authorization-code one, but your code can mint a token and pass it as an HTTP bearer credential. <span class="tag doc">documented</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The pattern in that last column is the whole finding. <strong>Hosted, no-code agent builders assume a signed-in human</strong> — Copilot Studio's wizard and custom GPT Actions both offer OAuth only as a redirect-and-consent flow — so they cannot authenticate to Connect as documented. <strong>Code-first frameworks can</strong>, because the code that runs the tool is yours and can do the client-credentials exchange itself. The reusable piece, then, is a small service that holds a member's Connect credential and exposes cases, notes and forms as tools. Today the shape most of these frameworks agree on for that service is an <strong>MCP server over Streamable HTTP</strong>: Copilot Studio and the Claude API both attach one directly <span class="tag doc">documented</span>; the others advertise MCP support that this page has not verified. <span class="tag probe">needs probe</span> Nobody has written that server for Connect. When somebody does, it is the same translation-service work as <a href="../api/index.html">Working with the API</a> describes, hosted somewhere reachable — which makes it a <a href="../topics/connector-classes.html">gateway-class</a> component operated by whoever hosts it.</p>
+    <div class="note"><strong>Getting the spec.</strong> Every one of these frameworks starts from the OpenAPI document. The public reference is the <a href="https://tsanet.gitbook.io/connect/api-reference">GitBook API reference</a> and a Postman collection; the OpenAPI file the SDK is generated from comes through <code>membership@tsanet.org</code>. Ask for it before designing around a spec upload, and check its version — Copilot Studio wants v2, the others v3.</div>
+  </div>
+</section>
+
+<section id="rules">
+  <div class="wrap">
+    <p class="eyebrow">Design</p>
+    <h2>What No Model Changes</h2>
+    <p>Everything on the <a href="../api/index.html">API page</a> still applies when the caller is a language model, and a few of those rules become sharper rather than softer.</p>
+    <ul class="tight">
+      <li><strong>Accepting is a commitment, so the agent must not do it alone.</strong> Approval stops the SLA clock and tells a partner an engineer is engaged. The shipped connectors disagree about automated acceptance, and the <a href="entitlement-automation.html">acceptance topic</a> works through when a rule asserts something true. An agent that can call the approval endpoint on its own judgement is the "accept everything" posture with extra steps; give it the read tools and the note tool, and route acceptance to a person, as the <a href="../connectors/fin-intercom.html">Fin / Intercom</a> connector does.</li>
+      <li><strong>The token is the primary key, and the model will not remember it for you.</strong> Whichever tool creates a case, the token has to be persisted by something that is not the conversation. There is no idempotency key on create, so a retried tool call is a duplicate case.</li>
+      <li><strong>Forms are fetched fresh</strong>, because the required <code>documentId</code> arrives with the fetch and partners change their forms. Do not let an agent cache a partner's process form as knowledge.</li>
+      <li><strong>Two note fields are two audiences.</strong> Internal notes and partner-visible notes are separate fields rendered as separate sections. A tool that "adds a note" is underspecified until it says which.</li>
+      <li><strong>Errors look like outages unless you ask otherwise.</strong> By default most Connect rejections arrive as HTTP 500; the <code>Accept</code> header that switches on RFC 7807 bodies has to be sent by whatever executes the tool, or the model will read every validation failure as an outage and retry it.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="copilot">
+  <div class="wrap">
+    <p class="eyebrow">Platform assessment</p>
+    <h2>Microsoft Copilot Studio, with Claude</h2>
+    <p>One hosted way to build an agent over Connect, assessed in detail because it is the platform behind the <a href="#assistant">hub assistant</a> and the one a Dynamics member already has an environment for. Everything here is <strong>documented, not observed</strong>: read on Microsoft Learn (dates in the <a href="#sources">sources</a>) and in the source of the shipped Dynamics solution. No Copilot Studio agent has been built against Connect. Assessed 2026-09-13.</p>
+
+    <h3 class="sub" id="copilot-model">Which Claude it offers, and where it runs</h3>
+    <p>A maker picks the agent's primary model from a dropdown on the agent's <strong>Overview</strong> page, and picks again, separately, for each prompt tool. Since 7 January 2026 Anthropic operates as a <strong>Microsoft subprocessor</strong> for these models, so Microsoft's Product Terms and Data Protection Addendum apply rather than Anthropic's commercial terms — except for models Microsoft labels "with Data Retention", which stay off by default and need a separate opt-in. <span class="tag doc">documented</span></p>
+    <div class="twrap">
+      <table>
+        <caption>Claude models a maker can pick, from the availability tables on Microsoft Learn. "Cross-geo" means the request may be processed outside the tenant's region; only United States tenants avoid it.</caption>
+        <thead><tr><th>Model</th><th>Where it can be picked</th><th>Status</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>Claude Sonnet 4.6</td><td>Agent primary model · prompt tools</td><td><span class="pill ok">GA</span></td><td>General-category. Cross-geo everywhere except the United States. Standard rate in prompt tools, 200K-token context per call. <strong>The model this page assumes.</strong></td></tr>
+          <tr><td>Claude Sonnet 5</td><td>Agent primary model</td><td><span class="pill ok">GA</span></td><td>Only for agents on the GitHub Copilot harness. Not offered in Australia or Saudi Arabia; in the United States, GA only in early-access environments.</td></tr>
+          <tr><td>Claude Opus 4.6 · 4.7</td><td>Agent primary model · prompt tools (4.6)</td><td><span class="pill ok">GA</span></td><td>Deep-category: highest latency and cost. Premium rate in prompt tools.</td></tr>
+          <tr><td>Claude Sonnet 4.5</td><td>—</td><td><span class="pill bad">Retired</span></td><td>GA in March 2026; retired in every region by the September 2026 table.</td></tr>
+          <tr><td>Claude Haiku (any version)</td><td>—</td><td><span class="pill bad">Not offered</span></td><td>Absent from the agent-model table, the prompt-tool table and every release note. See below.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul class="tight">
+      <li><strong>Two Learn pages disagree about Claude's status in prompt tools.</strong> The March 2026 release notes say Claude Sonnet and Opus are "generally available globally (excluding GCC)". The prompt-builder settings page, updated in August 2026, says "Anthropic Claude models are at the experimental stage, even though they don't display a tag" — and experimental models are subject to preview terms and not recommended for production. A member deciding whether an agent is production-grade should ask Microsoft which is current. <span class="tag doc">documented</span></li>
+      <li><strong>The same two pages disagree about hosting.</strong> The subprocessor page says Microsoft's terms and DPA govern Anthropic models; the prompt-builder page still says "Anthropic models are hosted outside Microsoft and are subject to Anthropic terms and data handling". The subprocessor page is dated later and is the admin-facing one; the hub reports both. <span class="tag doc">documented</span></li>
+      <li><strong>Content moderation is Microsoft's slider, and it is unavailable for Claude.</strong> The per-prompt moderation level applies only to Microsoft-managed models. Temperature still applies. <span class="tag doc">documented</span></li>
+      <li><strong>Revoking Anthropic after agents are built does not stop them cleanly.</strong> Agents switch to "another suitable internal model" if one exists and error out if not, until a maker changes the model by hand. <span class="tag doc">documented</span></li>
+    </ul>
+    <div class="note"><strong>Why not Haiku.</strong> Claude Haiku 4.5 is generally available in Microsoft Foundry, in both Azure-hosted and Anthropic-hosted variants, but Copilot Studio does not list it anywhere. The only documented way to bring a Foundry model into Copilot Studio is <em>Bring your own model for prompts</em>, which requires a chat-completions endpoint (a URL ending in <code>/chat/completions</code>) and lists no Anthropic models; Claude in Foundry is served through the Messages API at <code>/anthropic/v1/messages</code>. <span class="tag doc">documented</span> Whether any shim bridges that is untested <span class="tag probe">needs probe</span> — and even if one did, that route reaches prompt tools only, never orchestration. Sonnet 4.6 is the practical floor.</div>
+
+    <h3 class="sub" id="copilot-admin">Three switches, in two admin centres, before a maker sees Claude</h3>
+    <div class="twrap">
+      <table>
+        <thead><tr><th>Switch</th><th>Where</th><th>Default</th><th>Who</th></tr></thead>
+        <tbody>
+          <tr><td>Anthropic as a subprocessor, plus which users or groups may use it</td><td>Microsoft 365 admin center → <strong>Copilot</strong> → <strong>Settings</strong> → <strong>AI providers operating as Microsoft subprocessors</strong> → Anthropic</td><td><strong>On</strong> in commercial cloud; <strong>Off</strong> for EU, EFTA and UK tenants</td><td>AI Administrator or Global Administrator</td></tr>
+          <tr><td>External models for the environment</td><td>Power Platform admin center → <strong>Manage</strong> → <strong>Environments</strong> → environment → <strong>Settings</strong> → <strong>Product</strong> → <strong>Features</strong> → the model-family toggle; or the <strong>External Models</strong> rule on a managed environment group</td><td>Visible but not selectable until the first switch is on</td><td>Power Platform admin</td></tr>
+          <tr><td>Data movement across regions</td><td>Environment setting <strong>Move data across regions</strong> in the Power Platform admin center</td><td>Needed wherever the model is tagged cross-geo — every region except the United States for Sonnet 4.6</td><td>Tenant administrator</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul class="tight">
+      <li><strong>Access is per user, not just per tenant.</strong> The subprocessor setting takes a user or security-group assignment, enforced across Copilot Studio: a user outside it cannot use an agent that runs on Claude. For the hub assistant that constraint falls on the <em>maker</em>, not the anonymous visitor. <span class="tag doc">documented</span></li>
+      <li><strong>Preview models and external models are separate gates.</strong> Sonnet 4.6 is GA and external, so it needs only the external-model gate. <span class="tag doc">documented</span></li>
+      <li><strong>Compliance exclusions are explicit.</strong> Anthropic models in Copilot Studio are outside the EU Data Boundary; FedRAMP is not achieved; PCI DSS does not apply; the government-cloud table lists no Claude model. A member in any of those positions should stop at this row. <span class="tag doc">documented</span></li>
+    </ul>
+
+    <h3 class="sub" id="copilot-routes">Three routes from an agent to the Connect API</h3>
+    <p>Copilot Studio gives an agent tools; what a TSANet agent needs is a tool that reaches Connect. There are three shapes, and the platform's own rules decide which one a member can use.</p>
+    <figure>
+      <div class="diagram">
+        <svg viewBox="0 0 1020 340" style="min-width:900px" role="img" aria-label="A Copilot Studio agent, running on Claude Sonnet 4.6 on the standard harness or Claude Sonnet 5 on the GitHub Copilot harness, reaches the TSANet Connect API by one of three routes: A, the Dynamics solution's Dataverse tables and flows; B, a REST API tool or custom connector; C, an MCP server for Connect, which does not exist. The model is provided by Anthropic as a Microsoft subprocessor, cross-geo, outside the EU Data Boundary.">
+          <defs><marker id="cpA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--slate)"/></marker></defs>
+
+          <rect class="bx-acc" x="20" y="60" width="290" height="120" rx="8"/>
+          <text class="tt" x="34" y="84">Copilot Studio agent</text>
+          <text class="ts" x="34" y="105">Standard harness · Claude Sonnet 4.6</text>
+          <text class="ts" x="34" y="123">GitHub Copilot harness · Claude Sonnet 5</text>
+          <text class="ts" x="34" y="141">Model picked on the Overview page</text>
+          <text class="tl" x="34" y="160">in the member's own Power Platform environment</text>
+
+          <path class="ln" d="M165,180 V209" marker-end="url(#cpA)"/>
+
+          <rect class="bx-ext" x="20" y="215" width="290" height="105" rx="8"/>
+          <text class="tt" x="34" y="239">The model, wherever it is picked</text>
+          <text class="ts" x="34" y="259">Anthropic as a Microsoft subprocessor</text>
+          <text class="ts" x="34" y="277">Cross-geo · outside the EU Data Boundary</text>
+          <text class="ts" x="34" y="295">Off by default in EU / EFTA / UK tenants</text>
+          <text class="tl" x="34" y="312">not in GCC · FedRAMP not achieved</text>
+
+          <path class="ln" d="M310,95 H345 V75 H374" marker-end="url(#cpA)"/>
+          <path class="ln" d="M310,120 H350 V195 H374" marker-end="url(#cpA)"/>
+          <path class="ln" d="M310,145 H355 V315 H374" marker-end="url(#cpA)"/>
+
+          <rect class="bx-grn" x="380" y="30" width="300" height="90" rx="8"/>
+          <text class="tt" x="394" y="54">A · Dynamics solution (Dataverse)</text>
+          <text class="ts" x="394" y="74">Read the tables the connector keeps</text>
+          <text class="ts" x="394" y="92">Write through its flows as agent tools</text>
+          <text class="tl" x="394" y="110">in-tenant · no new credential · not yet wired</text>
+
+          <rect class="bx" x="380" y="150" width="300" height="90" rx="8"/>
+          <text class="tt" x="394" y="174">B · REST API tool / custom connector</text>
+          <text class="ts" x="394" y="194">OpenAPI v2 JSON; the wizard's OAuth is delegated</text>
+          <text class="ts" x="394" y="212">Connect wants app-only client credentials</text>
+          <text class="tl" x="394" y="230">preview · the auth mismatch needs a probe</text>
+
+          <rect class="bx" x="380" y="270" width="300" height="60" rx="8" style="stroke:var(--orange);stroke-dasharray:5 4"/>
+          <text class="tt" x="394" y="294" style="fill:var(--orange)">C · An MCP server for Connect</text>
+          <text class="ts" x="394" y="314">Streamable HTTP only · nothing exists to connect to</text>
+
+          <path class="ln" d="M680,75 H730 V185 H774" marker-end="url(#cpA)"/>
+          <path class="ln" d="M680,195 H774" marker-end="url(#cpA)"/>
+          <path class="ln" d="M680,300 H730 V205 H774" marker-end="url(#cpA)"/>
+
+          <rect class="bx-acc" x="780" y="140" width="220" height="110" rx="8"/>
+          <text class="tt" x="794" y="164">TSANet Connect API</text>
+          <text class="ts" x="794" y="185">Same rules on every route:</text>
+          <text class="ts" x="794" y="203">the token is the primary key,</text>
+          <text class="ts" x="794" y="221">forms are fetched fresh,</text>
+          <text class="ts" x="794" y="239">accepting is a commitment.</text>
+        </svg>
+      </div>
+      <figcaption>Route A keeps every Connect credential where the Dynamics connector already holds it and needs nothing new from TSANet. Routes B and C both put a new caller in front of the API, and route C also needs a server that has not been written. The model box applies whichever route is chosen.</figcaption>
+    </figure>
+
+    <div class="route">
+      <div class="k">A</div>
+      <div>
+        <h3>Sit the agent on the Dynamics connector</h3>
+        <p>The <a href="../connectors/dynamics.html">Dynamics solution</a> already installs six Dataverse tables — the case, its notes, the mapping and settings tables — and a set of Power Automate flows that do the Connect calls: a <em>Login</em> child flow that holds the client-credentials exchange in one place, and flows for fetching cases, posting a case, posting a note, and posting or updating an approval. All of it is in the public repository. <span class="tag doc">documented</span></p>
+        <p>A Copilot Studio agent in the same environment can use Dataverse as a knowledge source and call flows as tools, so the shape is: read the <code>ap_</code> tables directly, and write by invoking the solution's own flows rather than the API. The agent never sees a Connect credential, the connector's log table records what happened, and the whole thing stays in the member's tenant. Nothing on this route has been wired up and tested. <span class="tag probe">needs probe</span> For a Dynamics member it adds an agent to something that already works, which is why it is the route to try first.</p>
+      </div>
+
+      <div class="k">B</div>
+      <div>
+        <h3>Give the agent the API directly</h3>
+        <p>The <strong>REST API tool</strong> (preview, standard harness only) takes an OpenAPI specification — v2, as JSON; a v3 file is translated on upload — plus one of three auth shapes: none, an API key, or OAuth 2.0 with an authorization URL and a consent card shown to the user in chat. That last shape is an authorization-code flow: it exists to let an individual user sign in. <span class="tag doc">documented</span> There is no user to redirect on Connect's app-only path, so the wizard's OAuth option does not fit. Community write-ups say a Power Apps <em>custom connector</em> accepts a <em>Client Credentials</em> grant, and one forum thread reports Copilot Studio still sending a delegated token at runtime for such a connector. <span class="tag comm">community</span> <span class="tag probe">needs probe</span> The fallback that certainly works is the one route A already uses: a Power Automate flow with an HTTP action doing the exchange itself.</p>
+      </div>
+
+      <div class="k">C</div>
+      <div>
+        <h3>Put an MCP server in between</h3>
+        <p>Both harnesses can attach an MCP server as a tool: the standard harness through an onboarding wizard (or a custom connector whose OpenAPI stub carries <code>x-ms-agentic-protocol: mcp-streamable-1.0</code>), the GitHub Copilot harness through its Build tab, in preview since July 2026. Only the Streamable HTTP transport is supported — SSE was dropped in August 2025 — and because access rides on Power Platform connectors, the tenant's data-loss-prevention policies govern it too. <span class="tag doc">documented</span> What does not exist is the server; see <a href="#providers">the provider-agnostic finding</a> above for why it is the piece every hosted builder ends up needing.</p>
+      </div>
+    </div>
+
+    <h3 class="sub" id="copilot-harness">The harness decides the model and the tools together</h3>
+    <p>Copilot Studio runs agents on one of two harnesses, and since June 2026 the choice is real. The Claude model and the Connect tooling are not chosen independently: each harness admits a different Claude and a different set of tool types. <span class="tag doc">documented</span></p>
+    <div class="twrap">
+      <table>
+        <thead><tr><th>&nbsp;</th><th>Standard harness</th><th>GitHub Copilot harness</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Claude available</th><td>Sonnet 4.6 · Opus 4.6 · Opus 4.7</td><td>Sonnet 5 (GA), plus the standard set</td></tr>
+          <tr><th scope="row">Status</th><td>GA; the rule-based runtime</td><td>"Production-ready preview" since June 2026</td></tr>
+          <tr><th scope="row">Reaches Connect by</th><td>REST API tool (preview) · custom connector · flows · MCP wizard</td><td>MCP server or workflow as a tool (preview) · connected agents</td></tr>
+          <tr><th scope="row">Embeds in a website by</th><td>Custom website channel (iframe) or Web Chat with a token endpoint</td><td>Not documented for this harness</td></tr>
+          <tr><th scope="row">Billing</th><td>Copilot Credits at the standard-harness rates; Sonnet 4.6 standard rate, Opus premium rate in prompts</td><td>Usage-based Copilot Credits, including build and test</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul class="tight">
+      <li><strong>Sonnet 5 costs you the REST API tool and the iframe embed.</strong> Both are documented for the standard harness only. An agent that wants Sonnet 5 is on the newer harness, where the documented ways to reach an external API are an MCP server or a workflow. <span class="tag doc">documented</span></li>
+      <li><strong>A conversational turn is many model calls.</strong> The standard harness does not enforce a token limit across the planner, retrieval and tool-summary calls one user message triggers; the 200K context applies per call. <span class="tag doc">documented</span></li>
+      <li><strong>Every new agent gets a Microsoft Entra Agent ID</strong> from July 2026, and the environment-level opt-out is gone. It is not a Connect identity and does not replace the service principal TSANet provisions. <span class="tag doc">documented</span></li>
+    </ul>
+  </div>
+</section>
+
+<section id="open">
+  <div class="wrap">
+    <p class="eyebrow">Open questions</p>
+    <h2>What Has to Be Answered, and What Each One Blocks</h2>
+    <div class="twrap">
+      <table>
+        <thead><tr><th>Question</th><th>Blocks</th></tr></thead>
+        <tbody>
+          <tr><td>Has Bing indexed this hub, so that public-website knowledge returns its pages</td><td>The hub assistant's knowledge; the fallback is uploading the pages as files</td></tr>
+          <tr><td>What a hub-assistant conversation on Claude Sonnet 4.6 costs in Copilot Credits, and what an unauthenticated public agent spends in a month</td><td>Whether the assistant stays on</td></tr>
+          <tr><td>Can a standard-harness agent read the Dynamics solution's <code>ap_</code> tables and invoke its flows as tools, end to end</td><td>Route A — the cheapest pilot for a Dynamics member</td></tr>
+          <tr><td>Does a custom connector with a Client Credentials grant actually send an app-only token when Copilot Studio calls it</td><td>Route B without a flow in between</td></tr>
+          <tr><td>Do the OpenAI Agents SDK and Google ADK attach a Streamable HTTP MCP server the way Copilot Studio and the Claude API do</td><td>Whether one MCP server for Connect serves every provider</td></tr>
+          <tr><td>Which Learn page is right about Claude in Copilot Studio prompt tools — GA, or experimental under preview terms</td><td>Whether a member can call a Copilot Studio agent production-grade</td></tr>
+          <tr><td>Whether an MCP server for Connect should be TSANet-hosted (gateway class) or member-hosted</td><td>Route C entirely, and who operates it</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note"><strong>Interested in shaping this?</strong> A Dynamics member with a Copilot Studio licence and a non-production environment could close two of these rows in a day. If you have built an agent against Connect on any provider, say so in <a href="https://github.com/tsanetgit/tsanet-developer-hub/discussions/categories/show-and-tell">Show and tell</a>; for a pilot, <code>membership@tsanet.org</code>.</div>
+  </div>
+</section>
+
+<section id="sources">
+  <div class="wrap">
+    <p class="eyebrow">Verified against</p>
+    <h2>Sources, with the Dates That Were Read</h2>
+    <p>Vendor documentation changes monthly; the dates are each page's own date stamps at the time of reading. Where a row here contradicts the live page, the live page wins and this one needs revisiting.</p>
+    <div class="twrap src">
+      <table>
+        <thead><tr><th>Read on</th><th>Source</th><th>Used for</th></tr></thead>
+        <tbody>
+          <tr><td>2026-09-13</td><td><a href="https://agentskills.io">agentskills.io</a> and the four skill folders in the tsanetgit repositories</td><td>The skills standard and which tools read it; what each TSANet skill carries</td></tr>
+          <tr><td>2026-06-02 · upd. 2026-08-03</td><td><a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/publication-connect-bot-to-web-channels">Publish an agent to a live or demo website</a></td><td>Demo versus live website; the Web Chat and token-endpoint alternative</td></tr>
+          <tr><td>2026-05-01 · upd. 2026-07-21</td><td><a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/configuration-end-user-authentication">Configure user authentication</a></td><td>"No authentication" and its caution; the data-policy override</td></tr>
+          <tr><td>2026-07-21 · upd. 2026-08-03</td><td><a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/knowledge-add-public-website">Add a public website as a knowledge source</a></td><td>Bing grounding; the two-level URL rule; the Bing-indexed requirement</td></tr>
+          <tr><td>2026-05-04 · upd. 2026-08-03</td><td><a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/customize-default-canvas">Customize the look and feel of an agent</a></td><td>Where the token endpoint lives (Channels → Email)</td></tr>
+          <tr><td>undated</td><td><a href="https://adoption.microsoft.com/files/copilot-studio/Deploying-Microsoft-Copilot-Studio-agents-externally.pdf">Deploying Copilot Studio agents externally</a> (Microsoft adoption guide)</td><td>The custom-website iframe shape and its no-authentication condition</td></tr>
+          <tr><td>2026-05-28 · upd. 2026-09-05</td><td><a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/authoring-select-agent-model">Select a primary AI model for your agent</a></td><td>The model availability table; cross-geo; fallback and retirement rules</td></tr>
+          <tr><td>2026-05-28 · upd. 2026-09-05</td><td><a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/authoring-select-external-response-model">Choose an external model as the primary AI model</a></td><td>Anthropic as subprocessor; behaviour when access is revoked; the two gates</td></tr>
+          <tr><td>2026-08-04 · upd. 2026-08-05</td><td><a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/prompt-model-settings">Change the model version and settings (prompt builder)</a></td><td>Claude in prompt tools, rates, the "experimental stage" note, the moderation slider</td></tr>
+          <tr><td>2026-07-14 · upd. 2026-08-03</td><td><a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/bring-your-own-model-prompts">Bring your own model for your prompts</a></td><td>The chat-completions requirement that rules out Haiku via Foundry</td></tr>
+          <tr><td>2026-09-11</td><td><a href="https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/claude-models">Claude models in Microsoft Foundry</a></td><td>Haiku 4.5 GA in Foundry; the Messages API endpoint shape</td></tr>
+          <tr><td>2026-07-28 · upd. 2026-09-09</td><td><a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/harnesses-overview">Harnesses in Copilot Studio</a></td><td>Standard versus GitHub Copilot harness; billing split</td></tr>
+          <tr><td>2026-08-18 · upd. 2026-08-20</td><td><a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/whats-new">What's new in Copilot Studio</a></td><td>Release dates: Claude GA March 2026, Sonnet 5 June 2026, MCP-as-tool and Entra Agent ID July 2026</td></tr>
+          <tr><td>2026-04-17 · upd. 2026-08-19</td><td><a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/agent-extend-action-rest-api">Extend your agent with tools from a REST API (preview)</a></td><td>OpenAPI v2 JSON; the three auth shapes</td></tr>
+          <tr><td>2026-05-28 · upd. 2026-08-19</td><td><a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/mcp-add-existing-server-to-agent">Connect your agent to an existing MCP server</a></td><td>Streamable-only transport; auth flavours; DLP applies through connectors</td></tr>
+          <tr><td>2026-07-28 · upd. 2026-07-29</td><td><a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/agents-experience/tools-add-mcp-server">Add an MCP server as a tool (GitHub Copilot harness, preview)</a></td><td>MCP on the newer harness</td></tr>
+          <tr><td>2026-09-10</td><td><a href="https://learn.microsoft.com/en-us/microsoft-365/copilot/connect-to-ai-subprocessor">Anthropic models in Microsoft Online Services</a></td><td>Subprocessor terms; the Microsoft 365 admin center path; regional defaults; GCC</td></tr>
+          <tr><td>2026-05-28 · upd. 2026-08-14</td><td><a href="https://learn.microsoft.com/en-us/power-platform/admin/allow-llm-generative-responses">Allow external language models for generative responses</a></td><td>The Power Platform admin center path; EU Data Boundary, FedRAMP and PCI exclusions</td></tr>
+          <tr><td>undated</td><td><a href="https://developers.openai.com/api/docs/actions/authentication">GPT Actions authentication</a> (OpenAI)</td><td>None / API key / OAuth authorization-code; no client-credentials option</td></tr>
+          <tr><td>undated</td><td><a href="https://adk.dev/tools-custom/authentication/">Authenticating with tools</a> (Google Agent Development Kit)</td><td>OpenAPIToolset auth schemes and credential types; the documented interactive OAuth flow</td></tr>
+          <tr><td>2026-09-13</td><td><a href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview">Tool use overview</a> and <a href="https://platform.claude.com/docs/en/managed-agents/mcp-connector">Managed Agents MCP connector</a> (Anthropic)</td><td>JSON-schema tools executed by your code; MCP servers on the API and on managed agents; vault credentials</td></tr>
+          <tr><td>2026-09-13</td><td><a href="https://github.com/tsanetgit/MS_Power_App">tsanetgit/MS_Power_App</a>, the solution's Workflows folder</td><td>The flows route A would call: Login, GetMe, GetCases, PostCase, PostCaseNote, PostCaseApproval and their siblings</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-in">
+    <div><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
+    <nav class="foot-nav" aria-label="Sections">
+      <a href="../connectors/index.html">Connectors</a>
+      <a href="../api/index.html">Working with the API</a>
+      <a href="../docs/index.html">Design documents</a>
+      <a href="../topics/index.html">Topics</a>
+      <a href="../community/index.html">Community</a>
+    </nav>
+    <div class="foot-links mono">
+      <a href="https://connect2.tsanet.org">connect2.tsanet.org</a>
+      <a href="https://github.com/tsanetgit">github.com/tsanetgit</a>
+      <a href="mailto:membership@tsanet.org">membership@tsanet.org</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/assistant.js?v=20260913" defer></script>
+</body>
+</html>

@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/hub.css?v=20260908b">
+<link rel="stylesheet" href="assets/hub.css?v=20260913">
 <style>
   /* Page-local styles. Shared tokens, nav, cards, sections and footer live in assets/hub.css */
 
@@ -184,12 +184,6 @@
         <p>Not built yet. A platform assessment of the surfaces, Table API traps and distribution choices an eBonding integration has to design around.</p>
         <span class="card-foot">Platform assessment →</span>
       </a>
-      <a class="card" href="connectors/copilot-studio.html">
-        <span class="chip beta">Assessed · agent layer</span>
-        <h3>Copilot Studio with Claude</h3>
-        <p>Not built. Which Claude models Copilot Studio actually offers, the admin switches that gate them, and three routes from an agent to Connect — starting with the Dynamics solution's own tables and flows.</p>
-        <span class="card-foot">Platform assessment →</span>
-      </a>
       <a class="card" href="connectors/zendesk.html">
         <span class="chip live">GA · app</span>
         <h3>Zendesk</h3>
@@ -313,12 +307,22 @@
         <span class="sys muted">Human commits <span>· Fin / Intercom</span></span>
       </div>
     </div>
+    <div class="topic-band" style="border-left:3px solid var(--orange)">
+      <h3><a href="topics/agentic-usage.html" style="color:var(--ink)">Agentic usage with TSANet Connect →</a></h3>
+      <p>Working on Connect with an AI agent, whichever provider's. The four skills TSANet ships and how any assistant loads them, the assistant embedded in this hub and how it is built, what every provider's agent framework needs from the API and where the hosted builders fall short on auth, and a platform assessment of Microsoft Copilot Studio with Claude.</p>
+      <div class="sys-row">
+        <a class="sys" href="topics/agentic-usage.html">Read the topic</a>
+        <span class="sys muted">Skills <span>· four shipped</span></span>
+        <span class="sys muted">Hub assistant <span>· Copilot Studio</span></span>
+        <span class="sys muted">Providers <span>· Anthropic, Microsoft, OpenAI, Google</span></span>
+      </div>
+    </div>
     <div class="topic-band">
       <h3>AI-focused problem resolution systems</h3>
       <p>Evaluations, integration notes, and member experience with the new generation of AI-native support platforms — and how each connects to TSANet Connect for multi-vendor cases.</p>
       <div class="sys-row">
         <a class="sys" href="connectors/fin-intercom.html">Fin AI <span>· Intercom</span></a>
-        <a class="sys" href="connectors/copilot-studio.html">Copilot Studio <span>· Microsoft, on Claude</span></a>
+        <a class="sys" href="topics/agentic-usage.html#copilot">Copilot Studio <span>· Microsoft, assessed</span></a>
         <span class="sys muted">Pylon</span>
         <span class="sys muted">DevRev</span>
         <span class="sys muted">Wolken</span>
@@ -326,7 +330,7 @@
         <span class="sys muted">Zendesk AI</span>
         <span class="sys muted">Now Assist <span>· ServiceNow</span></span>
       </div>
-      <p style="font-size:13px;color:var(--mute);margin:14px 0 0">Fin&nbsp;/&nbsp;Intercom is written up and Copilot Studio is assessed. The rest are on the list, not yet assessed.</p>
+      <p style="font-size:13px;color:var(--mute);margin:14px 0 0">Fin&nbsp;/&nbsp;Intercom is written up and Copilot Studio is assessed as an agent platform. The rest are on the list, not yet assessed.</p>
     </div>
     <div class="topic-band">
       <h3>CRM &amp; ticketing, legacy to modern</h3>
@@ -421,5 +425,6 @@
   setInterval(step, 2800);
 })();
 </script>
+<script src="assets/assistant.js?v=20260913" defer></script>
 </body>
 </html>

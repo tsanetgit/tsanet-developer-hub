@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/hub.css?v=20260908b">
+<link rel="stylesheet" href="../assets/hub.css?v=20260913">
 <style>
   pre{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--ink);margin:16px 0}
   pre code{background:none;padding:0;font-size:inherit}
@@ -265,7 +265,7 @@
   <div class="wrap">
     <p class="eyebrow">Build with an assistant</p>
     <h2>The deployment skill, and how to load it</h2>
-    <p>The SDK repository ships an agent skill — <a href="https://github.com/tsanetgit/Connect_SDK/tree/main/skills/connect-sdk-deploy"><code>skills/connect-sdk-deploy</code></a> — that carries this page's practical knowledge in a form an agentic coding assistant can apply while it works in your project: the artifact-versus-source decision above, the GitHub Packages token requirement, both credential modes with working configuration, the demo's build-run-host runbook, and a symptom-first troubleshooting file for the traps that recur. It is plain markdown: a <code>SKILL.md</code> that routes, plus three reference files it points into.</p>
+    <p>The SDK repository ships an agent skill — <a href="https://github.com/tsanetgit/Connect_SDK/tree/main/skills/connect-sdk-deploy"><code>skills/connect-sdk-deploy</code></a> — that carries this page's practical knowledge in a form an agentic coding assistant can apply while it works in your project: the artifact-versus-source decision above, the GitHub Packages token requirement, both credential modes with working configuration, the demo's build-run-host runbook, and a symptom-first troubleshooting file for the traps that recur. It is plain markdown: a <code>SKILL.md</code> that routes, plus three reference files it points into. Every skill TSANet ships, and how to load one into any assistant, is collected on <a href="../topics/agentic-usage.html#skills">Agentic usage with TSANet Connect</a>.</p>
     <h3>Loading it</h3>
     <p><strong>Claude Code</strong> — copy the whole folder into your integration project's skills directory; the references must ride along with the <code>SKILL.md</code> that cites them:</p>
     <pre><code>git clone --depth 1 https://github.com/tsanetgit/Connect_SDK.git
@@ -300,5 +300,6 @@ cp -R Connect_SDK/skills/connect-sdk-deploy  your-project/.claude/skills/</code>
   </div>
 </footer>
 
+<script src="../assets/assistant.js?v=20260913" defer></script>
 </body>
 </html>

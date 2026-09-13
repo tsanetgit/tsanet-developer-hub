@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/hub.css?v=20260908b">
+<link rel="stylesheet" href="../assets/hub.css?v=20260913">
 <style>
   /* page-local: the class-comparison table wants a highlighted column */
   td.next{color:var(--ink);background:rgba(0,91,130,.05)}
@@ -708,7 +708,7 @@
   <div class="wrap">
     <p class="eyebrow">Build with an assistant</p>
     <h2>The deployment skill, and how to load it</h2>
-    <p>The connector repository ships an agent skill — <a href="https://github.com/tsanetgit/Fin-Intercom_App/tree/main/skills/fin-intercom-deploy"><code>skills/fin-intercom-deploy</code></a> — that carries this page's operational knowledge in a form an agentic coding assistant can apply while it works on your deployment: the invariants that produce specific defects when violated (one live adapter per member, single replica, a link store that survives restarts), the Intercom workspace setup — the private app's canvas and webhook URLs, the webhook topic list (empty today, and why), the verified-minimum permissions and the hardened profile, the Back-office ticket type with its three exactly-named attributes, the per-workspace ticket-state ids — the TSANet-side provisioning, webhook subscription and go-live flag, and the complete environment table with a verification checklist. It is plain markdown: a <code>SKILL.md</code> that routes, plus three reference files it points into.</p>
+    <p>The connector repository ships an agent skill — <a href="https://github.com/tsanetgit/Fin-Intercom_App/tree/main/skills/fin-intercom-deploy"><code>skills/fin-intercom-deploy</code></a> — that carries this page's operational knowledge in a form an agentic coding assistant can apply while it works on your deployment: the invariants that produce specific defects when violated (one live adapter per member, single replica, a link store that survives restarts), the Intercom workspace setup — the private app's canvas and webhook URLs, the webhook topic list (empty today, and why), the verified-minimum permissions and the hardened profile, the Back-office ticket type with its three exactly-named attributes, the per-workspace ticket-state ids — the TSANet-side provisioning, webhook subscription and go-live flag, and the complete environment table with a verification checklist. It is plain markdown: a <code>SKILL.md</code> that routes, plus three reference files it points into. Every skill TSANet ships, and how to load one into any assistant, is collected on <a href="../topics/agentic-usage.html#skills">Agentic usage with TSANet Connect</a>.</p>
     <h3>Loading it</h3>
     <p><strong>Claude Code</strong> — copy the whole folder into your deployment project's skills directory; the references must ride along with the <code>SKILL.md</code> that cites them:</p>
     <pre><code>git clone --depth 1 https://github.com/tsanetgit/Fin-Intercom_App.git
@@ -743,5 +743,6 @@ cp -R Fin-Intercom_App/skills/fin-intercom-deploy  your-project/.claude/skills/<
   </div>
 </footer>
 
+<script src="../assets/assistant.js?v=20260913" defer></script>
 </body>
 </html>

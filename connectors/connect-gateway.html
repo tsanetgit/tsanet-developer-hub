@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/hub.css?v=20260908b">
+<link rel="stylesheet" href="../assets/hub.css?v=20260913">
 <style>
   pre{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--ink);margin:16px 0}
   pre code{background:none;padding:0;font-size:inherit}
@@ -301,7 +301,7 @@ catch (<span class="good-v">GatewayException</span> rejected)        { surfaceTo
     <p>The authoring kit is written as an <strong>agent skill</strong>, deliberately: a <code>SKILL.md</code> that carries the build order and the rules, plus reference files it points into — the platform questions, the binding semantics, onboarding, deploy-and-go-live, and the vendored API spec. Loaded into an agentic assistant, it makes the assistant apply TSANet's rules while it writes your adapter, instead of you relaying them.</p>
     <p>When onboarding grants you repository access, copy the whole kit folder — the references must ride along with the <code>SKILL.md</code> that cites them:</p>
     <pre><code>cp -R Connect_Gateway/skills/connect-adapter-author  your-adapter-project/.claude/skills/</code></pre>
-    <p>That path is Claude Code's project skills directory; for other assistants, attach <code>SKILL.md</code> and the <code>references/</code> files as project instructions — the kit is plain markdown and assumes no particular tool. (A second, TSANet-internal skill covers the adapters TSANet builds itself; it is not part of the member kit.)</p>
+    <p>That path is Claude Code's project skills directory; for other assistants, attach <code>SKILL.md</code> and the <code>references/</code> files as project instructions — the kit is plain markdown and assumes no particular tool. (A second, TSANet-internal skill covers the adapters TSANet builds itself; it is not part of the member kit.) Every skill TSANet ships, and how to load one into any assistant, is collected on <a href="../topics/agentic-usage.html#skills">Agentic usage with TSANet Connect</a>.</p>
     <p><strong>Typical first steps, in the kit's own order:</strong></p>
     <ul class="tight">
       <li><em>"Complete references/platform-questions.md with me for &lt;platform&gt;."</em> Do this before any design talk — several answers are decisions, and the completed document is what TSANet works from when you raise a question.</li>
@@ -442,5 +442,6 @@ catch (<span class="good-v">GatewayException</span> rejected)        { surfaceTo
   </div>
 </footer>
 
+<script src="../assets/assistant.js?v=20260913" defer></script>
 </body>
 </html>

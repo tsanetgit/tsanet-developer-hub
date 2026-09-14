@@ -32,6 +32,7 @@
   <div class="wrap nav-in">
     <a class="brand" href="../index.html"><img class="brand-img" src="../assets/tsanet-devhub-horizontal.png" alt="TSANet Developer Hub"></a>
     <div class="nav-links">
+      <a href="../build/index.html">Build</a>
       <a href="index.html" aria-current="page">Connectors</a>
       <a href="../api/index.html">API</a>
       <a href="../docs/index.html">Design Docs</a>
@@ -166,35 +167,9 @@
 <section id="nothing">
   <div class="wrap">
     <p class="eyebrow">No connector for your platform</p>
-    <h2>Four Routes, in Order of Effort</h2>
-    <div class="grid g2">
-      <a class="card" href="connect-gateway.html">
-        <span class="chip beta">Work in progress · v2.0.0</span>
-        <h3>Build on the Connect Gateway</h3>
-        <p>TSANet supplies the engine, the contract and a conformance harness that certifies the seam; you write only the half that talks to your own platform — and never touch the Connect API or its errors. The repository is private; adapter authors get access at onboarding.</p>
-        <span class="card-foot">Design &amp; adapter guide →</span>
-      </a>
-      <a class="card" href="connect-sdk.html">
-        <span class="chip live">v2.0.0 · Java</span>
-        <h3>Use the SDK</h3>
-        <p>A Java client over the Connect API with typed facades, validation and both auth modes. The shortest path on the JVM that is not hand-rolled HTTP.</p>
-        <span class="card-foot">Library reference →</span>
-      </a>
-      <a class="card" href="../api/index.html">
-        <span class="chip">Pattern</span>
-        <h3>Build Against the API</h3>
-        <p>The translation-service pattern: your platform's events in, Connect API calls out, <code>updatedAfter</code> polling back. Read the behaviour guide before you design.</p>
-        <span class="card-foot">Working with the API →</span>
-      </a>
-      <a class="card" href="../community/index.html">
-        <span class="chip">Wish list</span>
-        <h3>Tell Us the Platform</h3>
-        <p>Which platform your team runs on is the single most useful thing you can say to us — it is what decides which connector gets built next.</p>
-        <span class="card-foot">Community →</span>
-      </a>
-    </div>
-    <p style="margin-top:18px;font-size:14.5px;color:var(--slate)">Whichever route you take, the environments, reference, SDK, test suites and skills you will use are collected on <a href="../tools/index.html">Tools for Building an Integration</a>.</p>
-    <div class="note" style="margin-top:20px"><strong>Before you start, settle one question:</strong> will your platform run your code inside your own tenant? It decides who operates the integration, where credentials live, and whether connector faults are independent or correlated — and it is a property of the platform, not a choice you get to make. The <a href="../topics/connector-classes.html">connector classes topic</a> has the four-question procedure for working it out. Building with an AI agent or assistant rather than by hand — on any provider — is a separate question, covered in <a href="../topics/agentic-usage.html">Agentic usage with TSANet Connect</a>.</div>
+    <h2>If Yours Is Not Listed</h2>
+    <p>There are four routes, in order of effort: build on the Connect Gateway, use the SDK, build against the API directly, or tell us the platform. One question decides between them — whether the platform will run your code inside the member's own tenant — and the tools you will use are the same on every route.</p>
+    <a class="btn btn-primary" href="../build/index.html" style="margin-top:14px">Build a New Integration →</a>
   </div>
 </section>
 
@@ -204,6 +179,7 @@
     <div class="foot-cols">
       <nav class="foot-col" aria-label="Developers">
         <h4>Developers</h4>
+        <a href="../build/index.html">Build a New Integration</a>
         <a href="../connectors/index.html">Connectors</a>
         <a href="../api/index.html">Working with the API</a>
         <a href="../docs/index.html">Design Documents</a>

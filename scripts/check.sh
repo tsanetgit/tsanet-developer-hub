@@ -47,7 +47,7 @@ check_deadlinks() {
 
 check_toc() {
   say "Page contents match their sections"
-  for f in api/index.html connectors/index.html community/index.html docs/index.html topics/index.html; do
+  for f in build/index.html api/index.html connectors/index.html community/index.html docs/index.html topics/index.html tools/index.html; do
     [ -e "$f" ] || continue
     secs=$(grep -oE '<section id="[a-z-]+"' "$f" | sed 's/.*id="//;s/"//' | sort)
     toc=$(sed -n '/class="toc"/,/<\/div>/p' "$f" | grep -oE 'href="#[a-z-]+"' | sed 's/href="#//;s/"//' | sort)

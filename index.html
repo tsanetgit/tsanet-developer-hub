@@ -98,6 +98,7 @@
   <div class="wrap nav-in">
     <a class="brand" href="#top"><img class="brand-img" src="assets/tsanet-devhub-horizontal.png" alt="TSANet Developer Hub"></a>
     <div class="nav-links">
+      <a href="build/index.html">Build</a>
       <a href="connectors/index.html">Connectors</a>
       <a href="api/index.html">API</a>
       <a href="docs/index.html">Design Docs</a>
@@ -115,8 +116,8 @@
     <h1>Connect to One.<br>Build for <em>Anyone</em>.</h1>
     <p class="lede">The engineering home for TSANet Connect: connectors, gateways, the REST API, and the design documents behind the platform. Built and maintained by TSANet, for the members who automate multi-vendor support.</p>
     <div class="cta-row">
-      <a class="btn btn-primary" href="api/index.html">Working with the API</a>
-      <a class="btn btn-ghost" href="connectors/index.html">Compare the connectors</a>
+      <a class="btn btn-primary" href="build/index.html">Build a new integration</a>
+      <a class="btn btn-ghost" href="api/index.html">Working with the API</a>
     </div>
    </div>
    <img class="hero-mark" src="assets/tsanet-devhub-vertical.png" alt="TSANet Developer Hub">
@@ -156,12 +157,58 @@
   </div>
 </header>
 
+
+
+
+
+
+
+<section id="build">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <h2>Build a New Integration</h2>
+        <p>Your platform has no connector, or you are wiring Connect into something of your own. One question about the platform decides which of four routes fits; they are ordered by how much you have to build.</p>
+      </div>
+      <a class="sec-link" href="build/index.html">Start here →</a>
+    </div>
+    <div class="grid g2">
+      <a class="card" href="connectors/connect-gateway.html"><span class="chip beta">Work in progress · v2.0.0</span><h3>Build on the Connect Gateway</h3><p>TSANet supplies the engine, the contract and a conformance harness; you write only the half that talks to your platform. The route when the platform will not run your code in the member's tenant.</p><span class="card-foot">Design &amp; adapter guide →</span></a>
+      <a class="card" href="connectors/connect-sdk.html"><span class="chip live">v2.0.0 · Java</span><h3>Use the SDK</h3><p>A Java client with typed facades, validation and both auth modes, as a public package. The shortest JVM path that is not hand-rolled HTTP.</p><span class="card-foot">Library reference →</span></a>
+      <a class="card" href="api/index.html"><span class="chip">Pattern</span><h3>Build Against the API</h3><p>Your platform's events in, Connect API calls out, <code>updatedAfter</code> polling back. For any stack; read the behaviour guide before you design.</p><span class="card-foot">Working with the API →</span></a>
+      <a class="card" href="community/index.html"><span class="chip">Wish list</span><h3>Tell Us the Platform</h3><p>Which platform your team runs on decides which connector gets built next. If yours is common, waiting may be the right route.</p><span class="card-foot">Community →</span></a>
+    </div>
+    <p style="margin-top:18px;font-size:14.5px;color:var(--slate)">Whichever route: settle first whether the platform runs your code inside the member's tenant, then build on Beta with test-flagged submissions. The <a href="build/index.html#first-week">first week</a> is the same on every route, and the <a href="tools/index.html">tools</a> are collected in one place.</p>
+  </div>
+</section>
+
+<section id="api">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <h2>Build Against the API</h2>
+        <p>The behaviours that cost integrators time, gathered from building four connectors and a Java client against it. The endpoint reference lives in GitBook and is generated from the spec — this is the layer underneath it.</p>
+      </div>
+      <a class="sec-link" href="api/index.html">Working with the API →</a>
+    </div>
+    <div class="grid g3">
+      <a class="card" href="api/index.html#reference"><span class="chip">Reference</span><h3>The Endpoint Reference</h3><p>Schemas, parameters and status codes for all 27 paths live in the GitBook reference, generated from the spec. Not duplicated here — but one known drift from the spec is flagged.</p></a>
+      <a class="card" href="api/index.html#errors"><span class="chip">Errors</span><h3>Two Response Modes</h3><p>By default most rejections return HTTP 500 — indistinguishable from an outage. One <code>Accept</code> header gets you documented status codes and RFC 7807 bodies.</p></a>
+      <a class="card" href="api/index.html#auth"><span class="chip">Auth</span><h3>Login &amp; Identity</h3><p>OAuth 2.0 client credentials is the current server-to-server path; <code>POST /v1/login</code> is legacy. Watch the scope format — the obvious one fails.</p></a>
+      <a class="card" href="api/index.html#partners"><span class="chip">Partners</span><h3>Discovery &amp; Forms</h3><p>Fetch the process form fresh every time, and parse its SELECT options on newlines rather than commas.</p></a>
+      <a class="card" href="api/index.html#cases"><span class="chip">Cases</span><h3>Collaboration Requests</h3><p>Save the token immediately. There is no idempotency key on create, and <code>responded</code> — not the status name — is what gates the SLA.</p></a>
+      <a class="card" href="api/index.html#content"><span class="chip">Content</span><h3>Notes &amp; Attachments</h3><p>Two note fields rendered as two sections, so never copy one into the other. Attachments need both sides configured.</p></a>
+      <a class="card" href="api/index.html#webhooks"><span class="chip">Webhooks</span><h3>Event Delivery</h3><p>v1 and v2 both accept your subscription and deliver different type strings. Payloads are thin; delivery is at-least-once, so build for duplicates.</p></a>
+      <a class="card" href="api/index.html#versions"><span class="chip">Sunset</span><h3>Deprecation Clocks</h3><p>Three v1 paths sunset on 2027-01-01: the case list and both webhook paths. Everything else has no v2 and no clock, so the migration is smaller than it sounds.</p></a>
+    </div>
+  </div>
+</section>
 <section id="connectors">
   <div class="wrap">
     <div class="sec-head">
       <div>
         <h2>Connectors &amp; Gateways</h2>
-        <p>Production integrations maintained in the tsanetgit organization. One connection reaches every partner member.</p>
+        <p>The shipped integrations, maintained in the tsanetgit organization — and, if you are building your own, the worked examples of the routes above. One connection reaches every partner member.</p>
       </div>
       <a class="sec-link" href="connectors/index.html">Compare all connectors →</a>
     </div>
@@ -217,46 +264,6 @@
     </div>
   </div>
 </section>
-
-<section id="api">
-  <div class="wrap">
-    <div class="sec-head">
-      <div>
-        <h2>Build Against the API</h2>
-        <p>The behaviours that cost integrators time, gathered from building four connectors and a Java client against it. The endpoint reference lives in GitBook and is generated from the spec — this is the layer underneath it.</p>
-      </div>
-      <a class="sec-link" href="api/index.html">Working with the API →</a>
-    </div>
-    <div class="grid g3">
-      <a class="card" href="api/index.html#reference"><span class="chip">Reference</span><h3>The Endpoint Reference</h3><p>Schemas, parameters and status codes for all 27 paths live in the GitBook reference, generated from the spec. Not duplicated here — but one known drift from the spec is flagged.</p></a>
-      <a class="card" href="api/index.html#errors"><span class="chip">Errors</span><h3>Two Response Modes</h3><p>By default most rejections return HTTP 500 — indistinguishable from an outage. One <code>Accept</code> header gets you documented status codes and RFC 7807 bodies.</p></a>
-      <a class="card" href="api/index.html#auth"><span class="chip">Auth</span><h3>Login &amp; Identity</h3><p>OAuth 2.0 client credentials is the current server-to-server path; <code>POST /v1/login</code> is legacy. Watch the scope format — the obvious one fails.</p></a>
-      <a class="card" href="api/index.html#partners"><span class="chip">Partners</span><h3>Discovery &amp; Forms</h3><p>Fetch the process form fresh every time, and parse its SELECT options on newlines rather than commas.</p></a>
-      <a class="card" href="api/index.html#cases"><span class="chip">Cases</span><h3>Collaboration Requests</h3><p>Save the token immediately. There is no idempotency key on create, and <code>responded</code> — not the status name — is what gates the SLA.</p></a>
-      <a class="card" href="api/index.html#content"><span class="chip">Content</span><h3>Notes &amp; Attachments</h3><p>Two note fields rendered as two sections, so never copy one into the other. Attachments need both sides configured.</p></a>
-      <a class="card" href="api/index.html#webhooks"><span class="chip">Webhooks</span><h3>Event Delivery</h3><p>v1 and v2 both accept your subscription and deliver different type strings. Payloads are thin; delivery is at-least-once, so build for duplicates.</p></a>
-      <a class="card" href="api/index.html#versions"><span class="chip">Sunset</span><h3>Deprecation Clocks</h3><p>Three v1 paths sunset on 2027-01-01: the case list and both webhook paths. Everything else has no v2 and no clock, so the migration is smaller than it sounds.</p></a>
-    </div>
-  </div>
-</section>
-
-<section id="tools">
-  <div class="wrap">
-    <div class="sec-head">
-      <div>
-        <h2>Tools for Building an Integration</h2>
-        <p>The environments, reference, SDK, test suites and agent skills you use while building, with what each needs to get hold of — and which ones members cannot reach yet.</p>
-      </div>
-      <a class="sec-link" href="tools/index.html">All tools →</a>
-    </div>
-    <div class="grid g3">
-      <a class="card" href="tools/index.html#environments"><span class="chip live">Public</span><h3>Beta and the Test Flag</h3><p>Build on Beta with test-flagged submissions so nothing reaches a real partner; confirm who you are with one call.</p></a>
-      <a class="card" href="tools/index.html#reference"><span class="chip live">Public</span><h3>Reference and Postman</h3><p>The generated endpoint reference in GitBook and a collection that exercises every path against your credentials.</p></a>
-      <a class="card" href="tools/index.html#testing"><span class="chip beta">Partly public</span><h3>SDK, Demo and Test Suites</h3><p>The Java client is a public package; the demo, the conformance harness and the connector test harness need onboarding or are not public yet.</p></a>
-    </div>
-  </div>
-</section>
-
 <section id="docs">
   <div class="wrap">
     <div class="sec-head">
@@ -295,7 +302,6 @@
     </div>
   </div>
 </section>
-
 <section id="topics">
   <div class="wrap">
     <div class="sec-head">
@@ -361,7 +367,6 @@
     </div>
   </div>
 </section>
-
 <section id="community">
   <div class="wrap">
     <div class="sec-head">
@@ -390,13 +395,13 @@
     </div>
   </div>
 </section>
-
 <footer>
   <div class="wrap">
     <div class="foot-top"><img src="assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
     <div class="foot-cols">
       <nav class="foot-col" aria-label="Developers">
         <h4>Developers</h4>
+        <a href="build/index.html">Build a New Integration</a>
         <a href="connectors/index.html">Connectors</a>
         <a href="api/index.html">Working with the API</a>
         <a href="docs/index.html">Design Documents</a>

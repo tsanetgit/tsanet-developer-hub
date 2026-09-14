@@ -21,6 +21,8 @@ Two consequences of the transfer worth knowing:
 
 ```
 index.html              Landing page — previews each section, links to its landing page
+build/index.html        Build a New Integration — the deciding question, four routes in
+                        order of effort, the first week, tools, worked examples
 assets/
   hub.css               The design system: brand tokens, nav, cards, tables,
                         pills, SVG diagram primitives, footer

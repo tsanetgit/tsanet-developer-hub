@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Build a New Integration — TSANet Connect Developer Hub</title>
+<link rel="icon" href="../assets/tsanet-favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/hub.css?v=20260914c">
+<style>
+  .q{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--orange);border-radius:14px;padding:26px 28px;margin-top:18px}
+  .q h3{margin:0 0 8px;font-size:20px}
+  .q p{font-size:15px;color:var(--slate);max-width:76ch}
+  .q .split{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:16px}
+  .q .split div{font-size:13.5px;color:var(--slate);line-height:1.6}
+  .q .split b{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);margin-bottom:4px}
+  @media(max-width:640px){.q .split{grid-template-columns:1fr}}
+  .steps{counter-reset:s;display:grid;gap:12px;margin-top:14px}
+  .steps li{list-style:none;position:relative;padding-left:38px;font-size:14.5px;color:var(--slate);line-height:1.6}
+  .steps li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:2px;width:26px;height:26px;border-radius:50%;background:var(--blue);color:#fff;font-family:var(--mono);font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center}
+  .steps li b{color:var(--ink)}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-in">
+    <a class="brand" href="../index.html"><img class="brand-img" src="../assets/tsanet-devhub-horizontal.png" alt="TSANet Developer Hub"></a>
+    <div class="nav-links">
+      <a href="index.html" aria-current="page">Build</a>
+      <a href="../connectors/index.html">Connectors</a>
+      <a href="../api/index.html">API</a>
+      <a href="../docs/index.html">Design Docs</a>
+      <a href="../topics/index.html">Topics</a>
+      <a href="../tools/index.html">Tools</a>
+      <a href="../community/index.html">Community</a>
+    </div>
+  </div>
+</nav>
+
+<header class="pagehead">
+  <div class="wrap">
+    <div class="crumb"><a href="../index.html">Hub</a> / Build</div>
+    <h1>Build a New Integration</h1>
+    <p class="lede">Start here if your platform has no TSANet connector, or you are wiring Connect into something of your own. One question decides which of four routes fits, the routes are ordered by how much you have to build, and the tools you use on any of them are one page away.</p>
+    <div class="meta-row">
+      <span><b>Routes</b> 4, in order of effort</span>
+      <span><b>Decides between them</b> one question about your platform</span>
+      <span><b>Before anything is real</b> Beta, test-flagged</span>
+    </div>
+    <div class="toc">
+      <a href="#question">The Question</a>
+      <a href="#routes">Four Routes</a>
+      <a href="#first-week">The First Week</a>
+      <a href="#tools">Tools</a>
+      <a href="#examples">Worked Examples</a>
+    </div>
+  </div>
+</header>
+
+<section id="question">
+  <div class="wrap">
+    <p class="eyebrow">Settle this first</p>
+    <h2>Will the Platform Run Your Code Inside the Member's Own Tenant?</h2>
+    <div class="q">
+      <h3>It is a property of the platform, not a choice you get to make.</h3>
+      <p>The answer decides who operates the integration, where credentials live, whether connector faults are isolated to one member or shared across all of them, and whether shipping a fix means asking every member to upgrade. Ask it before scoping anything, because it is what makes route one or route two the natural fit — and the platforms that answer "sort of" are where the design work is.</p>
+      <div class="split">
+        <div><b>Yes — in-tenant</b> Salesforce and Dynamics say yes and get managed packages the member installs. You build against the API or the SDK, and the member operates it.</div>
+        <div><b>No — gateway</b> Intercom says no, so TSANet hosts and operates the adapter on the Connect Gateway. You write only the half that talks to your platform.</div>
+      </div>
+      <p style="margin-top:14px;font-size:13.5px">The taxonomy, the consequences of each class, and what to do when a platform answers both ways: <a href="../topics/connector-classes.html">Two Ways to Build a Connector</a>. The worked case of an ambiguous answer is the <a href="../connectors/servicenow.html">ServiceNow assessment</a>.</p>
+    </div>
+  </div>
+</section>
+
+<section id="routes">
+  <div class="wrap">
+    <p class="eyebrow">Options</p>
+    <h2>Four Routes, in Order of Effort</h2>
+    <div class="grid g2">
+      <a class="card" href="../connectors/connect-gateway.html">
+        <span class="chip beta">Work in progress · v2.0.0</span>
+        <h3>Build on the Connect Gateway</h3>
+        <p>TSANet supplies the engine, the contract and a conformance harness that certifies the seam; you write only the half that talks to your own platform — and never touch the Connect API or its errors. The least effort, and the route for any platform that will not run your code in the member's tenant. The repository is private; adapter authors get access at onboarding.</p>
+        <span class="card-foot">Design &amp; adapter guide →</span>
+      </a>
+      <a class="card" href="../connectors/connect-sdk.html">
+        <span class="chip live">v2.0.0 · Java</span>
+        <h3>Use the SDK</h3>
+        <p>A Java client over the Connect API with typed facades, validation and both auth modes, published as a public package. The shortest path on the JVM that is not hand-rolled HTTP, and the one that already encodes the API's sharp edges.</p>
+        <span class="card-foot">Library reference →</span>
+      </a>
+      <a class="card" href="../api/index.html">
+        <span class="chip">Pattern</span>
+        <h3>Build Against the API</h3>
+        <p>The translation-service pattern: your platform's events in, Connect API calls out, <code>updatedAfter</code> polling back. For any stack that is not the JVM. Read the behaviour guide before you design; the reference alone will not tell you about the default error mode or the webhook version trap.</p>
+        <span class="card-foot">Working with the API →</span>
+      </a>
+      <a class="card" href="../community/index.html">
+        <span class="chip">Wish list</span>
+        <h3>Tell Us the Platform</h3>
+        <p>Which platform your team runs on is the single most useful thing you can say to us — it is what decides which connector gets built next. If yours is common among members, the right route may be to wait for a connector rather than build one.</p>
+        <span class="card-foot">Community →</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section id="first-week">
+  <div class="wrap">
+    <p class="eyebrow">Sequence</p>
+    <h2>The First Week, Whichever Route</h2>
+    <ol class="steps">
+      <li><b>Get a Beta account</b> from <a href="mailto:membership@tsanet.org">membership@tsanet.org</a>, and if you will use OAuth client credentials, have TSANet provision your service principal at the same time — an app-only token is not accepted until they have.</li>
+      <li><b>Call <code>GET /v1/me</code></b> and confirm the company your credentials resolve to. Every call is scoped to that identity.</li>
+      <li><b>Fetch a partner's process form fresh</b> and submit a case with <code>testSubmission: true</code>. Nothing you send reaches a real partner while the flag is set, and the <code>documentId</code> you must submit comes from that fetch.</li>
+      <li><b>Read it back.</b> The shape you write is not the shape you read, and <code>responded</code>, not the status name, is what gates the SLA. <a href="../docs/tsanet-2026-001-canonical-case-model.html">TSANET-2026-001</a> is the map.</li>
+      <li><b>Send the Accept header on every call</b> — <code>Accept: application/json, application/problem+json</code> — or every rejection arrives as HTTP 500 and looks like an outage.</li>
+      <li><b>Persist the token at creation</b>, before anything else in your flow can fail. There is no idempotency key on create; a blind retry is a second case.</li>
+      <li><b>Subscribe to webhooks on v2</b>, verify the signature before processing, fast-ack, and keep a poll behind the push — delivery is at-least-once and the fetch is what establishes truth.</li>
+    </ol>
+    <p style="margin-top:16px;font-size:14.5px;color:var(--slate)">Each of those is a section of <a href="../api/index.html">Working with the API</a>, which exists because the reference does not say them.</p>
+  </div>
+</section>
+
+<section id="tools">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <p class="eyebrow">Tools</p>
+        <h2>What You Use Along the Way</h2>
+      </div>
+      <a class="sec-link" href="../tools/index.html">All tools →</a>
+    </div>
+    <div class="grid g3">
+      <a class="card" href="../tools/index.html#environments"><span class="chip live">Public</span><h3>Beta and the Test Flag</h3><p>The environment to build on, and the flag that keeps partners out of it until you mean it.</p></a>
+      <a class="card" href="../tools/index.html#reference"><span class="chip live">Public</span><h3>Reference and Postman</h3><p>The generated endpoint reference and a collection that exercises every path with your credentials.</p></a>
+      <a class="card" href="../tools/index.html#sdk"><span class="chip live">Public</span><h3>connect-library</h3><p>The Java client as a public package; the console app and web demo behind it.</p></a>
+      <a class="card" href="../tools/index.html#testing"><span class="chip">Access at onboarding</span><h3>Test Suites</h3><p>The Gateway conformance harness for adapter authors; the connector test harness is not public yet.</p></a>
+      <a class="card" href="../tools/index.html#skills"><span class="chip live">Public</span><h3>Agent Skills</h3><p>Four skills that load into any assistant that reads the open skill format, two of them public today.</p></a>
+      <a class="card" href="../community/index.html"><span class="chip">Questions</span><h3>Where to Take What</h3><p>Trackers for connector bugs, membership for credentials, the discussions for everything else.</p></a>
+    </div>
+  </div>
+</section>
+
+<section id="examples">
+  <div class="wrap">
+    <p class="eyebrow">Worked examples</p>
+    <h2>The Shipped Integrations, Read as Examples</h2>
+    <p>Four connectors and one assessment. Each page shows the class it landed in, what it installs, and how it maps the canonical case onto its platform's data model — which is the part to read before you design your own mapping. The <a href="../connectors/index.html#matrix">comparison matrix</a> puts the four side by side.</p>
+    <div class="grid g3">
+      <a class="card" href="../connectors/salesforce.html"><span class="chip live">GA · in-tenant</span><h3>Salesforce</h3><p>Managed package; collaboration state in first-class custom objects; a Flow library as the extension point.</p></a>
+      <a class="card" href="../connectors/dynamics.html"><span class="chip live">GA · in-tenant</span><h3>Microsoft Dynamics</h3><p>Managed solution; six Dataverse tables; field mapping as a configuration table rather than code.</p></a>
+      <a class="card" href="../connectors/zendesk.html"><span class="chip live">GA · partial</span><h3>Zendesk</h3><p>A sandboxed app plus declarative flows; state in ticket fields and tags; the three-audience note model.</p></a>
+      <a class="card" href="../connectors/fin-intercom.html"><span class="chip beta">Early access · gateway</span><h3>Fin / Intercom</h3><p>The first gateway-class adapter: TSANet hosts it, the engine holds the state, the taxonomy parks ambiguity.</p></a>
+      <a class="card" href="../connectors/servicenow.html"><span class="chip beta">Not built · assessment</span><h3>ServiceNow</h3><p>What scoping looks like before code exists: every claim tagged, every open question named with what it blocks.</p></a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-top"><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
+    <div class="foot-cols">
+      <nav class="foot-col" aria-label="Developers">
+        <h4>Developers</h4>
+        <a href="index.html">Build a New Integration</a>
+        <a href="../connectors/index.html">Connectors</a>
+        <a href="../api/index.html">Working with the API</a>
+        <a href="../docs/index.html">Design Documents</a>
+        <a href="../topics/index.html">Topics</a>
+        <a href="../tools/index.html">Tools</a>
+        <a href="../community/index.html">Community</a>
+      </nav>
+      <div class="foot-col">
+        <h4>Members</h4>
+        <a href="https://www.tsanet.org/members/">Member List</a>
+        <a href="https://tsanet.gitbook.io/connect">Platform Documentation</a>
+        <a href="https://tsanet.gitbook.io/connect/help-center">Member Support</a>
+      </div>
+      <div class="foot-col">
+        <h4>About</h4>
+        <a href="https://www.tsanet.org/about-us/">About Us</a>
+        <a href="https://www.tsanet.org/board-of-directors/">Board of Directors</a>
+        <a href="https://www.tsanet.org/news-events/">News and Events</a>
+      </div>
+    </div>
+    <div class="foot-bottom mono">
+      <span>© TSANet Inc. All Rights Reserved</span>
+      <a href="https://www.tsanet.org/legal-policy/">Privacy Policy</a>
+      <a href="https://github.com/tsanetgit">github.com/tsanetgit</a>
+      <a href="mailto:membership@tsanet.org">membership@tsanet.org</a>
+      <span class="foot-social" aria-label="TSANet on social media">
+        <a href="https://twitter.com/TSANetTweet" aria-label="TSANet on X" title="X"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg></a>
+        <a href="https://www.linkedin.com/company/tsanet" aria-label="TSANet on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+        <a href="https://www.youtube.com/@tsanet8120" aria-label="TSANet on YouTube" title="YouTube"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+        <a href="https://github.com/tsanetgit" aria-label="TSANet on GitHub" title="GitHub"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+      </span>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

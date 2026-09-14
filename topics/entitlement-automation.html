@@ -44,11 +44,12 @@
   <div class="wrap">
     <div class="crumb"><a href="../index.html">Hub</a> / <a href="index.html">Topics</a> / Entitlement automation</div>
     <h1>Deciding what to accept automatically</h1>
-    <p class="lede">Every shipped connector offers some way to accept inbound collaboration requests without an agent. They disagree completely about when that is a good idea — and the disagreement is worth understanding, because accepting a case is not a routing step. It is a promise to another company.</p>
+    <p class="lede">Three of the four shipped connectors offer some way to accept inbound collaboration requests without an agent, and the fourth deliberately does not. They disagree completely about when that is a good idea — and the disagreement is worth understanding, because accepting a case is not a routing step. It is a promise to another company.</p>
     <div class="meta-row">
       <span><b>Topic</b> Inbound automation</span>
       <span><b>Grounded in</b> Four connectors</span>
       <span><b>Audience</b> Anyone configuring inbound</span>
+      <span><b>Updated</b> 2026-09-13</span>
     </div>
     <div class="toc">
       <a href="#commitment">What acceptance commits you to</a>
@@ -181,7 +182,7 @@ Notify the case owner</code></pre>
     <p>Matching on the partner's own case number first is what makes re-collaboration on a continuing issue attach to the same case rather than opening a duplicate. That is worth having even if you never intend to auto-accept.</p>
 
     <h3>Fin / Intercom: draft automatically, commit deliberately</h3>
-    <p>The gateway connector takes the opposite position and states the reasoning explicitly: accepting, declining and requesting information are <strong>contractual commitments to another vendor, made under a service-level clock</strong>. Automation composes the answer; a person makes the commitment.</p>
+    <p>The <a href="connector-classes.html">gateway-class</a> connector takes the opposite position and states the reasoning explicitly: accepting, declining and requesting information are <strong>contractual commitments to another vendor, made under a service-level clock</strong>. Automation composes the answer; a person makes the commitment.</p>
     <p>There is a second reason specific to AI-assisted flows. Partner escalations carry end-customer logs and text pasted in verbatim — untrusted content arriving at a system that would then reply under your company's name. Keeping a human on the commitment is also a containment boundary.</p>
   </div>
 </section>
@@ -206,7 +207,7 @@ Notify the case owner</code></pre>
     <p>Two design rules worth adopting whichever identifier you pick:</p>
     <ul class="tight">
       <li><strong>Decide what "no match" means before you build.</strong> Rejecting is a real answer and it is kinder than silence — but only if your matching is good enough that a rejection is usually correct. If it is not, leave unmatched cases open for a human instead. Rejecting wrongly is worse than not automating.</li>
-      <li><strong>Start scoped, then widen.</strong> One partner, or one product line, with everything else falling through to normal triage. Every connector here supports a conditional form, and it converts a policy question into an observation: run it narrow for a month and count how often the rule was right.</li>
+      <li><strong>Start scoped, then widen.</strong> One partner, or one product line, with everything else falling through to normal triage. Every connector that automates acceptance supports a conditional form, and it converts a policy question into an observation: run it narrow for a month and count how often the rule was right.</li>
     </ul>
   </div>
 </section>

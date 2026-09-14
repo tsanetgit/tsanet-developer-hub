@@ -49,6 +49,7 @@
       <span><b>Topic</b> Integration architecture</span>
       <span><b>Grounded in</b> Five platforms</span>
       <span><b>Audience</b> Anyone scoping an integration</span>
+      <span><b>Updated</b> 2026-09-13</span>
     </div>
     <div class="toc">
       <a href="#question">The question</a>
@@ -102,7 +103,7 @@
       <div class="classcard gateway">
         <h3>Gateway</h3>
         <div class="who">Fin / Intercom</div>
-        <p>The platform hosts no third-party code at all. Panels are pages served from elsewhere and framed in; there is no installed package to speak of. The shared machinery this class runs on is the <a href="../connectors/connect-gateway.html">Connect Gateway</a>.</p>
+        <p>The platform hosts no third-party code at all. Panels are pages served from elsewhere and framed in; there is no installed package — the member connects an app in their workspace (for Fin / Intercom, a connected Intercom app) and TSANet hosts the rest. The shared machinery this class runs on is the <a href="../connectors/connect-gateway.html">Connect Gateway</a>.</p>
         <ul>
           <li>TSANet operates it</li>
           <li>Credentials sit with TSANet, one set per member</li>
@@ -176,7 +177,7 @@
           <tr><th scope="row">Reconciliation</th><td>Scheduled jobs the platform runs for you</td><td class="next">A poller you build, operate and monitor</td></tr>
           <tr><th scope="row">Durable state</th><td>Platform objects — reportable, governed by their sharing model</td><td class="next">A store you run, back up and keep consistent with the platform</td></tr>
           <tr><th scope="row">Inbound delivery</th><td>An endpoint inside the tenant, or the platform's own event machinery</td><td class="next">Your endpoint, your signature verification, your dedupe</td></tr>
-          <tr><th scope="row">Deployment</th><td>A package a member installs and later upgrades</td><td class="next">A service you deploy; members install little or nothing</td></tr>
+          <tr><th scope="row">Deployment</th><td>A package a member installs and later upgrades</td><td class="next">A service you deploy; members connect an app and install little else</td></tr>
           <tr><th scope="row">Data residency</th><td>Case content never leaves the member's tenant</td><td class="next">Case content transits infrastructure TSANet operates</td></tr>
           <tr><th scope="row">Connector faults</th><td>Independent — one member's misconfiguration cannot affect another</td><td class="next">Correlated across members on the gateway — one shared service, which is what its durability and rollout design exists to manage</td></tr>
           <tr><th scope="row">Platform outage</th><td colspan="2" style="text-align:center">Affects everyone, in every class — the Connect API is a shared dependency regardless of where connector code runs</td></tr>
@@ -187,8 +188,9 @@
     <p>The row that most often gets under-weighted at scoping time is <strong>data residency</strong>, because it is a procurement question rather than an engineering one. A member whose policy says case content stays on their infrastructure has effectively ruled out the gateway class before the first design meeting — and will say so late, after review, unless someone asks early.</p>
     <p>The two failure rows are the ones most often reasoned about badly, including by us — an earlier version of this page got them wrong, so it is worth being precise.</p>
     <p><strong>Every class already shares a dependency.</strong> The Connect API is the shared floor: a platform outage stops collaboration for every member regardless of where their connector code runs. An in-tenant Salesforce package does not keep working when the platform is down. So "in-tenant means one member is affected" is only ever true of faults <em>in the connector itself</em>, and stating it without that qualifier flatters the in-tenant column.</p>
-    <p><strong>What the gateway changes is correlation, not fragility.</strong> It adds one more component shared by the members on it, so a fault there is correlated rather than independent. That is a design input, not a verdict: correlation is what clustering, replication and staged rollout exist to manage, and a gateway built that way targets availability in the same range members expect from the platform itself. The honest comparison is that in-tenant distributes connector faults across members while a gateway concentrates them into something engineered — and operated — to a higher standard than any individual member's install.</p>
+    <p><strong>What the gateway changes is correlation, not fragility.</strong> It adds one more component shared by the members on it, so a fault there is correlated rather than independent. That is a design input, not a verdict: correlation is what durability, recovery and staged rollout exist to manage, and a gateway built that way targets availability in the same range members expect from the platform itself. The honest comparison is that in-tenant distributes connector faults across members while a gateway concentrates them into something engineered — and operated — to a higher standard than any individual member's install.</p>
     <p>Where that genuinely bites is not uptime but <em>change</em>. A bad release to the gateway still reaches everyone on it at once, which is why deployment discipline matters more there than in a world where each member upgrades on their own schedule.</p>
+    <p>Two consequences of the class are worked through on their own pages: what it means for <a href="entitlement-automation.html">accepting cases automatically</a>, and for <a href="file-sharing.html">receiving files</a>.</p>
   </div>
 </section>
 
@@ -226,7 +228,7 @@
     <h2>When the platform answers "sort of"</h2>
     <p>Two of the five platforms above do not answer cleanly, and they are instructive in different ways.</p>
     <h3>Zendesk: yes to installation, no to a server</h3>
-    <p>Code installs and runs — but the app is a browser sandbox with no storage and no server, and the flow engine is declarative. So background work lives in a page that exists only while an agent has a tab open, and anything the flow language cannot express has nowhere to go. The class question resolves to "in-tenant, within limits", and the limits are the design.</p>
+    <p>Code installs and runs — but the app is a browser sandbox with no storage and no server, and the flow engine is declarative. So background work lives in a page that exists only while an agent has a tab open, and anything the flow language cannot express has nowhere to go. The class question resolves to <em>Partial</em> — in-tenant, within limits — and the limits are the design.</p>
     <h3>ServiceNow: yes to installation, no to hosting</h3>
     <p>Installed scoped applications are the native extension model, so code can certainly run in the member's instance. But the platform hosts no UI surface for you and provides no native webhooks — so something must be installed <em>and</em> something must be served from elsewhere. The remaining decision is not "app or no app"; it is how much of the connector lives inside that app, and therefore how often members have to upgrade it.</p>
     <div class="note">That reframing is the practical value of the taxonomy. When a platform answers ambiguously, the question stops being <em>which class is this</em> and becomes <em>what is the smallest thing that has to be installed</em> — because that is what determines the upgrade burden you are signing members up for. See the <a href="../connectors/servicenow.html">ServiceNow assessment</a> for that worked through in detail.</div>

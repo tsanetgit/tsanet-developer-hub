@@ -179,6 +179,10 @@ footer a:hover{text-decoration:underline}
 .foot-col a:hover{color:#fff}
 .foot-bottom{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:30px;padding-top:14px;border-top:1px solid rgba(255,255,255,.16)}
 .foot-bottom a{color:#BFD9E5}
+.foot-social{display:inline-flex;gap:14px;margin-left:auto;align-items:center}
+.foot-social a{color:#BFD9E5;display:inline-flex;line-height:0}
+.foot-social a:hover{color:#fff}
+@media(max-width:640px){.foot-social{margin-left:0;width:100%}}
 @media(max-width:640px){.foot-cols{grid-template-columns:1fr}}
 
 @media(prefers-reduced-motion:reduce){

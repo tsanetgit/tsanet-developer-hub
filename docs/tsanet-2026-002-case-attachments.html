@@ -41,7 +41,7 @@
       <div class="meta-cell"><b>Date</b><span>2026-08-25</span></div>
       <div class="meta-cell"><b>Version</b><span>0.2</span></div>
       <div class="meta-cell"><b>Audience</b><span>Member integrators</span></div>
-      <div class="meta-cell"><b>Status</b><span>Rolling out per member</span></div>
+      <div class="meta-cell"><b>Verified against</b><span>Connect API OpenAPI spec — the published attachment surface</span></div>
     </div>
   </div>
 </header>
@@ -65,7 +65,7 @@
       <tr><td><code>PUT .../attachments/config/https</code></td><td>Register or update the caller's normalized HTTPS receive configuration for the case</td></tr>
       <tr><td><code>POST .../attachments</code></td><td>Forward files — multipart, with a description and a file array</td></tr>
     </table>
-    <p>All four are scoped to a collaboration request by <code>token</code>, so attachment configuration is a property of a case rather than a global account setting.</p>
+    <p>All four are scoped to a collaboration request by <code>token</code>: this is the per-case layer. The baseline receiving configuration is registered per member with TSANet at onboarding (see the constraint in 2.1 and the <a href="../topics/file-sharing.html">companion topic</a>); a token-scoped registration overrides it for that one case.</p>
 
     <h3>2.1 What a receive configuration declares</h3>
     <p>The normalized HTTPS configuration requires <code>domain</code>, <code>httpsPort</code>, <code>httpsPath</code>, <code>password</code> and an <code>expiration</code>. In other words: where to deliver, on what port and path, with what credential, valid until when. Anything you register has to be an endpoint you actually operate and can receive on.</p>

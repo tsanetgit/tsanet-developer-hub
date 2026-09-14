@@ -59,7 +59,7 @@
 <header class="pagehead">
   <div class="wrap">
     <div class="crumb"><a href="../index.html">Hub</a> / <a href="index.html">Topics</a> / Agentic usage</div>
-    <h1>Agentic Usage with TSANet Connect</h1>
+    <h1>Agentic usage with TSANet Connect</h1>
     <p class="lede">Working on Connect with an AI agent rather than by hand — whichever provider's agent it is. The skills TSANet ships and how to load them into any assistant, the assistant embedded in this hub, what every provider's agent framework needs from the Connect API and where each one falls short, and a platform assessment of Microsoft Copilot Studio as one hosted way to build such an agent.</p>
     <div class="meta-row">
       <span><b>Shipped</b> Four agent skills · the hub assistant launcher</span>
@@ -104,7 +104,7 @@
 <section id="skills">
   <div class="wrap">
     <p class="eyebrow">Shipped</p>
-    <h2>Agent Skills: the Part That Already Exists</h2>
+    <h2>Agent skills: the part that already exists</h2>
     <p>An <strong>agent skill</strong> is a folder with a <code>SKILL.md</code> in it — name and description in frontmatter, instructions underneath, optionally reference files and scripts alongside. An assistant reads the description to decide when the skill applies and loads the full instructions only then. Anthropic released the format as an open standard on 18 December 2025; the specification lives at <a href="https://agentskills.io">agentskills.io</a>, and the site lists Claude, OpenAI Codex, Gemini CLI, GitHub Copilot, Cursor and VS Code among the tools that read it. <span class="tag doc">documented</span> That is why the connector pages can say "nothing in it is Claude-specific": the same folder loads into any of them.</p>
     <p>TSANet ships four. Each was distilled from the production implementation it sits next to, and each connector page on this hub was verified against its skill's repository.</p>
     <div class="twrap">
@@ -136,7 +136,7 @@ cp -R Connect_SDK/skills/connect-sdk-deploy  your-project/.claude/skills/</code>
 <section id="assistant">
   <div class="wrap">
     <p class="eyebrow">This site</p>
-    <h2>The Hub Assistant</h2>
+    <h2>The hub assistant</h2>
     <p>A chat assistant for developers working from these pages: ask it which connector fits a platform, what a status transition needs, why an auth call fails with a given code, and it answers from the hub, the <a href="https://tsanet.gitbook.io/connect/api-reference">API reference</a> and the public tsanetgit repositories, with a link to the page it drew on. It is a Microsoft Copilot Studio agent, running on Claude, embedded in every page of this site as an iframe.</p>
     <p>Two halves. <strong>The site half is shipped</strong>: <code>assets/assistant.js</code> renders a launcher in the bottom-right corner and a panel that loads the agent on first open — but only once an embed URL is configured, so no launcher appears for an agent that does not exist. <span class="tag ship">shipped</span> <strong>The agent half is not yet created.</strong> It has to be built in TSANet's Microsoft tenant by someone with Copilot Studio maker rights, and the recipe below is exactly that job. <span class="tag probe">needs probe</span></p>
     <h3 class="sub">Why Copilot Studio, for a static site</h3>
@@ -168,7 +168,7 @@ repeat the contradiction rather than resolving it.</code></pre></li>
 <section id="providers">
   <div class="wrap">
     <p class="eyebrow">Provider-agnostic</p>
-    <h2>Any Provider's Agent: What It Needs from Connect</h2>
+    <h2>Any provider's agent: what it needs from Connect</h2>
     <p>Strip away the branding and every agent framework needs the same two things to act on TSANet Connect: a <strong>tool definition</strong> it can read — an OpenAPI document or a JSON schema per operation — and an <strong>authentication path</strong> that produces the app-only token Connect expects. The first is easy everywhere. The second is where the frameworks split, because the Connect API's server-to-server path is <a href="../api/index.html#auth">OAuth 2.0 client credentials</a>: no user signs in, and the service principal is one TSANet provisions and maps to the member company.</p>
     <div class="twrap">
       <table>
@@ -191,7 +191,7 @@ repeat the contradiction rather than resolving it.</code></pre></li>
 <section id="rules">
   <div class="wrap">
     <p class="eyebrow">Design</p>
-    <h2>What No Model Changes</h2>
+    <h2>What no model changes</h2>
     <p>Everything on the <a href="../api/index.html">API page</a> still applies when the caller is a language model, and a few of those rules become sharper rather than softer.</p>
     <ul class="tight">
       <li><strong>Accepting is a commitment, so the agent must not do it alone.</strong> Approval stops the SLA clock and tells a partner an engineer is engaged. The shipped connectors disagree about automated acceptance, and the <a href="entitlement-automation.html">acceptance topic</a> works through when a rule asserts something true. An agent that can call the approval endpoint on its own judgement is the "accept everything" posture with extra steps; give it the read tools and the note tool, and route acceptance to a person, as the <a href="../connectors/fin-intercom.html">Fin / Intercom</a> connector does.</li>
@@ -353,7 +353,7 @@ repeat the contradiction rather than resolving it.</code></pre></li>
 <section id="open">
   <div class="wrap">
     <p class="eyebrow">Open questions</p>
-    <h2>What Has to Be Answered, and What Each One Blocks</h2>
+    <h2>What has to be answered, and what each one blocks</h2>
     <div class="twrap">
       <table>
         <thead><tr><th>Question</th><th>Blocks</th></tr></thead>
@@ -375,7 +375,7 @@ repeat the contradiction rather than resolving it.</code></pre></li>
 <section id="sources">
   <div class="wrap">
     <p class="eyebrow">Verified against</p>
-    <h2>Sources, with the Dates That Were Read</h2>
+    <h2>Sources, with the dates that were read</h2>
     <p>Vendor documentation changes monthly; the dates are each page's own date stamps at the time of reading. Where a row here contradicts the live page, the live page wins and this one needs revisiting.</p>
     <div class="twrap src">
       <table>

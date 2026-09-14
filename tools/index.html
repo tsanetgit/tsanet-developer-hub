@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tools — TSANet Connect Developer Hub</title>
+<link rel="icon" href="../assets/tsanet-favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/hub.css?v=20260914c">
+<style>
+  .tool{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:22px 24px;display:flex;flex-direction:column;gap:10px}
+  .tool h3{font-family:var(--disp);font-weight:700;font-size:17px;letter-spacing:-.01em;margin:0}
+  .tool p{font-size:13.5px;color:var(--slate);line-height:1.55;margin:0}
+  .tool .get{font-family:var(--mono);font-size:12.5px;color:var(--ink);margin-top:4px}
+  .tool .get b{color:var(--slate);font-weight:500;margin-right:6px}
+  .tool.pending{border-style:dashed}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0 0}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-in">
+    <a class="brand" href="../index.html"><img class="brand-img" src="../assets/tsanet-devhub-horizontal.png" alt="TSANet Developer Hub"></a>
+    <div class="nav-links">
+      <a href="../connectors/index.html">Connectors</a>
+      <a href="../api/index.html">API</a>
+      <a href="../docs/index.html">Design Docs</a>
+      <a href="../topics/index.html">Topics</a>
+      <a href="index.html" aria-current="page">Tools</a>
+      <a href="../community/index.html">Community</a>
+    </div>
+  </div>
+</nav>
+
+<header class="pagehead">
+  <div class="wrap">
+    <div class="crumb"><a href="../index.html">Hub</a> / Tools</div>
+    <h1>Tools for Building an Integration</h1>
+    <p class="lede">Everything you use while building against TSANet Connect, in one place: the environments and the test flag, the reference and the Postman collection, the SDK and its demo, the test suites, and the agent skills. Each entry says what it is for, how you get it, and what access it needs. Things that exist but are not reachable by members yet are marked, with what to do instead.</p>
+    <div class="meta-row">
+      <span><b>Public now</b> Beta environment · API reference · Postman collection · connect-library · two agent skills</span>
+      <span><b>At onboarding</b> conformance harness · two agent skills</span>
+      <span><b>Not yet public</b> hosted demo · connector test harness · hub assistant</span>
+    </div>
+    <div class="toc">
+      <a href="#environments">Environments</a>
+      <a href="#reference">Reference &amp; Postman</a>
+      <a href="#sdk">SDK &amp; Demo</a>
+      <a href="#testing">Test Suites</a>
+      <a href="#skills">Agent Skills</a>
+      <a href="#next">Where to Go Next</a>
+    </div>
+    <div class="legend"><span class="chip live">Public</span><span class="chip">Access at onboarding</span><span class="chip beta">Not yet public</span></div>
+  </div>
+</header>
+
+<section id="environments">
+  <div class="wrap">
+    <p class="eyebrow">Environments</p>
+    <h2>Beta to Build Against, and a Flag That Keeps Partners Out of It</h2>
+    <div class="grid g2">
+      <div class="tool">
+        <span class="chip live">Public</span>
+        <h3>The Beta Environment</h3>
+        <p>Build and test on <code>connect2.tsanet.net</code>; production is <code>connect2.tsanet.org</code>. Beta and production behave differently often enough that "which environment" is the first question anyone will ask about a problem. Every call is scoped to your member identity, so <code>GET /v1/me</code> is the cheapest check that your credentials resolve to the company you expect.</p>
+        <p class="get"><b>Get it</b> a Beta account and credentials from <a href="mailto:membership@tsanet.org">membership@tsanet.org</a>; for OAuth client credentials, TSANet also has to provision your service principal before an app-only token is accepted.</p>
+      </div>
+      <div class="tool">
+        <span class="chip live">Public</span>
+        <h3>The Test Flag</h3>
+        <p>Create cases with <code>testSubmission: true</code> while you build. It suppresses SLA timers and partner notifications, so nothing you send reaches a real partner's queue. You write <code>testSubmission</code> and read back <code>testCase</code>; that read-back is how you confirm a go-live flip actually happened. Every case that is not test-flagged reaches a real partner.</p>
+        <p class="get"><b>Get it</b> nothing to install — it is a field on the create request; see <a href="../api/index.html#cases">collaboration requests</a>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="reference">
+  <div class="wrap">
+    <p class="eyebrow">Reference &amp; Postman</p>
+    <h2>The Endpoint Reference, and the Collection That Exercises It</h2>
+    <div class="grid g2">
+      <div class="tool">
+        <span class="chip live">Public</span>
+        <h3>The API Reference in GitBook</h3>
+        <p>Request and response schemas, parameters and status codes for all 27 paths, generated from the specification. One known drift from the spec is flagged on the <a href="../api/index.html#ref-drift">API page</a>. The behaviours the reference does not tell you about — the default HTTP 500 error mode, the two note fields, the webhook version trap — are what <a href="../api/index.html">Working with the API</a> is for.</p>
+        <p class="get"><b>Get it</b> <a href="https://tsanet.gitbook.io/connect/api-reference">API Reference</a> · <a href="https://tsanet.gitbook.io/connect/api-reference/integration-guide">Integration guide</a> · <a href="https://tsanet.gitbook.io/connect/api-reference/models">Models</a></p>
+      </div>
+      <div class="tool">
+        <span class="chip live">Public</span>
+        <h3>The Postman Collection</h3>
+        <p>Every endpoint as a request you can send against Beta with your own credentials. Send <code>Accept: application/json, application/problem+json</code> on every request, or rejections come back as HTTP 500 with no usable detail.</p>
+        <p class="get"><b>Get it</b> <a href="https://tsanet.gitbook.io/connect/api-reference/postman-collection">Postman collection</a> in GitBook. The OpenAPI file the reference and the SDK are generated from is not published; ask <a href="mailto:membership@tsanet.org">membership@tsanet.org</a> for it if you are building a code generator or an agent's tool definitions around it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="sdk">
+  <div class="wrap">
+    <p class="eyebrow">SDK &amp; Demo</p>
+    <h2>A Java Client You Can Depend On, and a Demo You Have to Ask For</h2>
+    <div class="grid g3">
+      <div class="tool">
+        <span class="chip live">Public</span>
+        <h3>connect-library</h3>
+        <p>The Java client, generated from the specification and wrapped in nine typed facades. Published to GitHub Packages as a public package at v2.0.0; a token with <code>read:packages</code> is still required to resolve it, even for public artifacts.</p>
+        <p class="get"><b>Get it</b> <a href="../connectors/connect-sdk.html#getting">Connect SDK → Getting it</a></p>
+      </div>
+      <div class="tool">
+        <span class="chip">Access at onboarding</span>
+        <h3>The Console App</h3>
+        <p>A command per operation — create, approve, reject, information request and response, notes, close, attachments, webhooks — and an optional endpoint that receives webhooks into a local store. The source is public, but the build reads the specification from a private repository, so a clone alone does not build.</p>
+        <p class="get"><b>Get it</b> a built jar from TSANet at onboarding, or spec access if you need to build it yourself.</p>
+      </div>
+      <div class="tool pending">
+        <span class="chip beta">Not yet public</span>
+        <h3>The Web Demo</h3>
+        <p>A branded web demo over the SDK facades: dashboard, partner search, the partner's form rendered live, every lifecycle action, webhook management. It is not published as an artifact and there is no hosted instance members can sign into yet. How members get it — a TSANet-hosted instance or a hand-over — is being decided.</p>
+        <p class="get"><b>Until then</b> ask <a href="mailto:membership@tsanet.org">membership@tsanet.org</a> for a jar or image; if you host it, set <code>TSANET_DEMO_AUTH_PASSWORD</code> or it runs with no auth gate. Runbook on the <a href="../connectors/connect-sdk.html#modules">SDK page</a>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="testing">
+  <div class="wrap">
+    <p class="eyebrow">Test suites</p>
+    <h2>What Proves an Integration Before a Partner Does</h2>
+    <div class="grid g2">
+      <div class="tool">
+        <span class="chip">Access at onboarding</span>
+        <h3>The Gateway Conformance Harness</h3>
+        <p>For anyone writing an adapter on the <a href="../connectors/connect-gateway.html">Connect Gateway</a>: it drives your real adapter through Connect's failure modes — timeouts, ambiguous submits, duplicate inbound deliveries — and certifies the seam between your code and the engine. Run it continuously from day one, not once at the end.</p>
+        <p class="get"><b>Get it</b> the <code>conformance</code> module publishes with the gateway at v2.0.0 from the repository's package registry; the repository is private and access comes with adapter onboarding. Details under <a href="../connectors/connect-gateway.html#build">Building an adapter</a>.</p>
+      </div>
+      <div class="tool pending">
+        <span class="chip beta">Not yet public</span>
+        <h3>The Connector Test Harness</h3>
+        <p>TSANet's own local harness for testing connectors end to end against the Connect API: contract tests, connector unit suites, and end-to-end drivers for the shipped CRM connectors. It is internal today. Whether members should see it, and in what form, has not been decided.</p>
+        <p class="get"><b>Until then</b> the Beta environment with test-flagged submissions is the member-facing test bed, and the <a href="../community/index.html#trackers">connector issue trackers</a> are where a failing case goes.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="wrap">
+    <p class="eyebrow">Agent skills</p>
+    <h2>Four Skills, and an Assistant That Is Not Built Yet</h2>
+    <p>Each shipped skill was distilled from the production implementation it sits next to, and loads into any assistant that reads the open skill format. What each carries, and how to load one, is on <a href="../topics/agentic-usage.html#skills">Agentic Usage with TSANet Connect</a>.</p>
+    <div class="twrap">
+      <table>
+        <thead><tr><th>Skill</th><th>For</th><th>Access</th><th>Where</th></tr></thead>
+        <tbody>
+          <tr><td>Zendesk connector</td><td>Building or extending the ZAF + ZIS connector</td><td><span class="chip live">Public</span></td><td><a href="../connectors/zendesk.html#skill">Zendesk → Build with an assistant</a></td></tr>
+          <tr><td>Connect SDK deployment</td><td>Consuming the artifact, credentials, the demo runbook, troubleshooting</td><td><span class="chip live">Public</span></td><td><a href="../connectors/connect-sdk.html#skill">SDK → Build with an assistant</a></td></tr>
+          <tr><td>Fin / Intercom deployment</td><td>Deploying the hosted adapter for a member workspace</td><td><span class="chip">Access at onboarding</span></td><td><a href="../connectors/fin-intercom.html#skill">Fin / Intercom → Build with an assistant</a></td></tr>
+          <tr><td>Gateway adapter author</td><td>Writing your own adapter against the contract</td><td><span class="chip">Access at onboarding</span></td><td><a href="../connectors/connect-gateway.html#kit">Gateway → The authoring kit</a></td></tr>
+          <tr><td>The hub assistant</td><td>Asking this site questions from any page</td><td><span class="chip beta">Not yet public</span></td><td>The launcher is in this site; the agent behind it is not created yet — <a href="../topics/agentic-usage.html#assistant">what it will be</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="next">
+  <div class="wrap">
+    <p class="eyebrow">Where to go next</p>
+    <h2>Pick a Route, Then Come Back Here</h2>
+    <div class="grid g3">
+      <a class="card" href="../connectors/index.html#nothing">
+        <span class="chip">Options</span>
+        <h3>Four Routes, in Order of Effort</h3>
+        <p>Build on the Connect Gateway, use the SDK, build against the API directly, or tell us the platform. One question decides between them: will your platform run your code inside the member's tenant?</p>
+        <span class="card-foot">Connectors → Four Routes →</span>
+      </a>
+      <a class="card" href="../connectors/servicenow.html">
+        <span class="chip">Worked example</span>
+        <h3>Scoping a Platform Nobody Has Built For</h3>
+        <p>The ServiceNow assessment is what scoping looks like before code exists: every claim tagged documented or needs-probe, and the open questions listed with what each one blocks.</p>
+        <span class="card-foot">Platform assessment →</span>
+      </a>
+      <a class="card" href="../community/index.html">
+        <span class="chip">Questions</span>
+        <h3>Where to Take What</h3>
+        <p>Connector bugs go to that connector's tracker, credentials and pilots to membership, everything else to the organisation's discussions.</p>
+        <span class="card-foot">Community →</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-top"><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
+    <div class="foot-cols">
+      <nav class="foot-col" aria-label="Developers">
+        <h4>Developers</h4>
+        <a href="../connectors/index.html">Connectors</a>
+        <a href="../api/index.html">Working with the API</a>
+        <a href="../docs/index.html">Design Documents</a>
+        <a href="../topics/index.html">Topics</a>
+        <a href="../tools/index.html">Tools</a>
+        <a href="../community/index.html">Community</a>
+      </nav>
+      <div class="foot-col">
+        <h4>Members</h4>
+        <a href="https://www.tsanet.org/members/">Member List</a>
+        <a href="https://tsanet.gitbook.io/connect">Platform Documentation</a>
+        <a href="https://tsanet.gitbook.io/connect/help-center">Member Support</a>
+      </div>
+      <div class="foot-col">
+        <h4>About</h4>
+        <a href="https://www.tsanet.org/about-us/">About Us</a>
+        <a href="https://www.tsanet.org/board-of-directors/">Board of Directors</a>
+        <a href="https://www.tsanet.org/news-events/">News and Events</a>
+      </div>
+    </div>
+    <div class="foot-bottom mono">
+      <span>© TSANet Inc. All Rights Reserved</span>
+      <a href="https://www.tsanet.org/legal-policy/">Privacy Policy</a>
+      <a href="https://github.com/tsanetgit">github.com/tsanetgit</a>
+      <a href="mailto:membership@tsanet.org">membership@tsanet.org</a>
+      <span class="foot-social" aria-label="TSANet on social media">
+        <a href="https://twitter.com/TSANetTweet" aria-label="TSANet on X" title="X"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg></a>
+        <a href="https://www.linkedin.com/company/tsanet" aria-label="TSANet on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+        <a href="https://www.youtube.com/@tsanet8120" aria-label="TSANet on YouTube" title="YouTube"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+        <a href="https://github.com/tsanetgit" aria-label="TSANet on GitHub" title="GitHub"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+      </span>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

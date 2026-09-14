@@ -38,6 +38,9 @@ topics/*.html           Cross-connector write-ups, including agentic-usage.html
                         (skills, the hub assistant, provider comparison, Copilot Studio)
 assets/assistant.js     The hub assistant launcher — inert until embedUrl is set
 community/index.html    Where to take what: issue trackers, membership, discussions
+tools/index.html        Tools for building an integration: environments, reference,
+                        SDK and demo, test suites, agent skills — with public /
+                        at-onboarding / not-yet-public markers
 scripts/check.sh        Static checks — run before every commit
 ```
 

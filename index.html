@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/hub.css?v=202609142b">
+<link rel="stylesheet" href="assets/hub.css?v=20260914c">
 <style>
   /* Page-local styles. Shared tokens, nav, cards, sections and footer live in assets/hub.css */
 
@@ -102,6 +102,7 @@
       <a href="api/index.html">API</a>
       <a href="docs/index.html">Design Docs</a>
       <a href="topics/index.html">Topics</a>
+      <a href="tools/index.html">Tools</a>
       <a href="community/index.html">Community</a>
     </div>
   </div>
@@ -235,6 +236,23 @@
       <a class="card" href="api/index.html#content"><span class="chip">Content</span><h3>Notes &amp; Attachments</h3><p>Two note fields rendered as two sections, so never copy one into the other. Attachments need both sides configured.</p></a>
       <a class="card" href="api/index.html#webhooks"><span class="chip">Webhooks</span><h3>Event Delivery</h3><p>v1 and v2 both accept your subscription and deliver different type strings. Payloads are thin; delivery is at-least-once, so build for duplicates.</p></a>
       <a class="card" href="api/index.html#versions"><span class="chip">Sunset</span><h3>Deprecation Clocks</h3><p>Three v1 paths sunset on 2027-01-01: the case list and both webhook paths. Everything else has no v2 and no clock, so the migration is smaller than it sounds.</p></a>
+    </div>
+  </div>
+</section>
+
+<section id="tools">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <h2>Tools for Building an Integration</h2>
+        <p>The environments, reference, SDK, test suites and agent skills you use while building, with what each needs to get hold of — and which ones members cannot reach yet.</p>
+      </div>
+      <a class="sec-link" href="tools/index.html">All tools →</a>
+    </div>
+    <div class="grid g3">
+      <a class="card" href="tools/index.html#environments"><span class="chip live">Public</span><h3>Beta and the Test Flag</h3><p>Build on Beta with test-flagged submissions so nothing reaches a real partner; confirm who you are with one call.</p></a>
+      <a class="card" href="tools/index.html#reference"><span class="chip live">Public</span><h3>Reference and Postman</h3><p>The generated endpoint reference in GitBook and a collection that exercises every path against your credentials.</p></a>
+      <a class="card" href="tools/index.html#testing"><span class="chip beta">Partly public</span><h3>SDK, Demo and Test Suites</h3><p>The Java client is a public package; the demo, the conformance harness and the connector test harness need onboarding or are not public yet.</p></a>
     </div>
   </div>
 </section>
@@ -383,6 +401,7 @@
         <a href="api/index.html">Working with the API</a>
         <a href="docs/index.html">Design Documents</a>
         <a href="topics/index.html">Topics</a>
+        <a href="tools/index.html">Tools</a>
         <a href="community/index.html">Community</a>
       </nav>
       <div class="foot-col">

@@ -42,12 +42,13 @@
   <div class="wrap">
     <div class="crumb"><a href="../index.html">Hub</a> / <a href="index.html">Connectors</a> / Salesforce</div>
     <h1>Salesforce</h1>
-    <p class="lede">A managed package that installs entirely into your own org: custom objects, Apex services, Lightning Web Components, and a library of Flows you can clone. The most configurable connector TSANet ships — and the only one where the automation surface is yours to extend without writing code.</p>
+    <p class="lede">A managed package that installs entirely into your own org: custom objects, Apex services, Lightning Web Components, and a library of Flows you can clone. The most configurable connector TSANet ships — and the one where the automation surface is a Flow library you clone and edit, where <a href="dynamics.html">Dynamics</a> gives you a configuration table and <a href="zendesk.html">Zendesk</a> its triggers.</p>
     <div class="meta-row">
       <span><b>Class</b> In-tenant</span>
       <span><b>Status</b> GA · managed package</span>
       <span><b>Surface</b> Case record page + TSANet Case object</span>
       <span><b>Repo</b> tsanetgit/SFDC_App</span>
+      <span><b>Updated</b> 2026-09-13</span>
     </div>
     <div class="toc">
       <a href="#class">Connector class</a>
@@ -252,7 +253,7 @@
   <div class="wrap">
     <p class="eyebrow">Data model</p>
     <h2>Custom objects, and why that matters</h2>
-    <p>Unlike the other connectors, collaboration state here lands in first-class Salesforce objects. That is the single biggest practical difference: the data is reportable, dashboard-able, subject to your sharing rules, and addressable from any Flow or Apex you write yourself.</p>
+    <p>As on <a href="dynamics.html">Dynamics</a>, and unlike Zendesk and Fin / Intercom, collaboration state here lands in first-class Salesforce objects. That is the single biggest practical difference: the data is reportable, dashboard-able, subject to your sharing rules, and addressable from any Flow or Apex you write yourself.</p>
     <div class="obj-grid">
       <div class="obj"><h4>TSANetCase__c</h4><p>The collaboration record. Status, Type (inbound/outbound), Priority, Summary, Description, Request Date, Response SLA, both parties' company and engineer contact details, and a lookup to the standard Case. <code>Token</code> is the ExternalID.</p></div>
       <div class="obj"><h4>TSANetNote__c</h4><p>Notes on a case — summary, description, creator, status, priority, created-at. Token is the ExternalID, which is what makes upserts idempotent.</p></div>
@@ -471,6 +472,7 @@ Send Custom Notification        <span class="c">→ to the case owner</span></co
         <li><strong>Exactly one primary credential per org.</strong> Marking a second one primary is the usual cause of "it authenticated as the wrong company" after a sandbox refresh.</li>
         <li><strong>No <code>*/X</code> in Salesforce cron.</strong> Every interval shorter than an hour means multiple schedules. See above.</li>
         <li><strong>A 403 on the webhook is a guest-user permission problem</strong> nine times out of ten — not a TSANet-side issue and not a Site problem.</li>
+        <li><strong>Delivery signing is not described here.</strong> The API signs every delivery with <code>X-Hub-Signature-256</code>, and the Dynamics, Zendesk and Fin / Intercom pages each verify a secret or signature; whether the package verifies it has not been re-probed. The only controls documented on this endpoint are Site activation and guest permissions.</li>
         <li><strong>Empty event types on the webhook record deliver nothing, silently.</strong> Select both. The platform itself defines five event types — created, closed, response.created, response.updated and note.created; which of them the package handles beyond the two the record offers has not been re-probed.</li>
         <li><strong>Remote Site Settings are required per environment.</strong> A callout to an unregistered host never leaves the org.</li>
       </ul>

@@ -46,6 +46,7 @@
       <span><b>Status</b> GA · managed solution</span>
       <span><b>Surface</b> Case form + TSANET Configuration app</span>
       <span><b>Repo</b> tsanetgit/MS_Power_App</span>
+      <span><b>Updated</b> 2026-09-13</span>
     </div>
     <div class="toc">
       <a href="#class">Connector class</a>
@@ -295,13 +296,13 @@
     <div class="cols">
       <ul class="tight">
         <li><strong>Auto Create TSANote by Email</strong> — a Dynamics email activity linked to the case becomes a TSANet note, so partner-visible correspondence does not have to be re-entered.</li>
-        <li><strong>Auto Create TSANote by Note</strong> — the same for notes added manually to the Dynamics Case.</li>
+        <li><strong>Auto Create TSANote by Note</strong> — the same for notes added manually to the Dynamics Case. Both toggles make platform-internal content partner-visible with no filter; unlike <a href="zendesk.html#notes">Zendesk's public-only rule</a>, nothing here separates internal notes, so leave them off unless every note on a collaborating case is meant for the partner.</li>
         <li><strong>Auto Routing of New Case</strong> — the inbound path described below.</li>
       </ul>
       <ul class="tight">
         <li><strong>Case response automation</strong> — accepting a TSA case creates the corresponding Dynamics Case using the Case Create mapping, with required fields configurable.</li>
         <li><strong>Ownership and assignment changes</strong> propagate back to the collaborating member, appearing on their timeline.</li>
-        <li><strong>Automatic closure</strong> after 30 days of inactivity, matching the platform behaviour on the other connectors.</li>
+        <li><strong>Automatic closure</strong> after 30 days of inactivity — a platform behaviour the <a href="salesforce.html">Salesforce</a> page also documents; it has not been probed on this hub.</li>
       </ul>
     </div>
 
@@ -352,7 +353,7 @@
     <p class="eyebrow">Synchronisation</p>
     <h2>Polling by default, push if you register it</h2>
     <p>The solution ships with scheduled Power Automate flows that poll the Connect API on a <strong>15-minute</strong> interval, retrieving case status and creating inbound cases, responses and notes. Agents can force an update from the main navigation rather than waiting for the next cycle.</p>
-    <p>Near-real-time delivery is opt-in: the <strong>Register webhook</strong> button in the configuration app points TSANet at a Power Automate endpoint so case and note events arrive as they happen. Registering it does not retire the schedule — the poll remains the backstop, which is the same belt-and-braces arrangement the other connectors use.</p>
+    <p>Near-real-time delivery is opt-in: the <strong>Register webhook</strong> button in the configuration app points TSANet at a Power Automate endpoint so case and note events arrive as they happen. Registering it does not retire the schedule — the poll remains the backstop, the same belt-and-braces arrangement <a href="salesforce.html">Salesforce</a> and <a href="fin-intercom.html">Fin / Intercom</a> use; <a href="zendesk.html">Zendesk</a>'s poller runs only while an agent has a tab open.</p>
     <p>The registration is on the current webhook API: the flow behind the button subscribes on <code>/v2/webhooks</code> with prefixed CloudEvents types. Two details worth knowing. First, the subscription covers case creation and new notes only — <strong>responses and closures arrive with the next poll</strong>, so a case that seems slow to update after the partner acts is the schedule at work, not a fault. Second, the endpoint flow never branches on the event-type string: it validates the secret, reads the token from either payload shape, and fetches the case, which makes it immune to the <a href="../api/index.html#webhooks">bare-versus-prefixed no-op trap</a> that catches consumers that match type strings.</p>
     <div class="note">Verified against the solution source at release v2.13.0.1: the registration flow calls the v2 child flow; a v1 registration flow still ships in the solution with nothing calling it, and the cleanup flow deletes subscriptions on both versions.</div>
     <div class="twrap">

@@ -221,7 +221,7 @@
           <path class="ln" d="M1070,282 H1150" marker-end="url(#gwB)"/>
         </svg>
       </div>
-      <figcaption>The estate view, drawn from the gateway proposal's topology. Only the engine touches the Connect API; the registry keeps one credential set per member and never shares a client between them. One committed platform is a member's internal case system, unnamed here by this hub's redaction standard. TSANet-hosted is the default topology — a member-deployed adapter embeds the same engine in the member's own service instead.</figcaption>
+      <figcaption>The estate view, drawn from the gateway proposal's topology. Only the engine touches the Connect API; the registry keeps one credential set per member and never shares a client between them. One committed platform is a member's internal case system, unnamed here by this hub's redaction standard. TSANet-hosted is the default topology as designed; today the one shipped adapter, <a href="fin-intercom.html">Fin / Intercom</a>, runs as its own process with the engine embedded, and the shared runtime is at proposal stage (see below). A member-deployed adapter embeds the same engine in the member's own service instead.</figcaption>
     </figure>
     <h3>The modules</h3>
     <div class="grid g2">
@@ -238,14 +238,14 @@
   <div class="wrap">
     <p class="eyebrow">Contract</p>
     <h2>Eleven methods, and an error model that does the hard part for you</h2>
-    <p>The surface is deliberately small. Outbound: <code>searchPartners</code>, <code>form</code> (fetched fresh per submission, never cached), <code>submit</code>, and <code>findSubmission</code> for reconciling by your own case number. Inbound: <code>fetchByToken</code> and <code>listInboundUpdatedSince</code> for the poll behind the push, plus the three response actions an adapter calls when its own user answers — <code>approve</code>, <code>reject</code> and <code>requestInformation</code>, each taking the request token and the responding engineer's identity. Files: <code>forwardAttachments</code> outbound, and an <code>AttachmentDeliveryHandler</code> seam for inbound delivery. One more, <code>healthy</code>, for readiness.</p>
+    <p>The surface is deliberately small. Outbound: <code>searchPartners</code>, <code>form</code> (fetched fresh per submission, never cached), <code>submit</code>, and <code>findSubmission</code> for reconciling by your own case number. Inbound: <code>fetchByToken</code> and <code>listInboundUpdatedSince</code> for the poll behind the push, plus the three response actions an adapter calls when its own user answers — <code>approve</code>, <code>reject</code> and <code>requestInformation</code>, each taking the request token and the responding engineer's identity (approval also carries the case number and next-steps text, as the Fin sequence shows). Files: <code>forwardAttachments</code> outbound, and an <code>AttachmentDeliveryHandler</code> seam for inbound delivery. One more, <code>healthy</code>, for readiness. The contract has no webhook seam: as of v2.0.0 the TSANet push — signature verification, CloudEvents parsing, routing — is terminated by the adapter itself (Fin / Intercom's <code>TsanetWebhookController</code>), so the next adapter would carry that too until the engine takes it on.</p>
     <p>The centre of the design is the exception model. <a href="../api/index.html#cases">Submitting a collaboration case is not idempotent and there is no idempotency key</a> — a submit that fails may still have created a case at your partner, and a blind retry pages a second real engineer. So the contract splits every failure into exactly two kinds:</p>
     <div class="twrap">
       <table>
         <thead><tr><th>Exception</th><th>Meaning</th><th>What you do</th></tr></thead>
         <tbody>
           <tr><td><code>GatewayException</code></td><td>Definitively rejected — no case exists or can exist</td><td>Surface it to the user; retrying cannot succeed</td></tr>
-          <tr><td><code>GatewayTimeoutException</code></td><td>Outcome unknown — deadline expiry, 5xx after send, reset mid-response</td><td>Park it; reconcile with <code>findSubmission</code> before any resubmit</td></tr>
+          <tr><td><code>GatewayTimeoutException</code></td><td>Outcome unknown — deadline expiry, 5xx after send, reset mid-response, or a 200 with no token</td><td>Park it; reconcile with <code>findSubmission</code> before any resubmit</td></tr>
         </tbody>
       </table>
     </div>
@@ -319,9 +319,9 @@ catch (<span class="good-v">GatewayException</span> rejected)        { surfaceTo
     <h2>The attachment plane: transit-only by design</h2>
     <p>Case files get their own set of gateway-wide decisions, made ahead of any consumer because the first runtime that references a configuration key freezes it:</p>
     <ul class="tight">
-      <li><strong>One artifact, two hosting modes.</strong> The attachment receiver ships once and runs either TSANet-hosted multi-tenant (the default — members deploy nothing) or member-deployed, for members whose policy requires files to touch only their own infrastructure. The mode is a deployment decision, never a code fork. (The <a href="connect-sdk.html">SDK page</a>, re-verified 2026-09-08, records the HTTPS endpoint that accepts the push as not yet built; the two pages disagree on how much of this receiver is shipped, and the SDK page is the more recently verified.)</li>
-      <li><strong>Transit-only compute.</strong> In hosted mode, bytes stream from the push to the tenant's own storage backend — nothing is spooled to gateway disk. That property is what keeps "files are never stored on TSANet Connect" defensible while TSANet operates the compute.</li>
-      <li><strong>Storage at rest is member-owned.</strong> Production tenants configure their own S3, Azure Blob Storage, or Azure Files targets; credential custody stays with the member and revocation is always member-side.</li>
+      <li><strong>One artifact, two hosting modes.</strong> The attachment receiver is designed to ship once and run either TSANet-hosted multi-tenant (the default — members deploy nothing) or member-deployed, for members whose policy requires files to touch only their own infrastructure. The mode is a deployment decision, never a code fork. (The <a href="connect-sdk.html">SDK page</a>, which re-verified its module list against the 2.0.0 source, records the HTTPS endpoint that accepts the push as not yet built; the two pages disagree on how much of this receiver is shipped, and the SDK page is the better evidenced.)</li>
+      <li><strong>Transit-only compute.</strong> In hosted mode, bytes are to stream from the push to the tenant's own storage backend — nothing is spooled to gateway disk. That property is what keeps "files are never stored on TSANet Connect" defensible while TSANet operates the compute.</li>
+      <li><strong>Storage at rest is member-owned.</strong> Production tenants configure their own S3, Azure Blob Storage, Azure Files or Google Cloud Storage targets; credential custody stays with the member and revocation is always member-side.</li>
       <li><strong>Storage alone earns the 2xx.</strong> The platform makes one delivery attempt per destination (documented, not probed), so the receiver acknowledges when the bytes are secured in storage — never contingent on delivery into the member's platform, which runs after and apart. A failed delivery leaves the file in storage and surfaces to the member; it is never silently dropped.</li>
       <li><strong>Per-file outcomes are data, not exceptions.</strong> On the outbound side, one file's failure cannot masquerade as a whole-call failure.</li>
     </ul>

@@ -45,6 +45,7 @@
       <span><b>Status</b> GA</span>
       <span><b>Surface</b> Ticket sidebar + nav bar</span>
       <span><b>Repo</b> tsanetgit/Zendesk_App</span>
+      <span><b>Updated</b> 2026-09-13</span>
     </div>
     <div class="toc">
       <a href="#class">Connector class</a>
@@ -65,7 +66,7 @@
   <div class="wrap">
     <p class="eyebrow">Connector class</p>
     <h2>Zendesk sits between the two connector classes</h2>
-    <p>TSANet connectors divide by one question: will the platform run your code inside the member's own tenant? Salesforce, ServiceNow, Dynamics and Oracle will. <a href="fin-intercom.html">Intercom will not</a>, which is why that one is a hosted gateway. Zendesk is the interesting middle case — and understanding which half you are in explains most of the design below.</p>
+    <p>TSANet connectors divide by one question: will the platform run your code inside the member's own tenant? <a href="salesforce.html">Salesforce</a> and <a href="dynamics.html">Dynamics</a> will, and <a href="servicenow.html">ServiceNow</a> would, though nothing is built there yet. <a href="fin-intercom.html">Intercom will not</a>, which is why that one is a hosted gateway. Zendesk is the interesting middle case — and understanding which half you are in explains most of the design below.</p>
     <div class="twrap">
       <table>
         <caption>Everything in this connector runs in the member's account, so a broken install affects one member. The Connect API remains a shared dependency: a platform outage stops collaboration here as it does everywhere.</caption>
@@ -228,7 +229,7 @@
   <div class="wrap">
     <p class="eyebrow">Authentication</p>
     <h2>OAuth client credentials, and the scope that looks right but isn't</h2>
-    <p>Server-to-server auth is an OAuth 2.0 client-credentials grant against Microsoft Entra. Unlike the legacy <code>POST /v1/login</code> JWT — which expires in about 60 minutes and has to be refreshed by something — the caller re-mints automatically from a long-lived client credential. That is what retired the token-refresh job.</p>
+    <p>Server-to-server auth is an OAuth 2.0 client-credentials grant against Microsoft Entra. Unlike the legacy <code>POST /v1/login</code> JWT — which expires in about 60 minutes and has to be refreshed by something — the caller re-mints automatically from a long-lived client credential. That is what retired the token-refresh job on the ZIS side. The ZAF sidebar's own calls still cache a ~50-minute JWT (see the poller in the topology); which of the two schemes that token comes from has not been re-probed.</p>
 
     <pre><code><span class="c"># Mint an Entra token</span>
 POST https://login.microsoftonline.com/{tenant-id}/oauth2/v2.0/token

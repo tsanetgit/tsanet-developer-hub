@@ -51,6 +51,8 @@
       <span><b>Status</b> Early access</span>
       <span><b>Surface</b> Canvas Kit sidebar, Help Desk</span>
       <span><b>Last verified</b> 2026-08-21</span>
+      <span><b>Updated</b> 2026-09-13</span>
+      <span><b>Repo</b> tsanetgit/Fin-Intercom_App (private during early access)</span>
     </div>
     <div class="toc">
       <a href="#class">Why it is shaped differently</a>
@@ -73,7 +75,7 @@
   <div class="wrap">
     <p class="eyebrow">Connector class</p>
     <h2>Why this connector is shaped differently</h2>
-    <p>Every connector TSANet shipped before this one assumes code can run inside the member's own system. Salesforce, ServiceNow, Dynamics and Oracle all allow it; Zendesk partly. Intercom does not — and neither will most of the platforms behind it. That single constraint makes TSANet the <em>operator</em> of the integration rather than the author of a specification someone else implements.</p>
+    <p>Every connector TSANet shipped before this one assumes code can run inside the member's own system. <a href="salesforce.html">Salesforce</a> and <a href="dynamics.html">Dynamics</a> allow it; <a href="zendesk.html">Zendesk</a> partly; <a href="servicenow.html">ServiceNow</a> would, though nothing is built there yet. Intercom does not — and neither will most of the platforms behind it. That single constraint makes TSANet the <em>operator</em> of the integration rather than the author of a specification someone else implements.</p>
 
     <div class="twrap">
       <table>
@@ -82,7 +84,7 @@
           <tr><th scope="col">&nbsp;</th><th scope="col">In-tenant connector</th><th scope="col" class="next">Gateway adapter</th></tr>
         </thead>
         <tbody>
-          <tr><th scope="row">Platforms</th><td>Salesforce, ServiceNow, Dynamics, Oracle</td><td class="next">Intercom&nbsp;/&nbsp;Fin, Pylon, DevRev, Wolken</td></tr>
+          <tr><th scope="row">Platforms</th><td>Salesforce, Dynamics (ServiceNow would fit here; not built)</td><td class="next">Intercom&nbsp;/&nbsp;Fin, Pylon, DevRev, Wolken</td></tr>
           <tr><th scope="row">Where code runs</th><td>Inside the member's own tenant</td><td class="next">A service TSANet hosts and runs</td></tr>
           <tr><th scope="row">Who operates it</th><td>The member</td><td class="next">TSANet</td></tr>
           <tr><th scope="row">Credentials live</th><td>In the member's tenant</td><td class="next">With TSANet, one set per member</td></tr>
@@ -278,7 +280,7 @@
 
           <rect class="bx-ext" x="916" y="286" width="228" height="120" rx="8"/>
           <text class="tt" x="930" y="308">Connect webhook push</text>
-          <text class="ts" x="930" y="327">CloudEvents v2 · v1 gone early 2027</text>
+          <text class="ts" x="930" y="327">CloudEvents v2 · v1 sunset 2027-01</text>
           <text class="ts" x="930" y="343">request.created · request.closed</text>
           <text class="ts" x="930" y="359">note.created · response.created</text>
           <text class="ts" x="930" y="375">response.updated</text>
@@ -338,7 +340,7 @@
       <li><span class="n">1</span><span><b>Canvas requests.</b> <code>POST /canvas/initialize</code> and <code>/canvas/submit</code>, signed <code>X-Body-Signature</code>, HMAC-SHA256 over the raw body with the Intercom app client secret.</span></li>
       <li><span class="n">2</span><span><b>Intercom webhooks.</b> <code>POST /webhooks/intercom</code>, signed <code>X-Hub-Signature</code>, HMAC-SHA1 (<code>sha1=&lt;hex&gt;</code>), same client secret. Note the two schemes differ in both algorithm and prefix. <strong>Today this edge carries nothing:</strong> no handler consumes an Intercom event, so the reference deployment subscribes no topics (verified 2026-08-20 — a full inbound E2E ran green with the list empty). The intake stays signature-gated for the day a feature needs a topic.</span></li>
       <li><span class="n">3</span><span><b>TSANet push.</b> <code>POST /webhooks/tsanet</code>, CloudEvents v2, signed <code>x-hub-signature-256</code>, HMAC-SHA256. Non-routable bodies are refused loudly but still answered 200.</span></li>
-      <li><span class="n">4</span><span><b>Connect API calls.</b> REST — the v1 case paths, <code>/v2/collaboration-requests/list</code> reads and v2 webhooks — with the bearer injected per request by interceptor; OAuth pre-refreshes on a 30s expiry skew. Hard deadlines: 1500ms reads, 4000ms mutations, on virtual threads.</span></li>
+      <li><span class="n">4</span><span><b>Connect API calls.</b> REST — the v1 case paths and <code>/v2/collaboration-requests/list</code> reads through the embedded engine; webhook subscription is on the library's v1 client, while the inbound push it receives is CloudEvents v2 — with the bearer injected per request by interceptor; OAuth pre-refreshes on a 30s expiry skew. Hard deadlines: 1500ms reads, 4000ms mutations, on virtual threads.</span></li>
       <li><span class="n">5</span><span><b>Intercom API calls.</b> Tickets, admin notes, ticket-state writes. Every mutation is read back and asserted: the API 200s while ignoring unknown fields.</span></li>
     </ul>
   </div>
@@ -552,7 +554,7 @@
           <tr><td><code>INFORMATION</code></td><td>Waiting on customer</td><td>Blocked on the partner. Intercom's external label reads "Waiting on you" — cosmetic on Back-office tickets today.</td></tr>
           <tr><td><code>REJECTED</code></td><td>Resolved</td><td>Terminal. Ticket state alone cannot distinguish declined from finished; the distinction must live on a custom attribute.</td></tr>
           <tr><td><code>CLOSED</code></td><td>Resolved</td><td>Terminal.</td></tr>
-          <tr><td><code>PENDINGACTION</code></td><td><span class="pill bad">never moved</span></td><td>Undocumented in both contracts — a bare enum member in the spec with no reference documentation. Open question.</td></tr>
+          <tr><td><code>PENDINGACTION</code></td><td><span class="pill bad">never moved</span></td><td>Thinly documented — a bare enum member in the spec; the <a href="../api/index.html#cases">API page</a> reads it as a case awaiting an action from your side. What this adapter should do with it is an open question.</td></tr>
           <tr><td><code>UNKNOWN</code></td><td><span class="pill bad">never moved</span></td><td>An unrecognised wire value by construction. A stale state is visibly wrong; a guessed one is invisibly wrong.</td></tr>
         </tbody>
       </table>
@@ -649,7 +651,7 @@
           <li>collaboration-request.response.updated <span style="color:var(--mute)">→ partner verdict</span></li>
           <li>collaboration-request.note.created <span style="color:var(--mute)">→ notes slice</span></li>
         </ul>
-        <p style="font-size:13.5px">All prefixed <code>org.tsanet.connect.</code>. Build against v2 only: v1 is removed in the first part of 2027 — inside this connector's first year — and v1 carries no event-level idempotency key at all.</p>
+        <p style="font-size:13.5px">All prefixed <code>org.tsanet.connect.</code>. Build against v2 only: the v1 subscription and list paths sunset on 2027-01-01 — inside this connector's first year — while the v1 case paths stay with no clock, and v1 carries no event-level idempotency key at all.</p>
       </div>
     </div>
   </div>
@@ -665,7 +667,7 @@
         <ul class="tight">
           <li><strong>First full design-level security review</strong> against the connector security taxonomy (supply chain, credential lifecycle, authentication boundaries, data flow and retention, audit, untrusted-content rendering), with the authentication boundary live-probed. Findings are filed as <code>security</code>-labelled issues in the repository; several of the items below are its outcomes.</li>
           <li><strong>Hardened deployment profile:</strong> no webhook topics (verified functionally free), tickets-only mode, verified-minimum grants with a documented provision-then-revoke step — all in the deployment skill's <code>intercom-setup.md</code>.</li>
-          <li><strong>SDK-cache retention sweep:</strong> age-based eviction of terminal-case content on a per-deployment window, default off (see the persistence table). The eviction itself now lives in <code>connect-library</code> (0.2.0); the connector keeps only the schedule and the window, and its interim hand-rolled sweep is retired.</li>
+          <li><strong>SDK-cache retention sweep:</strong> age-based eviction of terminal-case content on a per-deployment window, default off (see the persistence table). The eviction itself now lives in <a href="connect-sdk.html"><code>connect-library</code></a> (since 0.2.0); the connector keeps only the schedule and the window, and its interim hand-rolled sweep is retired.</li>
           <li><strong>Backups gained history:</strong> hourly dated snapshots on a 48-hour window beside the 5-minute latest copy, with a delete-first restore procedure that survives a snapshot lacking a WAL file.</li>
           <li><strong>Build provenance:</strong> the deployable image is built in CI from a repository commit and pushed with a secretless, registry-scoped identity (no admin credential); images are addressed by digest. Dependency updates are automated; workflow actions are SHA-pinned.</li>
         </ul>
@@ -674,7 +676,7 @@
         <h3>Tracked next (not promises)</h3>
         <ul class="tight">
           <li><strong>Registry pull by managed identity</strong> and retirement of the registry admin credential — the live-touching half of the provenance work.</li>
-          <li><strong>Notes in both directions and status sync</strong> still wait on estate-wide decisions shared with the Zendesk connector: a note summary convention, severity mapping, and a platform direction field on notes.</li>
+          <li><strong>Notes in both directions and status sync</strong> still wait on estate-wide decisions shared with the <a href="zendesk.html">Zendesk connector</a>: a note summary convention, severity mapping, and a platform direction field on notes.</li>
           <li><strong>Outbound closure policy</strong> — see Known gaps.</li>
         </ul>
         <p style="font-size:13.5px">Evidence standard: everything under "Landed" is merged and was probed; everything under "Tracked next" has an open issue and no merged code.</p>
@@ -697,7 +699,8 @@
       <ul class="tight">
         <li><strong>Inbound ambiguity is transient:</strong> an ambiguous response action tells the acting agent, but the recorded state has moved, so a later render shows a cleanly answered case. Outbound has UNRESOLVED for this; inbound has no equivalent yet.</li>
         <li><strong>Dedupe strategy beyond the CloudEvent id</strong> is a later decision; the reconciliation poller remains the source of truth in both directions.</li>
-        <li><strong><code>PENDINGACTION</code></strong> is undefined in both contracts — an open question for TSANet.</li>
+        <li><strong><code>PENDINGACTION</code></strong> is thinly documented in both contracts; what this adapter should do with it is an open question for TSANet.</li>
+        <li><strong>Attachments</strong> are not covered on this page. Whether this adapter implements the contract's <code>forwardAttachments</code> and <code>AttachmentDeliveryHandler</code> has not been verified; see <a href="../topics/file-sharing.html">moving files between members</a>.</li>
         <li><strong>Orphaned claims</strong> hold the poller cursor loudly and indefinitely until a human releases them. Alert on consecutive held cycles, not on consecutive failures.</li>
       </ul>
     </div>

@@ -166,17 +166,20 @@ figcaption{font-size:13px;color:var(--mute);margin-top:14px;line-height:1.6;max-
 .toc a:hover{border-color:var(--blue);color:var(--blue)}
 
 /* ---- footer ---- */
-footer{padding:44px 0 60px;color:#BFD9E5;font-size:13.5px;background:var(--blue);border-top:2px solid var(--orange);margin-top:-1px}
+footer{padding:44px 0 36px;color:#BFD9E5;font-size:13.5px;background:var(--blue);margin-top:-1px}
 footer .mono{color:#9CC3D5;font-family:var(--mono);font-size:12px}
 footer p{color:var(--pale);max-width:none}
-.foot-in{display:flex;justify-content:space-between;gap:32px;flex-wrap:wrap;align-items:flex-start}
 footer a{color:#fff}
 footer a:hover{text-decoration:underline}
-.foot-nav{display:flex;flex-direction:column;gap:7px;font-size:13px}
-.foot-nav a{color:var(--pale)}
-.foot-nav a:hover{color:#fff}
-.foot-links{display:flex;flex-direction:column;gap:7px;text-align:right}
-@media(max-width:640px){.foot-links{text-align:left}}
+.foot-top{margin-bottom:28px}
+.foot-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px 32px}
+.foot-col{display:flex;flex-direction:column;gap:7px;font-size:13.5px}
+.foot-col h4{font-family:var(--disp);font-weight:700;font-size:15px;color:#fff;margin:0 0 4px}
+.foot-col a{color:var(--pale)}
+.foot-col a:hover{color:#fff}
+.foot-bottom{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:30px;padding-top:14px;border-top:1px solid rgba(255,255,255,.16)}
+.foot-bottom a{color:#BFD9E5}
+@media(max-width:640px){.foot-cols{grid-template-columns:1fr}}
 
 @media(prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}

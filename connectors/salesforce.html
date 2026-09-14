@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Salesforce connector — TSANet Connect Developer Hub</title>
+<title>Salesforce Connector — TSANet Connect Developer Hub</title>
 <link rel="icon" href="../assets/tsanet-favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/hub.css?v=20260913b">
+<link rel="stylesheet" href="../assets/hub.css?v=20260914b">
 <style>
   td.next{color:var(--ink);background:rgba(0,91,130,.05)}
   thead th.next{background:rgba(0,91,130,.05);color:var(--blue)}
@@ -67,7 +67,7 @@
 <section id="class">
   <div class="wrap">
     <p class="eyebrow">Connector class</p>
-    <h2>The reference in-tenant connector</h2>
+    <h2>The Reference In-Tenant Connector</h2>
     <p>TSANet connectors divide by one question: will the platform run your code inside the member's own tenant? Salesforce is the fullest yes on the list — Apex is real server-side code, running on Salesforce's infrastructure, inside your org, under your governance. <a href="fin-intercom.html">Intercom is the opposite pole</a>, where nothing can run in-tenant at all and TSANet hosts a gateway; <a href="zendesk.html">Zendesk sits in between</a>, with client-side apps and declarative flows but no arbitrary server code.</p>
     <div class="twrap">
       <table>
@@ -89,7 +89,7 @@
 <section id="topology">
   <div class="wrap">
     <p class="eyebrow">Architecture</p>
-    <h2>What the package installs</h2>
+    <h2>What the Package Installs</h2>
     <p>Four layers, all inside the org: Lightning components the agent works in, a Flow library that drives the business logic, Apex services that talk to TSANet, and custom objects that hold the state. Two integration points cross the org boundary — an outbound scheduled sync and an inbound Apex REST endpoint.</p>
     <figure>
       <div class="diagram">
@@ -252,7 +252,7 @@
 <section id="data">
   <div class="wrap">
     <p class="eyebrow">Data model</p>
-    <h2>Custom objects, and why that matters</h2>
+    <h2>Custom Objects, and Why That Matters</h2>
     <p>As on <a href="dynamics.html">Dynamics</a>, and unlike Zendesk and Fin / Intercom, collaboration state here lands in first-class Salesforce objects. That is the single biggest practical difference: the data is reportable, dashboard-able, subject to your sharing rules, and addressable from any Flow or Apex you write yourself.</p>
     <div class="obj-grid">
       <div class="obj"><h4>TSANetCase__c</h4><p>The collaboration record. Status, Type (inbound/outbound), Priority, Summary, Description, Request Date, Response SLA, both parties' company and engineer contact details, and a lookup to the standard Case. <code>Token</code> is the ExternalID.</p></div>
@@ -271,13 +271,13 @@
 <section id="auth">
   <div class="wrap">
     <p class="eyebrow">Authentication</p>
-    <h2>Two Salesforce platform limits shape the token handling</h2>
+    <h2>Two Salesforce Platform Limits Shape the Token Handling</h2>
     <p>Auth is basic authentication against a TSANet API user on the member account, exchanged for a JWT that lives about 60 minutes. That is the API's legacy scheme: OAuth 2.0 client credentials is the current server-to-server path, and it removes the token handling described below — see <a href="../api/index.html#auth">Working with the API → Authentication</a>. The managed package as documented here uses the login path. Storing and using that token runs into two Salesforce constraints that are worth understanding before you debug anything in this area.</p>
 
-    <h3>A JWT does not fit in one custom setting field</h3>
+    <h3>A JWT Does Not Fit in One Custom Setting Field</h3>
     <p>Custom setting text fields cap well below the length of a Connect JWT, so <code>AccessTokenSplitter</code> splits the token at 175 characters into <code>AccessTokenPart1__c</code> and <code>AccessTokenPart2__c</code>, and <code>TokenManager</code> concatenates them on read. If you are inspecting stored credentials and see a truncated-looking token, that is why — check both parts.</p>
 
-    <h3>DML before a callout is not allowed</h3>
+    <h3>DML Before a Callout Is Not Allowed</h3>
     <p>Salesforce refuses a callout when there is uncommitted DML in the transaction. A naive implementation — log in, save the token, then immediately call the API — hits <code>You have uncommitted work pending</code> on the very first request. <code>TokenManager</code> therefore holds a freshly minted token in a static in-memory field and defers persistence until after the callouts complete.</p>
     <pre><code><span class="c">// getAccessToken() returns the pending token without touching the database</span>
 <span class="c">// commitTokenIfPending() runs after the callouts, not before</span>
@@ -304,7 +304,7 @@ TokenManager.commitTokenIfPending();            <span class="c">// DML now safe<
 <section id="inbound">
   <div class="wrap">
     <p class="eyebrow">Inbound</p>
-    <h2>Push arrives through a public Salesforce Site</h2>
+    <h2>Push Arrives Through a Public Salesforce Site</h2>
     <p>TSANet cannot authenticate into your org, so inbound events land on an Apex REST endpoint exposed through a Salesforce Site running as a guest user. This is the part of the setup with the most moving pieces and by far the most common source of installation failures.</p>
     <figure>
       <div class="diagram">
@@ -359,7 +359,7 @@ TokenManager.commitTokenIfPending();            <span class="c">// DML now safe<
       <figcaption>The event carries identifiers, not content, so the fetch is what establishes truth — the same shape as the other connectors. Upserting on the token as ExternalID is what makes a redelivered event harmless.</figcaption>
     </figure>
 
-    <h3>What the setup actually requires</h3>
+    <h3>What the Setup Actually Requires</h3>
     <ul class="tight">
       <li><strong>A registered Salesforce Sites domain and an active Site.</strong> Both an active site and one showing a maintenance page will serve the endpoint; what breaks it is the site not existing or not being activated.</li>
       <li><strong>The <code>TSANet Webhook Guest Access</code> permission set assigned to that Site's guest user.</strong> This is the 403 cause. Find the guest user under Setup → Sites → your site → Public Access Settings → View users.</li>
@@ -374,7 +374,7 @@ TokenManager.commitTokenIfPending();            <span class="c">// DML now safe<
 <section id="sync">
   <div class="wrap">
     <p class="eyebrow">Scheduled sync</p>
-    <h2>The 15-minute sweep, and Salesforce cron</h2>
+    <h2>The 15-Minute Sweep, and Salesforce Cron</h2>
     <p><code>TSANetScheduledJob</code> reconciles Salesforce against TSANet every 15 minutes by default, catching anything the push path missed. Changing that interval runs into a platform quirk that surprises everyone who has written a crontab.</p>
     <div class="note" style="border-left-color:var(--red)"><strong>Salesforce cron does not support <code>*/X</code> or <code>0/X</code> increments.</strong> There is no "every 15 minutes" expression. A single schedule fires at most once per hour, at one specific minute — so a 15-minute cadence is <strong>four separate scheduled jobs</strong>, a 10-minute cadence is six, and a 5-minute cadence is twelve.</div>
     <pre><code><span class="c"># Every 15 minutes — four schedules, not one</span>
@@ -391,12 +391,12 @@ TokenManager.commitTokenIfPending();            <span class="c">// DML now safe<
 <section id="flows">
   <div class="wrap">
     <p class="eyebrow">Automation</p>
-    <h2>The Flow library is the extension point</h2>
+    <h2>The Flow Library Is the Extension Point</h2>
     <p>This is what makes the Salesforce connector different in kind from the others. The package ships a library of Flows covering every lifecycle action, in both screen and autolaunched form, and <strong>every one of them is clonable</strong>. A member can change routing, approval policy, notification recipients and case-matching logic without writing Apex — the Apex is exposed as invocable actions that Flow calls as building blocks.</p>
 
     <div class="cols">
       <div>
-        <h3>Invocable Apex actions</h3>
+        <h3>Invocable Apex Actions</h3>
         <ul class="tight">
           <li>Create Collaboration Case</li>
           <li>Approve Request · Reject Case</li>
@@ -407,7 +407,7 @@ TokenManager.commitTokenIfPending();            <span class="c">// DML now safe<
         </ul>
       </div>
       <div>
-        <h3>Flows worth knowing about</h3>
+        <h3>Flows Worth Knowing About</h3>
         <ul class="tight">
           <li><strong>Auto Accept Collaboration Request</strong> — record-triggered on TSANet Case creation, accepts eligible requests with no human step</li>
           <li><strong>Collaboration Request Trigger Handler</strong> — creates the Salesforce Case and links it back to the TSANet Case</li>
@@ -418,7 +418,7 @@ TokenManager.commitTokenIfPending();            <span class="c">// DML now safe<
       </div>
     </div>
 
-    <h3>Auto-approval by asset serial number</h3>
+    <h3>Auto-Approval by Asset Serial Number</h3>
     <p>The most-copied pattern in the library, and a good template for your own policy. The record-triggered flow fires when a TSANet Case is created with no Salesforce Case linked, direction inbound, and a serial number present:</p>
     <pre><code>Get Asset by Serial Number      <span class="c">→ no match? reject the request</span>
 Get Contact by Customer Email   <span class="c">→ optional enrichment</span>
@@ -434,10 +434,10 @@ Send Custom Notification        <span class="c">→ to the case owner</span></co
 <section id="setup">
   <div class="wrap">
     <p class="eyebrow">Setup</p>
-    <h2>Installation order</h2>
+    <h2>Installation Order</h2>
     <div class="cols">
       <div>
-        <h3>Package and access</h3>
+        <h3>Package and Access</h3>
         <ul class="tight">
           <li>Request credentials from <code>membership@tsanet.org</code></li>
           <li>Install the latest release package from the GitHub releases page, choosing all users or specific profiles</li>
@@ -448,7 +448,7 @@ Send Custom Notification        <span class="c">→ to the case owner</span></co
         </ul>
       </div>
       <div>
-        <h3>Surfaces and automation</h3>
+        <h3>Surfaces and Automation</h3>
         <ul class="tight">
           <li>Add the <code>TSANetApplication</code> component to the Case record page in Lightning App Builder, then activate and assign</li>
           <li>Add the TSANet Case related list to the Case page layout</li>
@@ -466,7 +466,7 @@ Send Custom Notification        <span class="c">→ to the case owner</span></co
 <section id="gotchas">
   <div class="wrap">
     <p class="eyebrow">Gotchas</p>
-    <h2>Constraints and common failures</h2>
+    <h2>Constraints and Common Failures</h2>
     <div class="cols">
       <ul class="tight">
         <li><strong>Exactly one primary credential per org.</strong> Marking a second one primary is the usual cause of "it authenticated as the wrong company" after a sandbox refresh.</li>
@@ -490,17 +490,33 @@ Send Custom Notification        <span class="c">→ to the case owner</span></co
 </section>
 
 <footer>
-  <div class="wrap foot-in">
-    <div><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
-    <nav class="foot-nav" aria-label="Sections">
-      <a href="../connectors/index.html">Connectors</a>
-      <a href="../api/index.html">Working with the API</a>
-      <a href="../docs/index.html">Design documents</a>
-      <a href="../topics/index.html">Topics</a>
-      <a href="../community/index.html">Community</a>
-    </nav>
-    <div class="foot-links mono">
-      <a href="https://connect2.tsanet.org">connect2.tsanet.org</a>
+  <div class="wrap">
+    <div class="foot-top"><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
+    <div class="foot-cols">
+      <nav class="foot-col" aria-label="Developers">
+        <h4>Developers</h4>
+        <a href="../connectors/index.html">Connectors</a>
+        <a href="../api/index.html">Working with the API</a>
+        <a href="../docs/index.html">Design Documents</a>
+        <a href="../topics/index.html">Topics</a>
+        <a href="../community/index.html">Community</a>
+      </nav>
+      <div class="foot-col">
+        <h4>Members</h4>
+        <a href="https://www.tsanet.org/members/">Member List</a>
+        <a href="https://tsanet.gitbook.io/connect">Platform Documentation</a>
+        <a href="https://tsanet.gitbook.io/connect/help-center">Member Support</a>
+      </div>
+      <div class="foot-col">
+        <h4>About</h4>
+        <a href="https://www.tsanet.org/about-us/">About Us</a>
+        <a href="https://www.tsanet.org/board-of-directors/">Board of Directors</a>
+        <a href="https://www.tsanet.org/news-events/">News and Events</a>
+      </div>
+    </div>
+    <div class="foot-bottom mono">
+      <span>© TSANet Inc. All Rights Reserved</span>
+      <a href="https://www.tsanet.org/legal-policy/">Privacy Policy</a>
       <a href="https://github.com/tsanetgit">github.com/tsanetgit</a>
       <a href="mailto:membership@tsanet.org">membership@tsanet.org</a>
     </div>

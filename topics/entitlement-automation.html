@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Deciding what to accept automatically — TSANet Connect Developer Hub</title>
+<title>Deciding What to Accept Automatically — TSANet Connect Developer Hub</title>
 <link rel="icon" href="../assets/tsanet-favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/hub.css?v=20260913b">
+<link rel="stylesheet" href="../assets/hub.css?v=20260914b">
 <style>
   pre{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--ink);margin:16px 0}
   pre code{background:none;padding:0;font-size:inherit}
@@ -43,7 +43,7 @@
 <header class="pagehead">
   <div class="wrap">
     <div class="crumb"><a href="../index.html">Hub</a> / <a href="index.html">Topics</a> / Entitlement automation</div>
-    <h1>Deciding what to accept automatically</h1>
+    <h1>Deciding What to Accept Automatically</h1>
     <p class="lede">Three of the four shipped connectors offer some way to accept inbound collaboration requests without an agent, and the fourth deliberately does not. They disagree completely about when that is a good idea — and the disagreement is worth understanding, because accepting a case is not a routing step. It is a promise to another company.</p>
     <div class="meta-row">
       <span><b>Topic</b> Inbound automation</span>
@@ -64,7 +64,7 @@
 <section id="commitment">
   <div class="wrap">
     <p class="eyebrow">The reframe</p>
-    <h2>Acceptance is a commitment, not a triage step</h2>
+    <h2>Acceptance Is a Commitment, Not a Triage Step</h2>
     <p>It is tempting to read <code>/approval</code> as "route this to my team". It is not. Accepting a collaboration request tells the partner that <strong>an engineer is engaged on their problem</strong>, and it satisfies the response SLA at the same moment. Those two effects pull in opposite directions, and that tension is the whole subject of this page.</p>
     <div class="twrap">
       <table>
@@ -84,28 +84,28 @@
 <section id="postures">
   <div class="wrap">
     <p class="eyebrow">The spectrum</p>
-    <h2>Four postures, all shipping today</h2>
+    <h2>Four Postures, All Shipping Today</h2>
     <div class="grid g2" style="margin-bottom:24px">
       <div class="posture p1">
-        <h3>Accept everything</h3>
+        <h3>Accept Everything</h3>
         <div class="who">Zendesk — app setting</div>
         <p>Every inbound case is accepted the moment it arrives. No condition, no lookup, no check that the request is one you can act on. Ships as a built-in setting, off by default.</p>
         <p class="trade">Buys: the SLA can never be breached. Spends: every case is a promise, including the ones that turn out not to be yours.</p>
       </div>
       <div class="posture p2">
-        <h3>Accept what matches existing work</h3>
+        <h3>Accept What Matches Existing Work</h3>
         <div class="who">Dynamics — auto-routing</div>
         <p>Look for a case that already exists for the partner's case number; fall back to the customer name. On a match, create and relate the local case and accept.</p>
         <p class="trade">Buys: re-collaboration on a known issue attaches to the right place instead of opening a duplicate. Spends: says nothing about entitlement.</p>
       </div>
       <div class="posture p3">
-        <h3>Accept what you can verify</h3>
+        <h3>Accept What You Can Verify</h3>
         <div class="who">Salesforce — asset match</div>
         <p>Resolve the serial number to an asset you actually have a record of. On a match, create the case and accept. <strong>On no match, reject.</strong></p>
         <p class="trade">Buys: acceptance means something checkable. Spends: needs clean asset data, and rejects legitimate requests when that data is stale.</p>
       </div>
       <div class="posture p4">
-        <h3>Never accept automatically</h3>
+        <h3>Never Accept Automatically</h3>
         <div class="who">Fin / Intercom — guardrail</div>
         <p>Automation drafts and proposes; a person accepts, declines or asks for more information. The commitment stays with a human even when the answer is machine-generated.</p>
         <p class="trade">Buys: no promise is made that nobody chose to make. Spends: the SLA clock runs until someone acts.</p>
@@ -158,14 +158,14 @@
 <section id="howthey">
   <div class="wrap">
     <p class="eyebrow">Implementations</p>
-    <h2>How each connector actually does it</h2>
+    <h2>How Each Connector Actually Does It</h2>
 
-    <h3>Zendesk: a setting for everything, a trigger for conditions</h3>
+    <h3>Zendesk: A Setting for Everything, a Trigger for Conditions</h3>
     <p>Since app v1.0.69 there are two paths, split by policy. Accepting <em>everything</em> is a built-in app setting — <em>Auto-accept inbound requests</em>, off by default — that accepts each inbound case the moment its ticket is created, with your ticket number as the case reference. It is deliberately unconditional, and toggling it takes effect only after a bundle redeploy. Accepting <em>conditionally</em> stays with a Zendesk trigger on the TSANet Action field, which rides the optional field-actions feature: fire on ticket creation, condition on the inbound tag, action sets TSANet Action to Accept. Both run server-side, so no agent needs to be logged in, and both are verified end to end — the partner sees the case accepted roughly fifteen seconds after submitting it.</p>
     <p>Crucially, <strong>trigger conditions are the scoping mechanism</strong>. A condition on the partner field turns "accept everything" into "accept everything from this partner" — which moves you along the spectrum without writing anything. Cases that do not match simply stay open for normal triage.</p>
     <div class="note">The published guide is honest about the cost: auto-accept commits you instantly, and the triage options are skipped for auto-accepted cases. If some cases should still be looked at first, use the trigger path and put those conditions in the trigger. <a href="https://tsanet.gitbook.io/connect/documentation/zendesk-app/auto-accepting-inbound-cases">Setup guide →</a></div>
 
-    <h3>Salesforce: verify, then accept — or reject</h3>
+    <h3>Salesforce: Verify, Then Accept — Or Reject</h3>
     <p>The shipped flow is the most opinionated of the four, and the only one that will say no. It fires on TSANet Case creation where no local case is linked, direction is inbound, and a serial number is present:</p>
     <pre><code>Get Asset by serial number
   └─ no match  <span class="c">→ reject the collaboration request</span>
@@ -177,11 +177,11 @@ Approve the collaboration request    <span class="c">with engineer details</span
 Notify the case owner</code></pre>
     <p>Rejecting on no asset match <em>is</em> the entitlement check. A partner escalating about hardware you have no record of does not become a case your team has to triage — and the partner finds out immediately rather than after a silent wait.</p>
 
-    <h3>Dynamics: attach to work that already exists</h3>
+    <h3>Dynamics: Attach to Work That Already Exists</h3>
     <p>Auto-routing is a feature toggle rather than a flow to activate, and it solves a different problem: not "should we take this" but "where does this belong". It searches for an existing case by the partner's case number, falls back to a customer-name lookup, and on a match creates and relates the local case before approving.</p>
     <p>Matching on the partner's own case number first is what makes re-collaboration on a continuing issue attach to the same case rather than opening a duplicate. That is worth having even if you never intend to auto-accept.</p>
 
-    <h3>Fin / Intercom: draft automatically, commit deliberately</h3>
+    <h3>Fin / Intercom: Draft Automatically, Commit Deliberately</h3>
     <p>The <a href="connector-classes.html">gateway-class</a> connector takes the opposite position and states the reasoning explicitly: accepting, declining and requesting information are <strong>contractual commitments to another vendor, made under a service-level clock</strong>. Automation composes the answer; a person makes the commitment.</p>
     <p>There is a second reason specific to AI-assisted flows. Partner escalations carry end-customer logs and text pasted in verbatim — untrusted content arriving at a system that would then reply under your company's name. Keeping a human on the commitment is also a containment boundary.</p>
   </div>
@@ -190,7 +190,7 @@ Notify the case owner</code></pre>
 <section id="designing">
   <div class="wrap">
     <p class="eyebrow">Designing yours</p>
-    <h2>Building a rule that asserts something true</h2>
+    <h2>Building a Rule That Asserts Something True</h2>
     <p>The Salesforce flow is the useful template even on other platforms, because its shape generalises: <em>resolve an identifier, branch on whether you found it, and be willing to say no.</em> What varies is the identifier.</p>
     <div class="twrap">
       <table>
@@ -215,7 +215,7 @@ Notify the case owner</code></pre>
 <section id="failures">
   <div class="wrap">
     <p class="eyebrow">Failure modes</p>
-    <h2>What goes wrong, in the order you will meet it</h2>
+    <h2>What Goes Wrong, in the Order You Will Meet It</h2>
     <ul class="tight">
       <li><strong>The silent accept.</strong> A rule accepts a case that lands in a queue nobody watches. The clock is off, so nothing escalates, and the partner waits on an engineer who was never assigned. This is the failure that auto-accept exists to prevent and the one it most often causes.</li>
       <li><strong>The confident reject.</strong> Matching runs against stale reference data and declines a request that was perfectly valid. The partner has to re-submit, and now believes your integration is unreliable. Audit your rejections before you trust them — they are the ones nobody complains about internally.</li>
@@ -228,17 +228,33 @@ Notify the case owner</code></pre>
 </section>
 
 <footer>
-  <div class="wrap foot-in">
-    <div><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
-    <nav class="foot-nav" aria-label="Sections">
-      <a href="../connectors/index.html">Connectors</a>
-      <a href="../api/index.html">Working with the API</a>
-      <a href="../docs/index.html">Design documents</a>
-      <a href="../topics/index.html">Topics</a>
-      <a href="../community/index.html">Community</a>
-    </nav>
-    <div class="foot-links mono">
-      <a href="https://connect2.tsanet.org">connect2.tsanet.org</a>
+  <div class="wrap">
+    <div class="foot-top"><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
+    <div class="foot-cols">
+      <nav class="foot-col" aria-label="Developers">
+        <h4>Developers</h4>
+        <a href="../connectors/index.html">Connectors</a>
+        <a href="../api/index.html">Working with the API</a>
+        <a href="../docs/index.html">Design Documents</a>
+        <a href="../topics/index.html">Topics</a>
+        <a href="../community/index.html">Community</a>
+      </nav>
+      <div class="foot-col">
+        <h4>Members</h4>
+        <a href="https://www.tsanet.org/members/">Member List</a>
+        <a href="https://tsanet.gitbook.io/connect">Platform Documentation</a>
+        <a href="https://tsanet.gitbook.io/connect/help-center">Member Support</a>
+      </div>
+      <div class="foot-col">
+        <h4>About</h4>
+        <a href="https://www.tsanet.org/about-us/">About Us</a>
+        <a href="https://www.tsanet.org/board-of-directors/">Board of Directors</a>
+        <a href="https://www.tsanet.org/news-events/">News and Events</a>
+      </div>
+    </div>
+    <div class="foot-bottom mono">
+      <span>© TSANet Inc. All Rights Reserved</span>
+      <a href="https://www.tsanet.org/legal-policy/">Privacy Policy</a>
       <a href="https://github.com/tsanetgit">github.com/tsanetgit</a>
       <a href="mailto:membership@tsanet.org">membership@tsanet.org</a>
     </div>

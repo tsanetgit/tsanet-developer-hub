@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/hub.css?v=20260913b">
+<link rel="stylesheet" href="../assets/hub.css?v=20260914b">
 <style>
   /* the matrix is wide by nature; let it scroll and keep the row label pinned */
   .matrix table{min-width:60rem}
@@ -139,22 +139,22 @@
     <div class="grid g2">
       <div class="card">
         <span class="chip">Pattern</span>
-        <h3>The fetch is the truth</h3>
+        <h3>The Fetch Is the Truth</h3>
         <p>Inbound events carry a token and little else, so every connector acknowledges fast and then fetches the case. None of them try to reconstruct state from the event body — which is also what makes redelivery harmless.</p>
       </div>
       <div class="card">
         <span class="chip">Pattern</span>
-        <h3>The token is the primary key</h3>
+        <h3>The Token Is the Primary Key</h3>
         <p>All of them persist the token at creation, before anything else can fail, and key every local record on it. An integration that loses the token has orphaned a case the partner can still see.</p>
       </div>
       <div class="card">
         <span class="chip">Pattern</span>
-        <h3>Push, with a poll behind it</h3>
+        <h3>Push, with a Poll Behind It</h3>
         <p>Every one pairs event delivery with a scheduled sweep. Push is the fast path; the poll is what makes missed deliveries recoverable rather than permanent.</p>
       </div>
       <div class="card">
         <span class="chip">Pattern</span>
-        <h3>Forms are fetched, never cached</h3>
+        <h3>Forms Are Fetched, Never Cached</h3>
         <p>The partner's process form is retrieved fresh for every submission, because partners change them and the required <code>documentId</code> comes with the fetch.</p>
       </div>
     </div>
@@ -181,13 +181,13 @@
       </a>
       <a class="card" href="../api/index.html">
         <span class="chip">Pattern</span>
-        <h3>Build against the API</h3>
+        <h3>Build Against the API</h3>
         <p>The translation-service pattern: your platform's events in, Connect API calls out, <code>updatedAfter</code> polling back. Read the behaviour guide before you design.</p>
         <span class="card-foot">Working with the API →</span>
       </a>
       <a class="card" href="../community/index.html">
         <span class="chip">Wish list</span>
-        <h3>Tell us the platform</h3>
+        <h3>Tell Us the Platform</h3>
         <p>Which platform your team runs on is the single most useful thing you can say to us — it is what decides which connector gets built next.</p>
         <span class="card-foot">Community →</span>
       </a>
@@ -197,17 +197,33 @@
 </section>
 
 <footer>
-  <div class="wrap foot-in">
-    <div><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
-    <nav class="foot-nav" aria-label="Sections">
-      <a href="index.html">Connectors</a>
-      <a href="../api/index.html">Working with the API</a>
-      <a href="../docs/index.html">Design documents</a>
-      <a href="../topics/index.html">Topics</a>
-      <a href="../community/index.html">Community</a>
-    </nav>
-    <div class="foot-links mono">
-      <a href="https://connect2.tsanet.org">connect2.tsanet.org</a>
+  <div class="wrap">
+    <div class="foot-top"><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
+    <div class="foot-cols">
+      <nav class="foot-col" aria-label="Developers">
+        <h4>Developers</h4>
+        <a href="../connectors/index.html">Connectors</a>
+        <a href="../api/index.html">Working with the API</a>
+        <a href="../docs/index.html">Design Documents</a>
+        <a href="../topics/index.html">Topics</a>
+        <a href="../community/index.html">Community</a>
+      </nav>
+      <div class="foot-col">
+        <h4>Members</h4>
+        <a href="https://www.tsanet.org/members/">Member List</a>
+        <a href="https://tsanet.gitbook.io/connect">Platform Documentation</a>
+        <a href="https://tsanet.gitbook.io/connect/help-center">Member Support</a>
+      </div>
+      <div class="foot-col">
+        <h4>About</h4>
+        <a href="https://www.tsanet.org/about-us/">About Us</a>
+        <a href="https://www.tsanet.org/board-of-directors/">Board of Directors</a>
+        <a href="https://www.tsanet.org/news-events/">News and Events</a>
+      </div>
+    </div>
+    <div class="foot-bottom mono">
+      <span>© TSANet Inc. All Rights Reserved</span>
+      <a href="https://www.tsanet.org/legal-policy/">Privacy Policy</a>
       <a href="https://github.com/tsanetgit">github.com/tsanetgit</a>
       <a href="mailto:membership@tsanet.org">membership@tsanet.org</a>
     </div>

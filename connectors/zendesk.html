@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zendesk connector — TSANet Connect Developer Hub</title>
+<title>Zendesk Connector — TSANet Connect Developer Hub</title>
 <link rel="icon" href="../assets/tsanet-favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/hub.css?v=20260913b">
+<link rel="stylesheet" href="../assets/hub.css?v=20260914b">
 <style>
   td.next{color:var(--ink);background:rgba(0,91,130,.05)}
   thead th.next{background:rgba(0,91,130,.05);color:var(--blue)}
@@ -65,7 +65,7 @@
 <section id="class">
   <div class="wrap">
     <p class="eyebrow">Connector class</p>
-    <h2>Zendesk sits between the two connector classes</h2>
+    <h2>Zendesk Sits Between the Two Connector Classes</h2>
     <p>TSANet connectors divide by one question: will the platform run your code inside the member's own tenant? <a href="salesforce.html">Salesforce</a> and <a href="dynamics.html">Dynamics</a> will, and <a href="servicenow.html">ServiceNow</a> would, though nothing is built there yet. <a href="fin-intercom.html">Intercom will not</a>, which is why that one is a hosted gateway. Zendesk is the interesting middle case — and understanding which half you are in explains most of the design below.</p>
     <div class="twrap">
       <table>
@@ -87,7 +87,7 @@
 <section id="topology">
   <div class="wrap">
     <p class="eyebrow">Architecture</p>
-    <h2>Two layers, and one that no longer exists</h2>
+    <h2>Two Layers, and One That No Longer Exists</h2>
     <p>Layer 1 is the ZAF app the agent sees. Layer 2 is ZIS, which holds the connections and receives inbound pushes. A third layer — a GitHub Actions workflow running a token-refresh job and an SLA monitor — has been <strong>retired</strong>: ZIS renews its own tokens now, and the ZAF background poller applies the SLA breach tag.</p>
     <figure>
       <div class="diagram">
@@ -228,7 +228,7 @@
 <section id="auth">
   <div class="wrap">
     <p class="eyebrow">Authentication</p>
-    <h2>OAuth client credentials, and the scope that looks right but isn't</h2>
+    <h2>OAuth Client Credentials, and the Scope That Looks Right but Isn't</h2>
     <p>Server-to-server auth is an OAuth 2.0 client-credentials grant against Microsoft Entra. Unlike the legacy <code>POST /v1/login</code> JWT — which expires in about 60 minutes and has to be refreshed by something — the caller re-mints automatically from a long-lived client credential. That is what retired the token-refresh job on the ZIS side. The ZAF sidebar's own calls still cache a ~50-minute JWT (see the poller in the topology); which of the two schemes that token comes from has not been re-probed.</p>
 
     <pre><code><span class="c"># Mint an Entra token</span>
@@ -246,7 +246,7 @@ POST https://login.microsoftonline.com/{tenant-id}/oauth2/v2.0/token
       <li><strong>Store secrets verbatim.</strong> Entra client secrets are random strings that can begin with punctuation — a leading <code>.</code> has been seen in production. "Cleaning" the value breaks authentication with <code>AADSTS7000215</code>. If the same secret works directly but fails through ZIS, the stored copy is corrupted: re-PATCH it and watch for paste artifacts.</li>
     </ul>
 
-    <h3>Error responses have two modes, and the default is HTTP 500</h3>
+    <h3>Error Responses Have Two Modes, and the Default Is HTTP 500</h3>
     <p>This is permanent, documented behaviour rather than a bug to work around. With no <code>Accept</code> header — or <code>application/json</code> alone — most business-rule, validation and authorization rejections return <strong>HTTP 500</strong> with a <code>{"message": "..."}</code> body, locked in for backward compatibility with existing clients.</p>
     <pre><code><span class="c"># Recommended for every new integration</span>
 Accept: application/json, application/problem+json</code></pre>
@@ -257,7 +257,7 @@ Accept: application/json, application/problem+json</code></pre>
 <section id="lifecycle">
   <div class="wrap">
     <p class="eyebrow">Lifecycle</p>
-    <h2>Case states, and what the SLA actually measures</h2>
+    <h2>Case States, and What the SLA Actually Measures</h2>
     <figure>
       <div class="diagram">
         <svg viewBox="0 0 800 230" style="min-width:700px" role="img" aria-labelledby="lcT lcD">
@@ -316,7 +316,7 @@ Accept: application/json, application/problem+json</code></pre>
 <section id="notes">
   <div class="wrap">
     <p class="eyebrow">Note visibility</p>
-    <h2>Three audiences, and a composer that only offers two</h2>
+    <h2>Three Audiences, and a Composer That Only Offers Two</h2>
     <p>The governing rule is simple: <strong>only public content reaches the partner; internal notes stay in Zendesk.</strong> The complication is that a note has three possible audiences and Zendesk's native composer is binary — an app cannot add a third option to the built-in Public reply / Internal note toggle.</p>
     <figure>
       <div class="diagram">
@@ -377,7 +377,7 @@ Accept: application/json, application/problem+json</code></pre>
       <li><strong>Notes come back as HTML.</strong> Strip <code>summary</code> and <code>description</code> to plain text before display. The process form's <code>adminNote</code> is the exception — see below.</li>
     </ul>
 
-    <h3>The Add Note payload</h3>
+    <h3>The Add Note Payload</h3>
     <p><code>summary</code> is required and capped at 500 characters; <code>description</code> is optional and capped at 5,000. The TSANet web UI renders both as separate labelled sections, so posting identical values shows the text twice — it looks like a duplication bug and is intentional rendering. Present two fields, Subject and Details, and only include <code>description</code> if the agent filled it in. Never auto-copy one into the other.</p>
   </div>
 </section>
@@ -385,7 +385,7 @@ Accept: application/json, application/problem+json</code></pre>
 <section id="zaf">
   <div class="wrap">
     <p class="eyebrow">ZAF constraints</p>
-    <h2>What the sandbox takes away</h2>
+    <h2>What the Sandbox Takes Away</h2>
     <p>ZAF apps run in cross-origin sandboxed iframes inside Zendesk. Three consequences drive most of the app's shape.</p>
     <div class="cols">
       <ul class="tight">
@@ -408,10 +408,10 @@ Accept: application/json, application/problem+json</code></pre>
 <section id="setup">
   <div class="wrap">
     <p class="eyebrow">Setup</p>
-    <h2>The path through installation</h2>
+    <h2>The Path Through Installation</h2>
     <div class="cols">
       <div>
-        <h3>Custom ticket fields</h3>
+        <h3>Custom Ticket Fields</h3>
         <div class="twrap">
           <table>
             <thead><tr><th>Field</th><th>Type</th></tr></thead>
@@ -427,7 +427,7 @@ Accept: application/json, application/problem+json</code></pre>
         <p style="font-size:13.5px"><strong>Do not copy field IDs out of Admin Center URLs.</strong> Create the fields, then open the app from the left nav bar and use <strong>Detect field IDs</strong> → <strong>Apply</strong>. It matches by title, shows the mapping before writing, and writes the IDs into its own settings. It refuses to guess when two fields share a title or a title match has the wrong type — fix the field and re-run.</p>
       </div>
       <div>
-        <h3>Order of operations</h3>
+        <h3>Order of Operations</h3>
         <ul class="tight">
           <li>Get API credentials and service-principal provisioning from TSANet</li>
           <li>Create the five custom ticket fields</li>
@@ -443,7 +443,7 @@ Accept: application/json, application/problem+json</code></pre>
       </div>
     </div>
 
-    <h3>The ZIS integration name is globally unique across all of Zendesk</h3>
+    <h3>The ZIS Integration Name Is Globally Unique Across All of Zendesk</h3>
     <p>This is documented vendor behaviour, and it is the single most expensive thing on this page to learn at runtime. Register a name and no other Zendesk customer can ever use it. <code>tsanet_connect</code> is already claimed, so <strong>every member needs their own name</strong> — the app exposes it as the <code>tsanet_integration_name</code> setting (charset <code>^[a-z0-9_-]{1,64}$</code>).</p>
     <pre><code>POST /api/services/zis/registry/{your_integration_name}
 <span class="bad-v">400 {"message":"the integration: tsanet_connect is not available for upsert by this account"}</span>
@@ -454,7 +454,7 @@ Accept: application/json, application/problem+json</code></pre>
       <li><strong>ZIS custom integrations are invisible in Admin Center.</strong> Verify over the API — this is by design, not a broken install.</li>
     </ul>
 
-    <h3>Inbound push registration is two calls, and the version matters</h3>
+    <h3>Inbound Push Registration Is Two Calls, and the Version Matters</h3>
     <pre><code><span class="c"># 1. On Zendesk — returns ingest URL + Basic credentials, shown once</span>
 POST /api/services/zis/inbound_webhooks/generic/{integration}
 
@@ -471,9 +471,9 @@ POST <span class="good-v">/v1/webhooks</span>
 <section id="gotchas">
   <div class="wrap">
     <p class="eyebrow">Platform gotchas</p>
-    <h2>Things that cost real debugging time</h2>
+    <h2>Things That Cost Real Debugging Time</h2>
 
-    <h3>Zendesk side</h3>
+    <h3>Zendesk Side</h3>
     <div class="note" style="border-left-color:var(--red)"><strong>Tag POST is not additive, whatever its name says.</strong> Zendesk documents <code>POST /api/v2/tickets/{id}/tags.json</code> as "Add Tags" and it <strong>replaces the ticket's entire tag set</strong>. Because tagger dropdown fields are stored as tags, replacing the tags also blanks those fields — which is how a status field goes empty on a breached ticket. <code>additional_tags</code> is not an escape hatch: on the single-ticket update endpoint it returns 200 and writes nothing, with no audit event.</div>
     <pre><code><span class="c"># The pattern that works</span>
 GET  /api/v2/tickets/{id}.json
@@ -493,7 +493,7 @@ PUT  /api/v2/tickets/{id}.json
       <li><strong>Hiding the app</strong> is an install-time role/group restriction, and it hides every surface at once: sidebar, nav entry and background poller. The <code>allowed_action_roles</code> setting is defence in depth for who can invoke actions, not a way to hide anything. Neither is a security boundary — the TSANet API credential is the real control.</li>
     </ul>
 
-    <h3>TSANet side</h3>
+    <h3>TSANet Side</h3>
     <ul class="tight">
       <li><strong><code>engineerEmail</code> is required on approval, and its domain rule is undocumented.</strong> The specification marks the field required — omitting it still returns "Error processing request" with no useful detail — but nothing documents that the address must be from your company's TSANet-registered domain. An agent's own Zendesk email fails domain validation, so use the dedicated API user's address.</li>
       <li><strong>SELECT field options are newline-delimited, not comma-delimited.</strong> The process form's <code>customFields[].options</code> separates choices with CRLF, and the structured <code>selections[]</code> array is frequently empty. Splitting on commas collapses every choice into one option. Parse <code>selections[].value</code> first, then split on newlines, then fall back to commas.</li>
@@ -509,7 +509,7 @@ PUT  /api/v2/tickets/{id}.json
 <section id="clocks">
   <div class="wrap">
     <p class="eyebrow">Deprecation clocks</p>
-    <h2>Dates worth putting in your calendar</h2>
+    <h2>Dates Worth Putting in Your Calendar</h2>
     <p>Two independent retirement schedules affect this connector. Neither is a TSANet decision, and both have hard dates.</p>
     <div class="twrap">
       <table>
@@ -536,15 +536,15 @@ PUT  /api/v2/tickets/{id}.json
 <section id="skill">
   <div class="wrap">
     <p class="eyebrow">Build with an assistant</p>
-    <h2>The implementation skill, and how to load it</h2>
+    <h2>The Implementation Skill, and How to Load It</h2>
     <p>The connector repository ships an agent skill — <a href="https://github.com/tsanetgit/Zendesk_App/blob/main/SKILL_TSANet_Connect.md"><code>SKILL_TSANet_Connect.md</code></a> — distilled from the production implementation: the two-layer architecture, the OAuth setup and its traps, the custom-field scheme, the lifecycle rules, and the platform gotchas on this page in a form an agentic coding assistant can apply while it works in your codebase. It is a plain markdown file with skill frontmatter (<code>name</code>, <code>description</code> and a <code>trigger</code> key), so it loads into Claude Code and any other assistant that accepts an instruction file. It is not quite self-contained: its PII-retention section points at a sibling file, <code>PII_Retention_and_Data_Handling.md</code>, in the same repository, so fetch that alongside it. Every skill TSANet ships, and how to load one into any assistant, is collected on <a href="../topics/agentic-usage.html#skills">Agentic usage with TSANet Connect</a>.</p>
-    <h3>Loading it</h3>
+    <h3>Loading It</h3>
     <p><strong>Claude Code</strong> — put it in your integration project's skills directory; from then on it triggers automatically whenever the work touches TSANet, ZAF or ZIS:</p>
     <pre><code>mkdir -p .claude/skills/tsanet-connect
 curl -o .claude/skills/tsanet-connect/SKILL.md \
   https://raw.githubusercontent.com/tsanetgit/Zendesk_App/main/SKILL_TSANet_Connect.md</code></pre>
     <p><strong>Other assistants</strong> — add the same file to whatever your tool treats as project instructions (a rules file, a context attachment). Nothing in it is Claude-specific. The skill lives in the connector repository and evolves with it, so re-download it when you upgrade the connector.</p>
-    <h3>Typical first steps</h3>
+    <h3>Typical First Steps</h3>
     <ul class="tight">
       <li><strong>Start with routing, not code.</strong> <em>"We're installing TSANet Connect for Zendesk — which layer do we need, and what should we provision first?"</em> The skill's first job is deciding between the ZAF app, ZIS, and a custom REST path, and it will surface prerequisites before you hit them.</li>
       <li><strong>Do auth with it, not after it.</strong> <em>"Walk me through the ZIS OAuth client-credentials setup."</em> The scope format that looks right and fails, and the secret-handling rules, are exactly the traps it exists to catch — the same ones under <a href="#auth">Authentication</a> above.</li>
@@ -556,17 +556,33 @@ curl -o .claude/skills/tsanet-connect/SKILL.md \
 </section>
 
 <footer>
-  <div class="wrap foot-in">
-    <div><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
-    <nav class="foot-nav" aria-label="Sections">
-      <a href="../connectors/index.html">Connectors</a>
-      <a href="../api/index.html">Working with the API</a>
-      <a href="../docs/index.html">Design documents</a>
-      <a href="../topics/index.html">Topics</a>
-      <a href="../community/index.html">Community</a>
-    </nav>
-    <div class="foot-links mono">
-      <a href="https://connect2.tsanet.org">connect2.tsanet.org</a>
+  <div class="wrap">
+    <div class="foot-top"><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
+    <div class="foot-cols">
+      <nav class="foot-col" aria-label="Developers">
+        <h4>Developers</h4>
+        <a href="../connectors/index.html">Connectors</a>
+        <a href="../api/index.html">Working with the API</a>
+        <a href="../docs/index.html">Design Documents</a>
+        <a href="../topics/index.html">Topics</a>
+        <a href="../community/index.html">Community</a>
+      </nav>
+      <div class="foot-col">
+        <h4>Members</h4>
+        <a href="https://www.tsanet.org/members/">Member List</a>
+        <a href="https://tsanet.gitbook.io/connect">Platform Documentation</a>
+        <a href="https://tsanet.gitbook.io/connect/help-center">Member Support</a>
+      </div>
+      <div class="foot-col">
+        <h4>About</h4>
+        <a href="https://www.tsanet.org/about-us/">About Us</a>
+        <a href="https://www.tsanet.org/board-of-directors/">Board of Directors</a>
+        <a href="https://www.tsanet.org/news-events/">News and Events</a>
+      </div>
+    </div>
+    <div class="foot-bottom mono">
+      <span>© TSANet Inc. All Rights Reserved</span>
+      <a href="https://www.tsanet.org/legal-policy/">Privacy Policy</a>
       <a href="https://github.com/tsanetgit">github.com/tsanetgit</a>
       <a href="mailto:membership@tsanet.org">membership@tsanet.org</a>
     </div>

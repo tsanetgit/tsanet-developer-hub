@@ -10,8 +10,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <!-- hub.css owns the brand tokens, fonts and SVG diagram primitives.
      doc.css adds only what is specific to a numbered design document. -->
-<link rel="stylesheet" href="../assets/hub.css?v=20260913b">
-<link rel="stylesheet" href="../assets/doc.css?v=20260913">
+<link rel="stylesheet" href="../assets/hub.css?v=20260914b">
+<link rel="stylesheet" href="../assets/doc.css?v=20260914">
 </head>
 <body>
 
@@ -35,7 +35,7 @@
       <span class="chip no">TSANET-2026-001</span>
       <span class="chip status">DRAFT</span>
     </div>
-    <h1>The canonical case model, and how connectors map onto it</h1>
+    <h1>The Canonical Case Model, and How Connectors Map onto It</h1>
     <p class="abstract">Every TSANet connector maps the same canonical collaboration case onto a different platform's data model. This document specifies that canonical model, the places where the write schema and the read schema deliberately diverge, and the mapping decisions each connector has to make. It is for anyone building or reviewing an integration against the Connect API.</p>
     <div class="meta-table">
       <div class="meta-cell"><b>Date</b><span>2026-09-13</span></div>
@@ -58,10 +58,10 @@
       Behavioural guidance for working with these endpoints is on <a href="../api/index.html">Working with the Connect API</a>. Platform-specific mappings are on the individual <a href="../connectors/index.html">connector pages</a>. File transfer is specified separately in <a href="tsanet-2026-002-case-attachments.html">TSANET-2026-002</a>; every endpoint there is scoped by the <code>token</code> this document introduces.
     </div>
 
-    <h2><span class="sec-no">2</span>Two schemas, one case</h2>
+    <h2><span class="sec-no">2</span>Two Schemas, One Case</h2>
     <p>The most consequential property of the model is that <strong>the shape you write is not the shape you read</strong>. Case creation takes a request schema; retrieval returns a status schema; the field names differ between them. This is not a defect, and it is not documented as a mapping anywhere — an integrator meets it when a read-back returns nothing under the names they just sent.</p>
 
-    <h3>2.1 Field-name divergence</h3>
+    <h3>2.1 Field-Name Divergence</h3>
     <table class="doc">
       <tr><th>Concept</th><th>Write (create request)</th><th>Read (case status)</th></tr>
       <tr><td>Short problem title</td><td><code>problemSummary</code></td><td><code>summary</code></td></tr>
@@ -77,17 +77,17 @@
       A mapping layer written from the create request alone will fail silently on read-back. Model the two schemas separately and map between them explicitly, rather than assuming one round-trips into the other.
     </div>
 
-    <h3>2.2 Fields that only exist on read</h3>
+    <h3>2.2 Fields That Only Exist on Read</h3>
     <p>The status schema carries lifecycle state the write schema has no concept of: <code>token</code>, <code>status</code>, <code>direction</code>, <code>createdAt</code> and <code>updatedAt</code>, <code>respondBy</code>, and <code>responded</code>. Two of these deserve particular attention.</p>
     <ul>
       <li><code>token</code> is the join key for everything. It appears in every subsequent URL and in every webhook payload. Persist it at creation, before anything else in your flow can fail.</li>
       <li><code>responded</code> is a boolean, and it — not the status name — is what gates the response SLA. Once it is true the platform has stopped tracking <code>respondBy</code>, so any countdown built on the status name alone will display a deadline nobody is measuring.</li>
     </ul>
 
-    <h2><span class="sec-no">3</span>Custom fields are data, not schema</h2>
+    <h2><span class="sec-no">3</span>Custom Fields Are Data, Not Schema</h2>
     <p>Beyond the canonical fields, each partner defines their own intake form. Those fields arrive as a typed template from the form endpoints and are submitted back as a <code>customFields[]</code> array. No connector hardcodes them — the mapping is driven by the template fetched at submission time.</p>
 
-    <h3>3.1 Form sections</h3>
+    <h3>3.1 Form Sections</h3>
     <p>The template groups fields into sections, which is what lets a connector lay the form out sensibly rather than as a flat list:</p>
     <table class="doc">
       <tr><th>Section</th><th>Carries</th></tr>
@@ -102,14 +102,14 @@
       Fetch the form template fresh for every submission. Partners change their forms, and the <code>documentId</code> you must submit alongside comes from that same fetch. A cached template means a stale <code>documentId</code> and a rejected case.
     </div>
 
-    <h3>3.2 Field types the template can specify</h3>
+    <h3>3.2 Field Types the Template Can Specify</h3>
     <p>Custom fields are typed — <code>STRING</code>, <code>TEXT</code>, <code>EMAIL</code>, <code>PHONE</code>, <code>INTEGER</code>, <code>URL</code>, <code>SELECT</code> and <code>HIDDEN</code> among them — and a connector is expected to render each appropriately rather than treating everything as free text.</p>
     <div class="callout warn">
       <b>Constraint</b>
       A <code>SELECT</code> field's options are <strong>newline-delimited</strong>, not comma-delimited, and the structured <code>selections[]</code> array is frequently empty. Splitting on commas collapses every choice into a single option — a bug that renders perfectly and is wrong. Parse <code>selections[].value</code> first, fall back to splitting on newlines, and only then on commas.
     </div>
 
-    <h2><span class="sec-no">4</span>Where connectors put the data</h2>
+    <h2><span class="sec-no">4</span>Where Connectors Put the Data</h2>
     <p>The canonical model says nothing about storage, and the shipped connectors have made genuinely opposite choices. Both are correct; the difference is worth understanding before designing a new one.</p>
     <table class="doc">
       <tr><th>Approach</th><th>Example</th><th>Consequence</th></tr>
@@ -140,13 +140,13 @@
       <figcaption>Figure 1 — One case, two representations. Neither member sees the other's mapping; the token is what makes them the same case.</figcaption>
     </div>
 
-    <h2><span class="sec-no">5</span>Known mapping gaps</h2>
+    <h2><span class="sec-no">5</span>Known Mapping Gaps</h2>
     <p>Two mappings are not cleanly expressible today. Both are recorded here so integrators design around them deliberately rather than discovering them mid-build.</p>
 
-    <h3>5.1 Priority is three levels; most members use four</h3>
+    <h3>5.1 Priority Is Three Levels; Most Members Use Four</h3>
     <p>The canonical model has <code>LOW</code>, <code>MEDIUM</code> and <code>HIGH</code>. Members commonly run a four-level severity scale (S1–S4), so a three-to-four mapping is required in both directions, and it has to stay synchronised across the case lifecycle for both sides' service levels to hold. There is no canonical answer; each connector currently decides its own collapse, which means a case can read as a different severity to each party.</p>
 
-    <h3>5.2 Note direction is a case property, not a note property</h3>
+    <h3>5.2 Note Direction Is a Case Property, Not a Note Property</h3>
     <p>The note object carries no direction field. Notes are written under a synchronisation identity, so author fields are identical regardless of who sent one, and the only available signal is the company name — which is ambiguous when both organisations have similar names. Direction is reliably derivable from the case, not from the note. A connector that labels notes "sent" or "received" should derive that from case direction and its own record of what it posted.</p>
 
     <div class="callout">
@@ -154,7 +154,7 @@
       A useful convention where both sides agree to it: put a structured event type in the note <code>summary</code> ("status change", "severity change", "new public note") and the human content in <code>description</code>. That gives either side something to build automation on without an API change. It is a convention, not a platform feature.
     </div>
 
-    <h2><span class="sec-no">6</span>Revision history</h2>
+    <h2><span class="sec-no">6</span>Revision History</h2>
     <table class="doc">
       <tr><th>Version</th><th>Date</th><th>Change</th></tr>
       <tr><td>0.2</td><td>2026-09-13</td><td>Add the <code>testSubmission</code> / <code>testCase</code> row to the divergence table; cross-reference TSANET-2026-002.</td></tr>
@@ -166,8 +166,35 @@
 
 <footer>
   <div class="wrap">
-    <div>TSANet Connect Platform Engineering · <a href="../index.html">Developer Hub</a></div>
-    <div class="mono">TSANET-2026-001 · v0.2</div>
+    <div class="foot-top"><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
+    <div class="foot-cols">
+      <nav class="foot-col" aria-label="Developers">
+        <h4>Developers</h4>
+        <a href="../connectors/index.html">Connectors</a>
+        <a href="../api/index.html">Working with the API</a>
+        <a href="../docs/index.html">Design Documents</a>
+        <a href="../topics/index.html">Topics</a>
+        <a href="../community/index.html">Community</a>
+      </nav>
+      <div class="foot-col">
+        <h4>Members</h4>
+        <a href="https://www.tsanet.org/members/">Member List</a>
+        <a href="https://tsanet.gitbook.io/connect">Platform Documentation</a>
+        <a href="https://tsanet.gitbook.io/connect/help-center">Member Support</a>
+      </div>
+      <div class="foot-col">
+        <h4>About</h4>
+        <a href="https://www.tsanet.org/about-us/">About Us</a>
+        <a href="https://www.tsanet.org/board-of-directors/">Board of Directors</a>
+        <a href="https://www.tsanet.org/news-events/">News and Events</a>
+      </div>
+    </div>
+    <div class="foot-bottom mono">
+      <span>© TSANet Inc. All Rights Reserved</span>
+      <a href="https://www.tsanet.org/legal-policy/">Privacy Policy</a>
+      <a href="https://github.com/tsanetgit">github.com/tsanetgit</a>
+      <a href="mailto:membership@tsanet.org">membership@tsanet.org</a>
+    </div>
   </div>
 </footer>
 

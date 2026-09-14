@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/hub.css?v=20260913b">
+<link rel="stylesheet" href="../assets/hub.css?v=20260914b">
 <style>
   .topic{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:26px 28px;border-left:3px solid var(--orange);margin-bottom:16px;display:block}
   .topic:hover{border-color:var(--blue);border-left-color:var(--orange)}
@@ -57,7 +57,7 @@
     <h2>Four Topics</h2>
 
     <a class="topic" href="connector-classes.html">
-      <h3>Two ways to build a connector</h3>
+      <h3>Two Ways to Build a Connector</h3>
       <p>One question about your platform — will it run your code inside the member's tenant? — decides who operates the integration, where credentials live, whether connector faults are independent or correlated, and whether shipping a fix means asking every member to upgrade. The taxonomy behind every connector on this hub, plus a four-question procedure for a platform that is not on it yet.</p>
       <div class="grounds">
         <span>In-tenant · Salesforce, Dynamics</span>
@@ -69,7 +69,7 @@
     </a>
 
     <a class="topic" href="entitlement-automation.html">
-      <h3>Deciding what to accept automatically</h3>
+      <h3>Deciding What to Accept Automatically</h3>
       <p>Three of the four shipped connectors can accept inbound cases without an agent, the fourth refuses to, and they disagree completely about when that is wise. Accepting stops the SLA clock and tells a partner an engineer is engaged — so a false acceptance is worse for them than an honest breach. Four shipping postures, and how to build a rule that asserts something actually true.</p>
       <div class="grounds">
         <span>Accept everything · Zendesk</span>
@@ -81,7 +81,7 @@
     </a>
 
     <a class="topic" href="file-sharing.html">
-      <h3>Moving files between members</h3>
+      <h3>Moving Files Between Members</h3>
       <p>A file attached to a collaboration case is delivered into the receiving member's own file store — not parked on a portal. The sender never learns how the receiver stores files, which is exactly what makes the system extensible. How sending works, what the normalized receiving contract requires, the five decisions every receiving member makes, and the sharp edges around one-attempt delivery.</p>
       <div class="grounds">
         <span>Live · normalized HTTPS push</span>
@@ -92,7 +92,7 @@
     </a>
 
     <a class="topic" href="agentic-usage.html">
-      <h3>Agentic usage with TSANet Connect</h3>
+      <h3>Agentic Usage with TSANet Connect</h3>
       <p>Working on Connect with an AI agent rather than by hand, whichever provider's agent it is. The four skills TSANet ships and how any assistant loads them, the assistant embedded in this hub and the recipe for the Copilot Studio agent behind it, what every provider's framework needs from the API — and the auth gap that separates hosted builders from code-first ones — plus a documented-only assessment of Copilot Studio with Claude.</p>
       <div class="grounds">
         <span>Shipped · four agent skills</span>
@@ -133,19 +133,19 @@
     <div class="grid g3">
       <a class="card" href="../community/index.html">
         <span class="chip">Community</span>
-        <h3>Start a discussion</h3>
+        <h3>Start a Discussion</h3>
         <p>Ideas and Wish List are the categories for this. Say what you hit, on which platforms, and how the answers differed.</p>
         <span class="card-foot">Community →</span>
       </a>
       <a class="card" href="../docs/index.html">
         <span class="chip">Adjacent</span>
-        <h3>Or write a design doc</h3>
+        <h3>Or Write a Design Doc</h3>
         <p>If the subject is platform-wide behaviour with a specification behind it rather than a comparison, it belongs in the numbered library instead.</p>
         <span class="card-foot">Design docs →</span>
       </a>
       <a class="card" href="../connectors/index.html">
         <span class="chip">Source</span>
-        <h3>Compare the connectors</h3>
+        <h3>Compare the Connectors</h3>
         <p>The comparison matrix is where most topic ideas start — a row where the connectors disagree is usually a topic waiting to be written.</p>
         <span class="card-foot">All connectors →</span>
       </a>
@@ -154,17 +154,33 @@
 </section>
 
 <footer>
-  <div class="wrap foot-in">
-    <div><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
-    <nav class="foot-nav" aria-label="Sections">
-      <a href="../connectors/index.html">Connectors</a>
-      <a href="../api/index.html">Working with the API</a>
-      <a href="../docs/index.html">Design documents</a>
-      <a href="../topics/index.html">Topics</a>
-      <a href="../community/index.html">Community</a>
-    </nav>
-    <div class="foot-links mono">
-      <a href="https://connect2.tsanet.org">connect2.tsanet.org</a>
+  <div class="wrap">
+    <div class="foot-top"><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
+    <div class="foot-cols">
+      <nav class="foot-col" aria-label="Developers">
+        <h4>Developers</h4>
+        <a href="../connectors/index.html">Connectors</a>
+        <a href="../api/index.html">Working with the API</a>
+        <a href="../docs/index.html">Design Documents</a>
+        <a href="../topics/index.html">Topics</a>
+        <a href="../community/index.html">Community</a>
+      </nav>
+      <div class="foot-col">
+        <h4>Members</h4>
+        <a href="https://www.tsanet.org/members/">Member List</a>
+        <a href="https://tsanet.gitbook.io/connect">Platform Documentation</a>
+        <a href="https://tsanet.gitbook.io/connect/help-center">Member Support</a>
+      </div>
+      <div class="foot-col">
+        <h4>About</h4>
+        <a href="https://www.tsanet.org/about-us/">About Us</a>
+        <a href="https://www.tsanet.org/board-of-directors/">Board of Directors</a>
+        <a href="https://www.tsanet.org/news-events/">News and Events</a>
+      </div>
+    </div>
+    <div class="foot-bottom mono">
+      <span>© TSANet Inc. All Rights Reserved</span>
+      <a href="https://www.tsanet.org/legal-policy/">Privacy Policy</a>
       <a href="https://github.com/tsanetgit">github.com/tsanetgit</a>
       <a href="mailto:membership@tsanet.org">membership@tsanet.org</a>
     </div>

@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ServiceNow platform assessment — TSANet Connect Developer Hub</title>
+<title>ServiceNow Platform Assessment — TSANet Connect Developer Hub</title>
 <link rel="icon" href="../assets/tsanet-favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/hub.css?v=20260913b">
+<link rel="stylesheet" href="../assets/hub.css?v=20260914b">
 <style>
   pre{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--ink);margin:16px 0}
   pre code{background:none;padding:0;font-size:inherit}
@@ -71,7 +71,7 @@
 <section id="status">
   <div class="wrap">
     <div class="status-band">
-      <h2>Read this before you use anything below</h2>
+      <h2>Read This Before You Use Anything Below</h2>
       <p>Every claim on this page is <strong>documented, not observed</strong> — somebody read it in vendor documentation or a community thread, not that anybody watched it work. That distinction has mattered before: on the most recent platform TSANet assessed, published documentation turned out to be wrong or silent on the majority of the findings that ended up shaping the design.</p>
       <p style="margin-top:12px">Treat this as a research map with citations. Anything marked <span class="tag probe">needs probe</span> is a known unknown rather than an oversight, and the first verified fact on this page will be the first one worth designing against.</p>
       <div class="status-grid">
@@ -91,7 +91,7 @@
 <section id="shape">
   <div class="wrap">
     <p class="eyebrow">Platform shape</p>
-    <h2>Why ServiceNow does not fit either existing pattern</h2>
+    <h2>Why ServiceNow Does Not Fit Either Existing Pattern</h2>
     <p>TSANet's connectors so far divide by one question: will the platform run your code inside the member's own tenant? <a href="salesforce.html">Salesforce</a> and <a href="dynamics.html">Dynamics</a> say yes and get managed packages. <a href="fin-intercom.html">Intercom</a> says no and gets a TSANet-hosted gateway. <a href="zendesk.html">Zendesk</a> sits between.</p>
     <p>ServiceNow answers <strong>both at once</strong>, and that is the whole difficulty. It will happily run installed code — scoped applications are the native extension model. But it hosts <em>none</em> of the UI for you and provides <em>no</em> native webhooks. There is no Canvas Kit and no ZAF analogue: if an agent is to see anything, it is either code installed in their instance or a page served from somewhere else and framed in.</p>
     <figure>
@@ -144,7 +144,7 @@
 <section id="surface">
   <div class="wrap">
     <p class="eyebrow">Agent surfaces</p>
-    <h2>Where a collaboration panel could live</h2>
+    <h2>Where a Collaboration Panel Could Live</h2>
     <ul class="tight">
       <li><strong>Two UI families, and a member is on one or the other.</strong> Classic UI means a UI Action opening a UI Page or modal on the Incident or Case form. Configurable Workspaces on Next Experience means UI Builder components on the record page. An app covering both typically ships a UI Action — which surfaces in each — plus optional workspace components. <span class="tag doc">documented</span></li>
       <li><strong>Legacy Agent Workspace is not a target.</strong> Support ended at the Washington DC release. <span class="tag doc">documented</span></li>
@@ -158,7 +158,7 @@
 <section id="api">
   <div class="wrap">
     <p class="eyebrow">Table API</p>
-    <h2>Traps to design around</h2>
+    <h2>Traps to Design Around</h2>
     <p>Several of these rhyme with traps found on other platforms, which is a reason to take them seriously and not a reason to assume they behave identically.</p>
     <ul class="tight">
       <li><strong>Unknown fields are reportedly accepted and silently dropped.</strong> An invalid or misspelled field name is said to return 200/201 with the value discarded. If a probe confirms it, read-back-and-assert becomes a standing rule for every write on this platform. <span class="tag probe">needs probe</span></li>
@@ -176,7 +176,7 @@
 <section id="events">
   <div class="wrap">
     <p class="eyebrow">Events</p>
-    <h2>No native webhooks, and a licensing trap in the workaround</h2>
+    <h2>No Native Webhooks, and a Licensing Trap in the Workaround</h2>
     <p>Nothing on the platform pushes to an external endpoint by default. Outbound delivery is configured inside the instance, and there are two ways to do it — which is where the trap is.</p>
     <div class="twrap">
       <table>
@@ -201,7 +201,7 @@
 <section id="model">
   <div class="wrap">
     <p class="eyebrow">Object model</p>
-    <h2>Three candidate homes for a collaboration case</h2>
+    <h2>Three Candidate Homes for a Collaboration Case</h2>
     <p>Unusually, the right answer here is probably per member rather than per platform.</p>
     <div class="twrap">
       <table>
@@ -226,7 +226,7 @@
 <section id="tenancy">
   <div class="wrap">
     <p class="eyebrow">Tenancy &amp; auth</p>
-    <h2>Per-instance, and reachable only sometimes</h2>
+    <h2>Per-Instance, and Reachable Only Sometimes</h2>
     <ul class="tight">
       <li><strong>Every member has their own instance</strong> at <code>https://&lt;instance&gt;.service-now.com</code>, publicly reachable <em>by default</em>. <span class="tag doc">documented</span></li>
       <li><strong>But inbound access is a per-member question, not an assumption.</strong> Customers can enable IP Address Access Control, and security-conscious enterprises do — an entire third-party static-IP proxy market exists to serve integrations that hit this. Any externally hosted component needs stable egress addresses, and where ingress is blocked the traffic direction inverts: the instance polls out instead. This is the single most likely thing to reshape a design per member. <span class="tag doc">documented</span></li>
@@ -241,7 +241,7 @@
 <section id="distribution">
   <div class="wrap">
     <p class="eyebrow">Distribution</p>
-    <h2>Certification gates the Store, not the platform</h2>
+    <h2>Certification Gates the Store, Not the Platform</h2>
     <p>A member's admin can install a third-party scoped app directly, with no ServiceNow review, no partner program and no fee — by update-set XML import, or by source-control import in Studio. That is the same private-install model TSANet already uses elsewhere. <span class="tag doc">documented</span></p>
     <div class="twrap">
       <table>
@@ -264,7 +264,7 @@
 <section id="open">
   <div class="wrap">
     <p class="eyebrow">Open questions</p>
-    <h2>What has to be answered, and what each one blocks</h2>
+    <h2>What Has to Be Answered, and What Each One Blocks</h2>
     <p>These are listed because they are unresolved, not because they are hard. Each blocks real design work downstream.</p>
     <div class="twrap">
       <table>
@@ -286,17 +286,33 @@
 </section>
 
 <footer>
-  <div class="wrap foot-in">
-    <div><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
-    <nav class="foot-nav" aria-label="Sections">
-      <a href="../connectors/index.html">Connectors</a>
-      <a href="../api/index.html">Working with the API</a>
-      <a href="../docs/index.html">Design documents</a>
-      <a href="../topics/index.html">Topics</a>
-      <a href="../community/index.html">Community</a>
-    </nav>
-    <div class="foot-links mono">
-      <a href="https://connect2.tsanet.org">connect2.tsanet.org</a>
+  <div class="wrap">
+    <div class="foot-top"><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
+    <div class="foot-cols">
+      <nav class="foot-col" aria-label="Developers">
+        <h4>Developers</h4>
+        <a href="../connectors/index.html">Connectors</a>
+        <a href="../api/index.html">Working with the API</a>
+        <a href="../docs/index.html">Design Documents</a>
+        <a href="../topics/index.html">Topics</a>
+        <a href="../community/index.html">Community</a>
+      </nav>
+      <div class="foot-col">
+        <h4>Members</h4>
+        <a href="https://www.tsanet.org/members/">Member List</a>
+        <a href="https://tsanet.gitbook.io/connect">Platform Documentation</a>
+        <a href="https://tsanet.gitbook.io/connect/help-center">Member Support</a>
+      </div>
+      <div class="foot-col">
+        <h4>About</h4>
+        <a href="https://www.tsanet.org/about-us/">About Us</a>
+        <a href="https://www.tsanet.org/board-of-directors/">Board of Directors</a>
+        <a href="https://www.tsanet.org/news-events/">News and Events</a>
+      </div>
+    </div>
+    <div class="foot-bottom mono">
+      <span>© TSANet Inc. All Rights Reserved</span>
+      <a href="https://www.tsanet.org/legal-policy/">Privacy Policy</a>
       <a href="https://github.com/tsanetgit">github.com/tsanetgit</a>
       <a href="mailto:membership@tsanet.org">membership@tsanet.org</a>
     </div>

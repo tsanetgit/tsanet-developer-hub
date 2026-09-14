@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/hub.css?v=20260913b">
+<link rel="stylesheet" href="../assets/hub.css?v=20260914b">
 <style>
   pre{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--ink);margin:16px 0}
   pre code{background:none;padding:0;font-size:inherit}
@@ -72,7 +72,7 @@
 <section id="reference">
   <div class="wrap">
     <div class="status-band">
-      <h3>Looking for the endpoint reference?</h3>
+      <h3>Looking for the Endpoint Reference?</h3>
       <p>Full request and response schemas, parameters and status codes for all 27 paths are published in the GitBook API Reference and generated from the specification, which keeps it broadly in step with the API — broadly, not perfectly: <a href="#ref-drift">one known drift</a> is flagged on this page. The path count, the sunset table, the status and attachment enums, the note caps, the event types and both retry policies were re-checked against <code>openapi.yaml</code> and <code>webhook-asyncapi.yaml</code> on 2026-09-13. It deliberately does not duplicate the reference — two copies of a reference is one copy that goes stale.</p>
       <div class="out">
         <a href="https://tsanet.gitbook.io/connect/api-reference">API Reference →</a>
@@ -232,9 +232,9 @@
       <p>Accepting tells the partner an engineer is engaged, and it satisfies the SLA at the same moment. Those pull in opposite directions, which is why automating acceptance is a real decision rather than a convenience: a rule that accepts something nobody will work stops the clock and leaves the partner waiting — worse for them than an honest breach, because a breach is visible.</p>
       <p class="where">Four shipping postures compared in <a href="../topics/entitlement-automation.html">Deciding what to accept automatically</a></p>
     </div>
-    <h3>Approval's email carries an undocumented constraint</h3>
+    <h3>Approval's Email Carries an Undocumented Constraint</h3>
     <p><code>engineerEmail</code> is required on <code>/approval</code> — the specification marks it required, though omitting it still returns an unhelpful error. What the specification does not say: the address must be on your company's TSANet-registered domain. An individual agent's own address fails domain validation, so use the dedicated API user's address.</p>
-    <h3>Listing and polling</h3>
+    <h3>Listing and Polling</h3>
     <ul class="tight">
       <li><code>/v2/collaboration-requests</code> is paginated and returns <code>{content:[...]}</code>; <code>/v2/collaboration-requests/list</code> returns a plain array and supports <code>updatedAfter</code> and <code>createdAfter</code>. The deprecated <code>GET /v1/collaboration-requests</code> accepts both filters as well (ignored when its <code>paginated</code> flag is true), so the reason to move is the sunset, not a missing parameter.</li>
       <li>Store the <code>updatedAt</code> of the last synced record and pass it as <code>updatedAfter</code> on the next poll. Overlap the window slightly rather than trusting exact boundaries.</li>
@@ -286,7 +286,7 @@
         </tbody>
       </table>
     </div>
-    <h3>The five event types</h3>
+    <h3>The Five Event Types</h3>
       <p>These are the v2 set. A v1 subscription delivers only two of them — <code>collaboration-request.created</code> and <code>note.created</code> — so closures and responses reach a v1 consumer through the poll, never the push.</p>
     <pre><code>org.tsanet.connect.collaboration-request.created
 org.tsanet.connect.collaboration-request.closed
@@ -311,7 +311,7 @@ org.tsanet.connect.collaboration-request.note.created</code></pre>
       <p>Past that the delivery is treated as failed. Acknowledge immediately and do the real work asynchronously — every connector on this hub fast-acks and hands off to a queue for exactly this reason.</p>
     </div>
     <div class="note" style="border-left-color:var(--orange)"><strong>The published retry policy is currently inconsistent.</strong> The OpenAPI specification states 5 total attempts with exponential backoff from 10s capped at 300s; the AsyncAPI specification states 2 retries an hour apart. Both are published, and they disagree. Until it is reconciled, do not design around a specific cadence — assume retries happen, make handlers idempotent, and treat the reconciliation poll as the real guarantee. Exhausted deliveries are dead-lettered either way and flagged in the delivery log.</div>
-    <h3>Managing a subscription</h3>
+    <h3>Managing a Subscription</h3>
     <ul class="tight">
       <li>Subscribe with <code>POST /v2/webhooks</code> carrying a <code>callbackUrl</code> and <code>callbackAuth</code> (<code>BASIC</code>, <code>BEARER</code> or <code>HEADER</code>). If <code>callbackAuth</code> is set, the URL must be HTTPS.</li>
       <li><strong>Save the <code>secret</code> at creation.</strong> The HMAC signing key is returned once and cannot be read back. Rotate it later with <code>POST /v1/webhooks/{id}/secret</code>.</li>
@@ -338,9 +338,9 @@ org.tsanet.connect.collaboration-request.note.created</code></pre>
         </tbody>
       </table>
     </div>
-    <h3>The migration is smaller than "v1 → v2" sounds</h3>
+    <h3>The Migration Is Smaller than "v1 → v2" Sounds</h3>
     <p>The v2 surface is exactly three paths: the two list endpoints and the webhook subscription. Creating a case and every <code>{token}</code> sub-resource — approval, rejection, closure, notes, attachments, the information exchange — exist only on v1 and carry no deprecation. Migrating means moving your list polling and your webhook subscription; nothing else moves. And the webhook half is a <a href="#webhooks">two-sided change</a>: the subscription and the consumer's event-type matching have to move together, or every delivery returns 200 into a no-op.</p>
-    <h3>Where the shipped integrations stand</h3>
+    <h3>Where the Shipped Integrations Stand</h3>
     <div class="twrap">
       <table>
         <thead><tr><th>Integration</th><th>Posture</th><th>Where it stands</th><th>Evidence</th></tr></thead>
@@ -358,17 +358,33 @@ org.tsanet.connect.collaboration-request.note.created</code></pre>
 </section>
 
 <footer>
-  <div class="wrap foot-in">
-    <div><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
-    <nav class="foot-nav" aria-label="Sections">
-      <a href="../connectors/index.html">Connectors</a>
-      <a href="index.html">Working with the API</a>
-      <a href="../docs/index.html">Design documents</a>
-      <a href="../topics/index.html">Topics</a>
-      <a href="../community/index.html">Community</a>
-    </nav>
-    <div class="foot-links mono">
-      <a href="https://connect2.tsanet.org">connect2.tsanet.org</a>
+  <div class="wrap">
+    <div class="foot-top"><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
+    <div class="foot-cols">
+      <nav class="foot-col" aria-label="Developers">
+        <h4>Developers</h4>
+        <a href="../connectors/index.html">Connectors</a>
+        <a href="../api/index.html">Working with the API</a>
+        <a href="../docs/index.html">Design Documents</a>
+        <a href="../topics/index.html">Topics</a>
+        <a href="../community/index.html">Community</a>
+      </nav>
+      <div class="foot-col">
+        <h4>Members</h4>
+        <a href="https://www.tsanet.org/members/">Member List</a>
+        <a href="https://tsanet.gitbook.io/connect">Platform Documentation</a>
+        <a href="https://tsanet.gitbook.io/connect/help-center">Member Support</a>
+      </div>
+      <div class="foot-col">
+        <h4>About</h4>
+        <a href="https://www.tsanet.org/about-us/">About Us</a>
+        <a href="https://www.tsanet.org/board-of-directors/">Board of Directors</a>
+        <a href="https://www.tsanet.org/news-events/">News and Events</a>
+      </div>
+    </div>
+    <div class="foot-bottom mono">
+      <span>© TSANet Inc. All Rights Reserved</span>
+      <a href="https://www.tsanet.org/legal-policy/">Privacy Policy</a>
       <a href="https://github.com/tsanetgit">github.com/tsanetgit</a>
       <a href="mailto:membership@tsanet.org">membership@tsanet.org</a>
     </div>

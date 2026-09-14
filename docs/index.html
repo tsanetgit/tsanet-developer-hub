@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/hub.css?v=20260913b">
+<link rel="stylesheet" href="../assets/hub.css?v=20260914b">
 <style>
   .doclist{display:grid;gap:0;border:1px solid var(--line);border-radius:13px;background:var(--panel);overflow:hidden}
   .docrow{display:grid;grid-template-columns:9.5rem 1fr 7rem;gap:18px;padding:18px 22px;border-bottom:1px solid var(--line);align-items:baseline}
@@ -63,7 +63,7 @@
       <a class="docrow" href="tsanet-2026-001-canonical-case-model.html">
         <span class="no">TSANET-2026-001</span>
         <span>
-          <h3>The canonical case model</h3>
+          <h3>The Canonical Case Model</h3>
           <p>One case, two schemas: where the write and read models diverge, how custom fields arrive from the form template, the two storage philosophies connectors have chosen, and the mappings that have no clean answer yet.</p>
         </span>
         <span class="st"><span class="pill warn">DRAFT</span></span>
@@ -71,7 +71,7 @@
       <a class="docrow" href="tsanet-2026-002-case-attachments.html">
         <span class="no">TSANET-2026-002</span>
         <span>
-          <h3>Case attachments and the direct-push model</h3>
+          <h3>Case Attachments and the Direct-Push Model</h3>
           <p>The platform brokers file transfer and never stores it. What that forces on the connector, why delivery reaches both parties, and the two responsibilities the platform leaves entirely to you.</p>
         </span>
         <span class="st"><span class="pill warn">DRAFT</span></span>
@@ -89,7 +89,7 @@
       <a class="docrow" href="../connectors/fin-intercom.html">
         <span class="no">CONNECTOR</span>
         <span>
-          <h3>Fin / Intercom: the gateway adapter class</h3>
+          <h3>Fin / Intercom: The Gateway Adapter Class</h3>
           <p>Why a hosted gateway rather than an installed app, the runtime as built, and the submit-outcome taxonomy that parks ambiguous submits for reconciliation rather than retrying them into duplicates.</p>
         </span>
         <span class="st"><span class="pill info">Architecture</span></span>
@@ -97,7 +97,7 @@
       <a class="docrow" href="../connectors/zendesk.html">
         <span class="no">CONNECTOR</span>
         <span>
-          <h3>Zendesk: two layers in your own tenant</h3>
+          <h3>Zendesk: Two Layers in Your Own Tenant</h3>
           <p>ZAF sandbox constraints, ZIS integration naming, the three-audience note visibility model, and the API-token retirement clock.</p>
         </span>
         <span class="st"><span class="pill info">Architecture</span></span>
@@ -105,7 +105,7 @@
       <a class="docrow" href="../connectors/servicenow.html">
         <span class="no">PLATFORM</span>
         <span>
-          <h3>ServiceNow: what the platform forces</h3>
+          <h3>ServiceNow: What the Platform Forces</h3>
           <p>A pre-implementation map with every claim tagged by evidence level — surfaces, Table API traps, and the distribution choice certification gates.</p>
         </span>
         <span class="st"><span class="pill info">Assessment</span></span>
@@ -127,22 +127,22 @@
     <div class="grid g2">
       <div class="card">
         <span class="chip">Step 1</span>
-        <h3>Copy the template file</h3>
+        <h3>Copy the Template File</h3>
         <p>Duplicate <code>tsanet-design-doc-template.html</code> and rename it <code>tsanet-2026-NNN-short-slug.html</code>. It links <code>hub.css</code> and <code>doc.css</code> and defines no colours of its own — leave it that way, so a brand change lands everywhere at once.</p>
       </div>
       <div class="card">
         <span class="chip">Step 2</span>
-        <h3>Fill the masthead honestly</h3>
+        <h3>Fill the Masthead Honestly</h3>
         <p>The <em>Verified against</em> cell is the one that matters: name what you actually checked. "The OpenAPI specification" and "a live call on Beta" are useful; "internal knowledge" means the reader should not trust the numbers.</p>
       </div>
       <div class="card">
         <span class="chip">Step 3</span>
-        <h3>Use callouts sparingly</h3>
+        <h3>Use Callouts Sparingly</h3>
         <p><strong>Note</strong> for a convention worth pulling out of the flow, <strong>Constraint</strong> for something that will bite. Not for emphasis in general — a page where everything is highlighted highlights nothing.</p>
       </div>
       <div class="card">
         <span class="chip">Step 4</span>
-        <h3>Draw with the shared primitives</h3>
+        <h3>Draw with the Shared Primitives</h3>
         <p>Inline SVG using <code>.bx</code>, <code>.ln</code>, <code>.tt</code>, <code>.ts</code>, <code>.tl</code> from <code>hub.css</code> rather than literal colours. Give each figure a caption that says what to take from it, not what it depicts.</p>
       </div>
     </div>
@@ -164,7 +164,7 @@
         </tbody>
       </table>
     </div>
-    <h3>What belongs in this library</h3>
+    <h3>What Belongs in This Library</h3>
     <div class="cols">
       <ul class="tight">
         <li><strong>Platform-wide behaviour</strong> that more than one connector has to implement the same way.</li>
@@ -182,17 +182,33 @@
 </section>
 
 <footer>
-  <div class="wrap foot-in">
-    <div><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
-    <nav class="foot-nav" aria-label="Sections">
-      <a href="../connectors/index.html">Connectors</a>
-      <a href="../api/index.html">Working with the API</a>
-      <a href="../docs/index.html">Design documents</a>
-      <a href="../topics/index.html">Topics</a>
-      <a href="../community/index.html">Community</a>
-    </nav>
-    <div class="foot-links mono">
-      <a href="https://connect2.tsanet.org">connect2.tsanet.org</a>
+  <div class="wrap">
+    <div class="foot-top"><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
+    <div class="foot-cols">
+      <nav class="foot-col" aria-label="Developers">
+        <h4>Developers</h4>
+        <a href="../connectors/index.html">Connectors</a>
+        <a href="../api/index.html">Working with the API</a>
+        <a href="../docs/index.html">Design Documents</a>
+        <a href="../topics/index.html">Topics</a>
+        <a href="../community/index.html">Community</a>
+      </nav>
+      <div class="foot-col">
+        <h4>Members</h4>
+        <a href="https://www.tsanet.org/members/">Member List</a>
+        <a href="https://tsanet.gitbook.io/connect">Platform Documentation</a>
+        <a href="https://tsanet.gitbook.io/connect/help-center">Member Support</a>
+      </div>
+      <div class="foot-col">
+        <h4>About</h4>
+        <a href="https://www.tsanet.org/about-us/">About Us</a>
+        <a href="https://www.tsanet.org/board-of-directors/">Board of Directors</a>
+        <a href="https://www.tsanet.org/news-events/">News and Events</a>
+      </div>
+    </div>
+    <div class="foot-bottom mono">
+      <span>© TSANet Inc. All Rights Reserved</span>
+      <a href="https://www.tsanet.org/legal-policy/">Privacy Policy</a>
       <a href="https://github.com/tsanetgit">github.com/tsanetgit</a>
       <a href="mailto:membership@tsanet.org">membership@tsanet.org</a>
     </div>

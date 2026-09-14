@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Two ways to build a connector — TSANet Connect Developer Hub</title>
+<title>Two Ways to Build a Connector — TSANet Connect Developer Hub</title>
 <link rel="icon" href="../assets/tsanet-favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/hub.css?v=20260913b">
+<link rel="stylesheet" href="../assets/hub.css?v=20260914b">
 <style>
   td.next{color:var(--ink);background:rgba(0,91,130,.05)}
   thead th.next{background:rgba(0,91,130,.05);color:var(--blue)}
@@ -43,7 +43,7 @@
 <header class="pagehead">
   <div class="wrap">
     <div class="crumb"><a href="../index.html">Hub</a> / <a href="index.html">Topics</a> / Connector classes</div>
-    <h1>Two ways to build a connector</h1>
+    <h1>Two Ways to Build a Connector</h1>
     <p class="lede">Every integration decision downstream — who operates it, where credentials live, what happens when it breaks, how members upgrade — is decided by one question about your platform. Ask it first, because the answer is not yours to choose.</p>
     <div class="meta-row">
       <span><b>Topic</b> Integration architecture</span>
@@ -64,7 +64,7 @@
 <section id="question">
   <div class="wrap">
     <p class="eyebrow">The question</p>
-    <h2>Will the platform run your code inside the member's own tenant?</h2>
+    <h2>Will the Platform Run Your Code Inside the Member's Own Tenant?</h2>
     <p>That is the whole taxonomy. Not which CRM it is, not how good the API is, not whether it has webhooks — whether the platform will host and execute integration code on the member's behalf, inside their instance.</p>
     <p>It sounds like an implementation detail and it is the opposite. It determines who is on call when the integration breaks, whose infrastructure holds the member's case data in transit, whether connector faults are independent or correlated across members, and whether shipping a fix means asking every member to upgrade something. Get it wrong at scoping time and you discover it during the build, when the cost of changing course is highest.</p>
     <div class="note"><strong>The answer is a property of the platform, not a preference.</strong> No amount of design work turns a platform that hosts no third-party code into one that does. What you choose is how much lives where the platform <em>does</em> allow it — which is a real decision, and a different one.</div>
@@ -74,10 +74,10 @@
 <section id="classes">
   <div class="wrap">
     <p class="eyebrow">The three classes</p>
-    <h2>Where the platforms actually fall</h2>
+    <h2>Where the Platforms Actually Fall</h2>
     <div class="grid g3" style="margin-bottom:26px">
       <div class="classcard intenant">
-        <h3>In-tenant</h3>
+        <h3>In-Tenant</h3>
         <div class="who">Salesforce · Dynamics</div>
         <p>The platform runs real code in the member's own instance. Apex classes, plugin assemblies, declarative automation — all executing under the member's governance.</p>
         <ul>
@@ -168,7 +168,7 @@
 <section id="consequences">
   <div class="wrap">
     <p class="eyebrow">What follows</p>
-    <h2>The consequences you inherit</h2>
+    <h2>The Consequences You Inherit</h2>
     <div class="twrap">
       <table>
         <caption>Every row here was a design decision on at least one shipped connector, made because of the class rather than in spite of it.</caption>
@@ -197,7 +197,7 @@
 <section id="deciding">
   <div class="wrap">
     <p class="eyebrow">Deciding</p>
-    <h2>Working out which class your platform is</h2>
+    <h2>Working Out Which Class Your Platform Is</h2>
     <p>Four questions, in this order. The first "no" usually settles it.</p>
     <ol class="tight" style="counter-reset:none">
       <li><strong>Can third-party code be installed and executed in a customer's instance?</strong> Managed packages, scoped apps, plugin assemblies. If yes, in-tenant is available.</li>
@@ -206,7 +206,7 @@
       <li><strong>Where can durable state live?</strong> If the platform gives you no first-class object to hold case linkage, something you operate has to hold it — and that thing becomes precious.</li>
     </ol>
     <div class="note"><strong>Ask a fifth question of the member, not the platform:</strong> does their policy allow case content to transit infrastructure they do not operate? A "no" collapses the choice regardless of what the platform supports, and it is cheaper to hear at scoping than at security review.</div>
-    <h3>Where the shipped connectors landed</h3>
+    <h3>Where the Shipped Connectors Landed</h3>
     <div class="twrap">
       <table>
         <thead><tr><th>Platform</th><th>Class</th><th>Why</th></tr></thead>
@@ -225,28 +225,44 @@
 <section id="middle">
   <div class="wrap">
     <p class="eyebrow">The awkward case</p>
-    <h2>When the platform answers "sort of"</h2>
+    <h2>When the Platform Answers "Sort Of"</h2>
     <p>Two of the five platforms above do not answer cleanly, and they are instructive in different ways.</p>
-    <h3>Zendesk: yes to installation, no to a server</h3>
+    <h3>Zendesk: Yes to Installation, No to a Server</h3>
     <p>Code installs and runs — but the app is a browser sandbox with no storage and no server, and the flow engine is declarative. So background work lives in a page that exists only while an agent has a tab open, and anything the flow language cannot express has nowhere to go. The class question resolves to <em>Partial</em> — in-tenant, within limits — and the limits are the design.</p>
-    <h3>ServiceNow: yes to installation, no to hosting</h3>
+    <h3>ServiceNow: Yes to Installation, No to Hosting</h3>
     <p>Installed scoped applications are the native extension model, so code can certainly run in the member's instance. But the platform hosts no UI surface for you and provides no native webhooks — so something must be installed <em>and</em> something must be served from elsewhere. The remaining decision is not "app or no app"; it is how much of the connector lives inside that app, and therefore how often members have to upgrade it.</p>
     <div class="note">That reframing is the practical value of the taxonomy. When a platform answers ambiguously, the question stops being <em>which class is this</em> and becomes <em>what is the smallest thing that has to be installed</em> — because that is what determines the upgrade burden you are signing members up for. See the <a href="../connectors/servicenow.html">ServiceNow assessment</a> for that worked through in detail.</div>
   </div>
 </section>
 
 <footer>
-  <div class="wrap foot-in">
-    <div><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
-    <nav class="foot-nav" aria-label="Sections">
-      <a href="../connectors/index.html">Connectors</a>
-      <a href="../api/index.html">Working with the API</a>
-      <a href="../docs/index.html">Design documents</a>
-      <a href="../topics/index.html">Topics</a>
-      <a href="../community/index.html">Community</a>
-    </nav>
-    <div class="foot-links mono">
-      <a href="https://connect2.tsanet.org">connect2.tsanet.org</a>
+  <div class="wrap">
+    <div class="foot-top"><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
+    <div class="foot-cols">
+      <nav class="foot-col" aria-label="Developers">
+        <h4>Developers</h4>
+        <a href="../connectors/index.html">Connectors</a>
+        <a href="../api/index.html">Working with the API</a>
+        <a href="../docs/index.html">Design Documents</a>
+        <a href="../topics/index.html">Topics</a>
+        <a href="../community/index.html">Community</a>
+      </nav>
+      <div class="foot-col">
+        <h4>Members</h4>
+        <a href="https://www.tsanet.org/members/">Member List</a>
+        <a href="https://tsanet.gitbook.io/connect">Platform Documentation</a>
+        <a href="https://tsanet.gitbook.io/connect/help-center">Member Support</a>
+      </div>
+      <div class="foot-col">
+        <h4>About</h4>
+        <a href="https://www.tsanet.org/about-us/">About Us</a>
+        <a href="https://www.tsanet.org/board-of-directors/">Board of Directors</a>
+        <a href="https://www.tsanet.org/news-events/">News and Events</a>
+      </div>
+    </div>
+    <div class="foot-bottom mono">
+      <span>© TSANet Inc. All Rights Reserved</span>
+      <a href="https://www.tsanet.org/legal-policy/">Privacy Policy</a>
       <a href="https://github.com/tsanetgit">github.com/tsanetgit</a>
       <a href="mailto:membership@tsanet.org">membership@tsanet.org</a>
     </div>

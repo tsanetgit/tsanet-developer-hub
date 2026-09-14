@@ -10,8 +10,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <!-- hub.css owns the brand tokens, fonts and SVG diagram primitives.
      doc.css adds only what is specific to a numbered design document. -->
-<link rel="stylesheet" href="../assets/hub.css?v=20260913b">
-<link rel="stylesheet" href="../assets/doc.css?v=20260913">
+<link rel="stylesheet" href="../assets/hub.css?v=20260914b">
+<link rel="stylesheet" href="../assets/doc.css?v=20260914">
 </head>
 <body>
 
@@ -35,7 +35,7 @@
       <span class="chip no">TSANET-2026-002</span>
       <span class="chip status">DRAFT</span>
     </div>
-    <h1>Case attachments and the direct-push model</h1>
+    <h1>Case Attachments and the Direct-Push Model</h1>
     <p class="abstract">File transfer on TSANet Connect is a direct push between members: the platform brokers the exchange but never stores the file. That single design choice determines everything an integrator has to build, and it is the reason attachments require setup on both sides before they work at all. This document specifies the model, the responsibilities it leaves to the connector, and what to expect while enablement is still rolling out.</p>
     <div class="meta-table">
       <div class="meta-cell"><b>Date</b><span>2026-09-13</span></div>
@@ -49,7 +49,7 @@
 <main>
   <div class="wrap">
 
-    <h2><span class="sec-no">1</span>The model in one paragraph</h2>
+    <h2><span class="sec-no">1</span>The Model in One Paragraph</h2>
     <p>When a member forwards a file, the platform looks up the other party's registered storage endpoint and delivers the bytes straight to it. TSANet Connect does not keep a copy. There is no attachment store to read from later, and no server-side endpoint that lists the files on a case — if your integration needs a history, it keeps its own.</p>
     <div class="callout">
       <b>Consequence</b>
@@ -61,7 +61,7 @@
         The case every endpoint here hangs off, and the <code>token</code> that scopes them, are specified in <a href="tsanet-2026-001-canonical-case-model.html">TSANET-2026-001</a>. Behavioural guidance is on <a href="../api/index.html">Working with the Connect API</a>.
       </div>
 
-    <h2><span class="sec-no">2</span>The four endpoints</h2>
+    <h2><span class="sec-no">2</span>The Four Endpoints</h2>
     <table class="doc">
       <tr><th>Endpoint</th><th>Purpose</th></tr>
       <tr><td><code>GET .../attachments/config</code></td><td>Read the attachment configuration for the case — returns a <code>submitter</code> and a <code>receiver</code> config</td></tr>
@@ -71,21 +71,21 @@
     </table>
     <p>All four are scoped to a collaboration request by <code>token</code>: this is the per-case layer. The baseline receiving configuration is registered per member with TSANet at onboarding (see the constraint in 2.1 and the <a href="../topics/file-sharing.html">companion topic</a>); a token-scoped registration overrides it for that one case.</p>
 
-    <h3>2.1 What a receive configuration declares</h3>
+    <h3>2.1 What a Receive Configuration Declares</h3>
     <p>The normalized HTTPS configuration requires <code>domain</code>, <code>httpsPort</code>, <code>httpsPath</code>, <code>password</code> and an <code>expiration</code>. In other words: where to deliver, on what port and path, with what credential, valid until when. Anything you register has to be an endpoint you actually operate and can receive on.</p>
     <div class="callout warn">
       <b>Constraint</b>
       Registering a receive configuration is not the same as being enabled. Enablement is arranged with TSANet during connector onboarding, and involves your own IT because it means standing up a reachable endpoint. Start that conversation early — it is the long pole, not the code.
     </div>
 
-    <h2><span class="sec-no">3</span>Delivery reaches both parties</h2>
+    <h2><span class="sec-no">3</span>Delivery Reaches Both Parties</h2>
     <p>A forward is not one delivery, it is two. The result object reports a <code>receiverStatus</code> <em>and</em> a <code>submitterStatus</code>, along with <code>completeSuccess</code> when both landed and <code>partialSuccess</code> when exactly one did. The sending member gets a copy of what they sent, delivered to their own registered endpoint.</p>
     <div class="callout warn">
       <b>Constraint</b>
       If you send files but have never registered a receive configuration of your own, every forward you make will report <code>submitterStatus: CONFIG_MISSING</code>. Nothing is broken — but you are keeping no copy of what you sent. Registering a receive endpoint is worth doing even for an integration that only ever sends.
     </div>
 
-    <h3>3.1 Per-file statuses</h3>
+    <h3>3.1 Per-File Statuses</h3>
     <p>Each file in a forward carries its own status on each side, drawn from a fixed set:</p>
     <table class="doc">
       <tr><th>Status</th><th>Meaning for that side</th></tr>
@@ -128,13 +128,13 @@
       <figcaption>Figure 1 — One forward, two deliveries. If your own receive endpoint is unregistered, the lower path reports <code>CONFIG_MISSING</code> and you keep no copy of what you sent.</figcaption>
     </div>
 
-    <h2><span class="sec-no">4</span>What the platform does not do for you</h2>
+    <h2><span class="sec-no">4</span>What the Platform Does Not Do for You</h2>
     <p>Two responsibilities sit with the connector, and both are easy to assume are handled.</p>
 
-    <h3>4.1 No case note is created</h3>
+    <h3>4.1 No Case Note Is Created</h3>
     <p>Forwarding a file does not add anything to the case timeline. If an engineer on the other side should know a file arrived, <strong>your connector has to post the note saying so</strong>. The <code>description</code> you send with the forward is not what surfaces it.</p>
 
-    <h3>4.2 No attachment history is kept</h3>
+    <h3>4.2 No Attachment History Is Kept</h3>
     <p>There is no endpoint that lists the files previously forwarded on a case, because there is nothing server-side holding them. Any "attachments on this case" view is something your integration maintains from its own record of what it sent and received.</p>
 
     <div class="callout warn">
@@ -142,7 +142,7 @@
       The published API reference currently shows <code>description</code> as a <em>query</em> parameter on the forward call. In the canonical specification it is part of the multipart form and is required, with a maximum length of 500. Where the reference and the specification disagree, the specification is authoritative — this is worth checking against a live call before you build around either.
     </div>
 
-    <h2><span class="sec-no">5</span>Current state and planning guidance</h2>
+    <h2><span class="sec-no">5</span>Current State and Planning Guidance</h2>
     <p>Attachment receive capability is being rolled out per member rather than switched on platform-wide, and members are at different stages. Common storage arrangements — object storage in the member's own cloud account being the usual shape — are converging, so a member coming to this now should ask TSANet what the current recommended arrangement is rather than designing one from scratch.</p>
     <p>Practical guidance while that continues:</p>
     <ul>
@@ -152,7 +152,7 @@
       <li><strong>Surface <code>partialSuccess</code> honestly.</strong> It will be the common case early on, while one side of a given pairing is enabled and the other is not.</li>
     </ul>
 
-    <h2><span class="sec-no">6</span>Revision history</h2>
+    <h2><span class="sec-no">6</span>Revision History</h2>
     <table class="doc">
       <tr><th>Version</th><th>Date</th><th>Change</th></tr>
       <tr><td>0.3</td><td>2026-09-13</td><td>Add the <em>Verified against</em> cell in place of a second status cell; state that token-scoped configuration is the per-case override over the per-member registration; cross-reference TSANET-2026-001.</td></tr>
@@ -165,8 +165,35 @@
 
 <footer>
   <div class="wrap">
-    <div>TSANet Connect Platform Engineering · <a href="../index.html">Developer Hub</a></div>
-    <div class="mono">TSANET-2026-002 · v0.3</div>
+    <div class="foot-top"><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
+    <div class="foot-cols">
+      <nav class="foot-col" aria-label="Developers">
+        <h4>Developers</h4>
+        <a href="../connectors/index.html">Connectors</a>
+        <a href="../api/index.html">Working with the API</a>
+        <a href="../docs/index.html">Design Documents</a>
+        <a href="../topics/index.html">Topics</a>
+        <a href="../community/index.html">Community</a>
+      </nav>
+      <div class="foot-col">
+        <h4>Members</h4>
+        <a href="https://www.tsanet.org/members/">Member List</a>
+        <a href="https://tsanet.gitbook.io/connect">Platform Documentation</a>
+        <a href="https://tsanet.gitbook.io/connect/help-center">Member Support</a>
+      </div>
+      <div class="foot-col">
+        <h4>About</h4>
+        <a href="https://www.tsanet.org/about-us/">About Us</a>
+        <a href="https://www.tsanet.org/board-of-directors/">Board of Directors</a>
+        <a href="https://www.tsanet.org/news-events/">News and Events</a>
+      </div>
+    </div>
+    <div class="foot-bottom mono">
+      <span>© TSANet Inc. All Rights Reserved</span>
+      <a href="https://www.tsanet.org/legal-policy/">Privacy Policy</a>
+      <a href="https://github.com/tsanetgit">github.com/tsanetgit</a>
+      <a href="mailto:membership@tsanet.org">membership@tsanet.org</a>
+    </div>
   </div>
 </footer>
 

@@ -11,8 +11,8 @@
 <!-- hub.css owns the brand tokens, fonts and SVG diagram primitives.
      doc.css adds only what is specific to a numbered design document.
      Do not redefine colours locally: change them once in hub.css. -->
-<link rel="stylesheet" href="../assets/hub.css?v=20260913b">
-<link rel="stylesheet" href="../assets/doc.css?v=20260913">
+<link rel="stylesheet" href="../assets/hub.css?v=20260914b">
+<link rel="stylesheet" href="../assets/doc.css?v=20260914">
 </head>
 <body>
 
@@ -73,7 +73,7 @@
       Something that will bite. State the behaviour, then the consequence: <em>save the <code>token</code> from case creation — it is the primary key for every later operation, and an integration that loses it has orphaned the case.</em>
     </div>
 
-    <h3>2.1 Example request</h3>
+    <h3>2.1 Example Request</h3>
     <pre>POST /v1/collaboration-requests
 Authorization: Bearer {token}
 Accept: application/json, application/problem+json
@@ -85,7 +85,7 @@ Content-Type: application/json
   "problemSummary": "Example collaboration request"
 }</pre>
 
-    <h3>2.2 Parameter reference</h3>
+    <h3>2.2 Parameter Reference</h3>
     <table class="doc">
       <tr><th>Field</th><th>Required</th><th>Notes</th></tr>
       <tr><td><code>testSubmission</code></td><td>No</td><td>Use <code>true</code> in development; suppresses SLA timers and partner notifications. Note you write <code>testSubmission</code> and read <code>testCase</code>.</td></tr>
@@ -115,7 +115,7 @@ Content-Type: application/json
       <figcaption>Figure 1 — Replace with the document's real diagram. Give every figure a caption that says what the reader should take from it, not what it depicts.</figcaption>
     </div>
 
-    <h2><span class="sec-no">4</span>Revision history</h2>
+    <h2><span class="sec-no">4</span>Revision History</h2>
     <table class="doc">
       <tr><th>Version</th><th>Date</th><th>Change</th></tr>
       <tr><td>0.1</td><td>2026-08-15</td><td>Initial draft from template.</td></tr>
@@ -126,8 +126,35 @@ Content-Type: application/json
 
 <footer>
   <div class="wrap">
-    <div>TSANet Connect Platform Engineering · <a href="../index.html">Developer Hub</a></div>
-    <div class="mono">TSANET-2026-XXX · v0.1</div>
+    <div class="foot-top"><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
+    <div class="foot-cols">
+      <nav class="foot-col" aria-label="Developers">
+        <h4>Developers</h4>
+        <a href="../connectors/index.html">Connectors</a>
+        <a href="../api/index.html">Working with the API</a>
+        <a href="../docs/index.html">Design Documents</a>
+        <a href="../topics/index.html">Topics</a>
+        <a href="../community/index.html">Community</a>
+      </nav>
+      <div class="foot-col">
+        <h4>Members</h4>
+        <a href="https://www.tsanet.org/members/">Member List</a>
+        <a href="https://tsanet.gitbook.io/connect">Platform Documentation</a>
+        <a href="https://tsanet.gitbook.io/connect/help-center">Member Support</a>
+      </div>
+      <div class="foot-col">
+        <h4>About</h4>
+        <a href="https://www.tsanet.org/about-us/">About Us</a>
+        <a href="https://www.tsanet.org/board-of-directors/">Board of Directors</a>
+        <a href="https://www.tsanet.org/news-events/">News and Events</a>
+      </div>
+    </div>
+    <div class="foot-bottom mono">
+      <span>© TSANet Inc. All Rights Reserved</span>
+      <a href="https://www.tsanet.org/legal-policy/">Privacy Policy</a>
+      <a href="https://github.com/tsanetgit">github.com/tsanetgit</a>
+      <a href="mailto:membership@tsanet.org">membership@tsanet.org</a>
+    </div>
   </div>
 </footer>
 

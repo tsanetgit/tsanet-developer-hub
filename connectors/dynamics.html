@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Microsoft Dynamics connector — TSANet Connect Developer Hub</title>
+<title>Microsoft Dynamics Connector — TSANet Connect Developer Hub</title>
 <link rel="icon" href="../assets/tsanet-favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/hub.css?v=20260913b">
+<link rel="stylesheet" href="../assets/hub.css?v=20260914b">
 <style>
   td.next{color:var(--ink);background:rgba(0,91,130,.05)}
   thead th.next{background:rgba(0,91,130,.05);color:var(--blue)}
@@ -65,7 +65,7 @@
 <section id="class">
   <div class="wrap">
     <p class="eyebrow">Connector class</p>
-    <h2>The second in-tenant connector, with a different extension model</h2>
+    <h2>The Second In-Tenant Connector, with a Different Extension Model</h2>
     <p>Like <a href="salesforce.html">Salesforce</a>, everything here installs into the member's own environment and TSANet operates nothing. <a href="fin-intercom.html">Intercom</a> is the opposite pole — a TSANet-hosted gateway, because nothing can run in-tenant at all — and <a href="zendesk.html">Zendesk</a> sits between. What distinguishes Dynamics from Salesforce is not <em>where</em> the code runs but <em>how you change its behaviour</em>.</p>
     <div class="twrap">
       <table>
@@ -88,7 +88,7 @@
 <section id="topology">
   <div class="wrap">
     <p class="eyebrow">Architecture</p>
-    <h2>What the solution installs</h2>
+    <h2>What the Solution Installs</h2>
     <p>A managed solution containing six Dataverse tables, a plugin assembly registered against roughly fifteen SDK message steps, a set of Power Automate cloud flows, a model-driven configuration app, a canvas app for connection settings, and the web resources that render the collaboration UI on the Case form.</p>
     <figure>
       <div class="diagram">
@@ -235,7 +235,7 @@
 <section id="data">
   <div class="wrap">
     <p class="eyebrow">Data model</p>
-    <h2>Six Dataverse tables</h2>
+    <h2>Six Dataverse Tables</h2>
     <div class="obj-grid">
       <div class="obj"><h4>ap_tsanetcase</h4><p>The collaboration record. <code>ap_name</code> is the TSANet identifier (100 chars), <code>ap_direction</code> is inbound or outbound, and <code>statuscode</code> carries Open, Information, Accepted, Rejected or Closed — the API enum also has <code>PENDINGACTION</code>, which this option set has no value for; how the solution handles it has not been verified. <code>ap_formjson</code> holds the live form payload as a 200,000-character memo.</p></div>
       <div class="obj"><h4>ap_tsanetnote</h4><p>Notes against a case — <code>ap_description</code> up to 2,000 characters, plus creator name and email, related back through <code>ap_tsanetcaseid</code>. The API's note carries a required <code>summary</code> (500 characters) and an optional <code>description</code> (5,000), so a longer partner note is truncated here, and how the solution fills <code>summary</code> on outbound notes has not been verified.</p></div>
@@ -245,7 +245,7 @@
       <div class="obj"><h4>ap_tsanetlog</h4><p>Integration logging. The first place to look when a sync cycle or a plugin step misbehaves.</p></div>
     </div>
     <p style="margin-top:18px">Four option sets ship alongside: <code>ap_direction</code>, <code>ap_priorities</code>, <code>ap_tsaresponsetypes</code> and <code>ap_sourcesystem</code>. Because these are ordinary Dataverse tables, they carry standard views, are reportable, and obey your environment's security model — a <strong>TSANET User</strong> security role granting access to the case, note and response tables ships with the solution.</p>
-    <h3>Relating TSANet cases to your own tables</h3>
+    <h3>Relating TSANet Cases to Your Own Tables</h3>
     <p>To surface collaborations against something other than the standard Case, add the TSANet tables to your own unmanaged solution, create a lookup from your table to <code>ap_tsanetcase</code>, and drop a subgrid on the form with <em>Show related records</em> enabled. Nothing in the managed solution needs changing.</p>
   </div>
 </section>
@@ -253,7 +253,7 @@
 <section id="auth">
   <div class="wrap">
     <p class="eyebrow">Authentication</p>
-    <h2>OAuth2 or Bearer, and they are mutually exclusive</h2>
+    <h2>OAuth2 or Bearer, and They Are Mutually Exclusive</h2>
     <p>Credentials live in <code>ap_tsanetsetting</code> and are entered through the TSANET Configuration app: a client id, a secret, and the environment URI. A given environment uses <strong>either</strong> OAuth2 <strong>or</strong> a bearer token — not both, and not a fallback from one to the other. Picking the wrong one for the credentials TSANet issued you is a common first-install failure. The API page documents two schemes — OAuth 2.0 client credentials, the current path, and the legacy <code>POST /v1/login</code> JWT; how the solution's Bearer mode maps onto those has not been verified against the solution source.</p>
     <ul class="tight">
       <li><strong>The URI field caps at 400 characters.</strong> Not usually a constraint, but worth knowing if you are templating environment URLs.</li>
@@ -267,7 +267,7 @@
 <section id="mapping">
   <div class="wrap">
     <p class="eyebrow">Case Mapping</p>
-    <h2>Field mapping as configuration, not code</h2>
+    <h2>Field Mapping as Configuration, Not Code</h2>
     <p>This is the connector's distinguishing feature. Rather than editing a flow to change which TSANet field lands on which Dynamics column, you create records in <code>ap_casemapping</code>. Three mapping types cover the three places a mapping is needed:</p>
     <div class="twrap">
       <table>
@@ -291,7 +291,7 @@
 <section id="automation">
   <div class="wrap">
     <p class="eyebrow">Automation</p>
-    <h2>What runs without an agent touching it</h2>
+    <h2>What Runs Without an Agent Touching It</h2>
     <p>Three environment variables toggle the automatic behaviours, so a member can adopt them one at a time rather than all at once.</p>
     <div class="cols">
       <ul class="tight">
@@ -306,7 +306,7 @@
       </ul>
     </div>
 
-    <h3>Inbound auto-routing</h3>
+    <h3>Inbound Auto-Routing</h3>
     <p>With <em>Auto Routing of New Case</em> enabled, an arriving collaboration tries to attach itself to work that already exists before creating anything new:</p>
     <figure>
       <div class="diagram">
@@ -351,7 +351,7 @@
 <section id="sync">
   <div class="wrap">
     <p class="eyebrow">Synchronisation</p>
-    <h2>Polling by default, push if you register it</h2>
+    <h2>Polling by Default, Push If You Register It</h2>
     <p>The solution ships with scheduled Power Automate flows that poll the Connect API on a <strong>15-minute</strong> interval, retrieving case status and creating inbound cases, responses and notes. Agents can force an update from the main navigation rather than waiting for the next cycle.</p>
     <p>Near-real-time delivery is opt-in: the <strong>Register webhook</strong> button in the configuration app points TSANet at a Power Automate endpoint so case and note events arrive as they happen. Registering it does not retire the schedule — the poll remains the backstop, the same belt-and-braces arrangement <a href="salesforce.html">Salesforce</a> and <a href="fin-intercom.html">Fin / Intercom</a> use; <a href="zendesk.html">Zendesk</a>'s poller runs only while an agent has a tab open.</p>
     <p>The registration is on the current webhook API: the flow behind the button subscribes on <code>/v2/webhooks</code> with prefixed CloudEvents types. Two details worth knowing. First, the subscription covers case creation and new notes only — <strong>responses and closures arrive with the next poll</strong>, so a case that seems slow to update after the partner acts is the schedule at work, not a fault. Second, the endpoint flow never branches on the event-type string: it validates the secret, reads the token from either payload shape, and fetches the case, which makes it immune to the <a href="../api/index.html#webhooks">bare-versus-prefixed no-op trap</a> that catches consumers that match type strings.</p>
@@ -372,10 +372,10 @@
 <section id="setup">
   <div class="wrap">
     <p class="eyebrow">Setup</p>
-    <h2>Installation order</h2>
+    <h2>Installation Order</h2>
     <div class="cols">
       <div>
-        <h3>Import the solution</h3>
+        <h3>Import the Solution</h3>
         <ul class="tight">
           <li>Request credentials and environment URLs from <code>membership@tsanet.org</code></li>
           <li>Install from Microsoft AppSource, or download the managed solution from the GitHub releases page</li>
@@ -402,7 +402,7 @@
 <section id="gotchas">
   <div class="wrap">
     <p class="eyebrow">Limits &amp; gotchas</p>
-    <h2>Constraints worth knowing before you design around them</h2>
+    <h2>Constraints Worth Knowing Before You Design Around Them</h2>
     <div class="cols">
       <ul class="tight">
         <li><strong>OAuth2 and Bearer are mutually exclusive per environment.</strong> There is no fallback between them; the wrong choice fails at the first call.</li>
@@ -422,17 +422,33 @@
 </section>
 
 <footer>
-  <div class="wrap foot-in">
-    <div><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
-    <nav class="foot-nav" aria-label="Sections">
-      <a href="../connectors/index.html">Connectors</a>
-      <a href="../api/index.html">Working with the API</a>
-      <a href="../docs/index.html">Design documents</a>
-      <a href="../topics/index.html">Topics</a>
-      <a href="../community/index.html">Community</a>
-    </nav>
-    <div class="foot-links mono">
-      <a href="https://connect2.tsanet.org">connect2.tsanet.org</a>
+  <div class="wrap">
+    <div class="foot-top"><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
+    <div class="foot-cols">
+      <nav class="foot-col" aria-label="Developers">
+        <h4>Developers</h4>
+        <a href="../connectors/index.html">Connectors</a>
+        <a href="../api/index.html">Working with the API</a>
+        <a href="../docs/index.html">Design Documents</a>
+        <a href="../topics/index.html">Topics</a>
+        <a href="../community/index.html">Community</a>
+      </nav>
+      <div class="foot-col">
+        <h4>Members</h4>
+        <a href="https://www.tsanet.org/members/">Member List</a>
+        <a href="https://tsanet.gitbook.io/connect">Platform Documentation</a>
+        <a href="https://tsanet.gitbook.io/connect/help-center">Member Support</a>
+      </div>
+      <div class="foot-col">
+        <h4>About</h4>
+        <a href="https://www.tsanet.org/about-us/">About Us</a>
+        <a href="https://www.tsanet.org/board-of-directors/">Board of Directors</a>
+        <a href="https://www.tsanet.org/news-events/">News and Events</a>
+      </div>
+    </div>
+    <div class="foot-bottom mono">
+      <span>© TSANet Inc. All Rights Reserved</span>
+      <a href="https://www.tsanet.org/legal-policy/">Privacy Policy</a>
       <a href="https://github.com/tsanetgit">github.com/tsanetgit</a>
       <a href="mailto:membership@tsanet.org">membership@tsanet.org</a>
     </div>

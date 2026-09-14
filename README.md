@@ -8,7 +8,9 @@ No build step, no framework, no dependencies. Plain HTML and CSS, deployable as-
 
 ## Where this lives
 
-Public at `tsanetgit/tsanet-developer-hub`, with the site served by GitHub Pages at <https://tsanetgit.github.io/tsanet-developer-hub/>. The repo was transferred there from `shawn-tsanet` on 2026-08-21 as a whole-repo ownership transfer, which carried history, Discussions (all seven categories and the threads in them), and settings across intact. GitHub Discussions is enabled and linked throughout the site's Community section.
+Public at `tsanetgit/tsanet-developer-hub`, with the site served by GitHub Pages at <https://tsanetgit.github.io/tsanet-developer-hub/>. The repo was transferred there from `shawn-tsanet` on 2026-08-21 as a whole-repo ownership transfer, which carried history, Discussions, and settings across intact.
+
+Community discussion lives in the **organisation-level Discussions** at <https://github.com/orgs/tsanetgit/discussions> (hosted by the `Connect_SDK` repo), not in this repo's own Discussions tab. On 2026-09-13 the hub's five extra categories (Ideas, Membership, Show and tell, Troubleshooting, Wish List) were added there alongside the existing Announcements, Q&A and Technology Committee, and the welcome announcement was transferred across. Every discussion link on the site points at the org-level area; keep it that way.
 
 Two consequences of the transfer worth knowing:
 

@@ -29,7 +29,7 @@ assets/
   doc.css               Design-document layer only; loads on top of hub.css
   *.png                 Brand assets, generated from the TSANet Logo Suite
                         (2026 identity; the suite itself stays untracked)
-connectors/index.html   Section landing: routing table + comparison matrix
+connectors/index.html   Section landing ("Existing Solutions" in the navigation): routing table + comparison matrix
 connectors/*.html       One page per platform, plus the SDK and the Connect Gateway
 api/index.html          Behaviour and pitfalls; deliberately NOT an endpoint reference
 docs/index.html         Design-document library index + authoring conventions

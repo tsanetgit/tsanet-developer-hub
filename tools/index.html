@@ -15,6 +15,10 @@
   .tool p{font-size:13.5px;color:var(--slate);line-height:1.55;margin:0}
   .tool .get{font-family:var(--mono);font-size:12.5px;color:var(--ink);margin-top:4px}
   .tool .get b{color:var(--slate);font-weight:500;margin-right:6px}
+  .tool .get a{color:var(--blue)}
+  .tool .get a:hover{text-decoration:underline}
+  .tool .foot{font-family:var(--mono);font-size:12.5px;color:var(--blue);margin-top:auto;padding-top:6px}
+  .tool .foot:hover{text-decoration:underline}
   .tool.pending{border-style:dashed}
   .legend{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0 0}
 </style>
@@ -68,12 +72,14 @@
         <h3>The Beta Environment</h3>
         <p>Build and test on <code>connect2.tsanet.net</code>; production is <code>connect2.tsanet.org</code>. Beta and production behave differently often enough that "which environment" is the first question anyone will ask about a problem. Every call is scoped to your member identity, so <code>GET /v1/me</code> is the cheapest check that your credentials resolve to the company you expect.</p>
         <p class="get"><b>Get it</b> a Beta account and credentials from <a href="mailto:membership@tsanet.org">membership@tsanet.org</a>; for OAuth client credentials, TSANet also has to provision your service principal before an app-only token is accepted.</p>
+        <a class="foot" href="../api/index.html#auth">The authentication rules →</a>
       </div>
       <div class="tool">
         <span class="chip live">Public</span>
         <h3>The Test Flag</h3>
         <p>Create cases with <code>testSubmission: true</code> while you build. It suppresses SLA timers and partner notifications, so nothing you send reaches a real partner's queue. You write <code>testSubmission</code> and read back <code>testCase</code>; that read-back is how you confirm a go-live flip actually happened. Every case that is not test-flagged reaches a real partner.</p>
-        <p class="get"><b>Get it</b> nothing to install — it is a field on the create request; see <a href="../api/index.html#cases">collaboration requests</a>.</p>
+        <p class="get"><b>Get it</b> nothing to install — it is a field on the create request.</p>
+        <a class="foot" href="../api/index.html#cases">Collaboration requests →</a>
       </div>
     </div>
   </div>
@@ -88,13 +94,15 @@
         <span class="chip live">Public</span>
         <h3>The API Reference in GitBook</h3>
         <p>Request and response schemas, parameters and status codes for all 27 paths, generated from the specification. One known drift from the spec is flagged on the <a href="../api/index.html#ref-drift">API page</a>. The behaviours the reference does not tell you about — the default HTTP 500 error mode, the two note fields, the webhook version trap — are what <a href="../api/index.html">Working with the API</a> is for.</p>
-        <p class="get"><b>Get it</b> <a href="https://tsanet.gitbook.io/connect/api-reference">API Reference</a> · <a href="https://tsanet.gitbook.io/connect/api-reference/integration-guide">Integration guide</a> · <a href="https://tsanet.gitbook.io/connect/api-reference/models">Models</a></p>
+        <p class="get"><b>Get it</b> in GitBook, alongside the <a href="https://tsanet.gitbook.io/connect/api-reference/integration-guide">integration guide</a> and the <a href="https://tsanet.gitbook.io/connect/api-reference/models">models</a>.</p>
+        <a class="foot" href="https://tsanet.gitbook.io/connect/api-reference">API Reference →</a>
       </div>
       <div class="tool">
         <span class="chip live">Public</span>
         <h3>The Postman Collection</h3>
         <p>Every endpoint as a request you can send against Beta with your own credentials. Send <code>Accept: application/json, application/problem+json</code> on every request, or rejections come back as HTTP 500 with no usable detail.</p>
-        <p class="get"><b>Get it</b> <a href="https://tsanet.gitbook.io/connect/api-reference/postman-collection">Postman collection</a> in GitBook. The OpenAPI file the reference and the SDK are generated from is not published; ask <a href="mailto:membership@tsanet.org">membership@tsanet.org</a> for it if you are building a code generator or an agent's tool definitions around it.</p>
+        <p class="get"><b>Get it</b> in GitBook. The OpenAPI file the reference and the SDK are generated from is not published; ask <a href="mailto:membership@tsanet.org">membership@tsanet.org</a> for it if you are building a code generator or an agent's tool definitions around it.</p>
+        <a class="foot" href="https://tsanet.gitbook.io/connect/api-reference/postman-collection">Postman collection →</a>
       </div>
     </div>
   </div>
@@ -109,7 +117,8 @@
         <span class="chip live">Public</span>
         <h3>connect-library</h3>
         <p>The Java client, generated from the specification and wrapped in nine typed facades. Published to GitHub Packages as a public package at v2.0.0; a token with <code>read:packages</code> is still required to resolve it, even for public artifacts.</p>
-        <p class="get"><b>Get it</b> <a href="../connectors/connect-sdk.html#getting">Connect SDK → Getting it</a></p>
+        <p class="get"><b>Get it</b> as a Maven dependency from GitHub Packages; the coordinates and the token requirement are on the SDK page.</p>
+        <a class="foot" href="../connectors/connect-sdk.html#getting">Connect SDK → Getting it →</a>
       </div>
       <div class="tool">
         <span class="chip">Access at onboarding</span>
@@ -121,7 +130,8 @@
         <span class="chip beta">Not yet public</span>
         <h3>The Web Demo</h3>
         <p>A branded web demo over the SDK facades: dashboard, partner search, the partner's form rendered live, every lifecycle action, webhook management. It is not published as an artifact and there is no hosted instance members can sign into yet. How members get it — a TSANet-hosted instance or a hand-over — is being decided.</p>
-        <p class="get"><b>Until then</b> ask <a href="mailto:membership@tsanet.org">membership@tsanet.org</a> for a jar or image; if you host it, set <code>TSANET_DEMO_AUTH_PASSWORD</code> or it runs with no auth gate. Runbook on the <a href="../connectors/connect-sdk.html#modules">SDK page</a>.</p>
+        <p class="get"><b>Until then</b> ask <a href="mailto:membership@tsanet.org">membership@tsanet.org</a> for a jar or image; if you host it, set <code>TSANET_DEMO_AUTH_PASSWORD</code> or it runs with no auth gate. Runbook on the SDK page.</p>
+        <a class="foot" href="../connectors/connect-sdk.html#modules">SDK page → Modules →</a>
       </div>
     </div>
   </div>
@@ -136,13 +146,15 @@
         <span class="chip">Access at onboarding</span>
         <h3>The Gateway Conformance Harness</h3>
         <p>For anyone writing an adapter on the <a href="../connectors/connect-gateway.html">Connect Gateway</a>: it drives your real adapter through Connect's failure modes — timeouts, ambiguous submits, duplicate inbound deliveries — and certifies the seam between your code and the engine. Run it continuously from day one, not once at the end.</p>
-        <p class="get"><b>Get it</b> the <code>conformance</code> module publishes with the gateway at v2.0.0 from the repository's package registry; the repository is private and access comes with adapter onboarding. Details under <a href="../connectors/connect-gateway.html#build">Building an adapter</a>.</p>
+        <p class="get"><b>Get it</b> the <code>conformance</code> module publishes with the gateway at v2.0.0 from the repository's package registry; the repository is private and access comes with adapter onboarding. Details under Building an adapter.</p>
+        <a class="foot" href="../connectors/connect-gateway.html#build">Building an adapter →</a>
       </div>
       <div class="tool pending">
         <span class="chip beta">Not yet public</span>
         <h3>The Connector Test Harness</h3>
         <p>TSANet's own local harness for testing connectors end to end against the Connect API: contract tests, connector unit suites, and end-to-end drivers for the shipped CRM connectors. It is internal today. Whether members should see it, and in what form, has not been decided.</p>
-        <p class="get"><b>Until then</b> the Beta environment with test-flagged submissions is the member-facing test bed, and the <a href="../community/index.html#trackers">connector issue trackers</a> are where a failing case goes.</p>
+        <p class="get"><b>Until then</b> the Beta environment with test-flagged submissions is the member-facing test bed, and the connector issue trackers are where a failing case goes.</p>
+        <a class="foot" href="../community/index.html#trackers">Connector issue trackers →</a>
       </div>
     </div>
   </div>

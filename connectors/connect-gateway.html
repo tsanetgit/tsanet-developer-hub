@@ -230,7 +230,7 @@
       <div class="mod"><h4>conformance</h4><p>The harness an adapter author runs to prove their adapter survives Connect's failure modes, plus the live certification suite the certification pin was cut against.</p></div>
       <div class="mod"><h4>example-adapter &amp; example-service</h4><p>A complete runnable worked example: adapter over the contract, in-memory platform, conformance suite green, and a bootable service embedding the real engine. Fake mode runs the whole story with zero credentials.</p></div>
     </div>
-    <p style="margin-top:16px">There is also a TSANet-internal admin console (read and validate, not operate) over a versioned admin contract every adapter exposes. All four modules ship from the repository's package registry at the release version — <code>2.0.0</code> since 2026-09-09, alongside the older <code>1.0.0</code> and <code>0.1.2</code>.</p>
+    <p style="margin-top:16px">There is also a TSANet-internal admin console (read and validate, not operate) over a versioned admin contract every adapter exposes. Three of the modules above — <code>connector-core</code>, <code>gateway-engine</code> and <code>conformance</code> — ship from the repository's package registry together with the parent POM, at the release version: <code>2.0.0</code> since 2026-09-09, alongside the older <code>1.0.0</code> and <code>0.1.2</code>. The examples and the admin console are source-only, built from the repository rather than published. (Verified against the registry's package list on 2026-09-13.)</p>
   </div>
 </section>
 

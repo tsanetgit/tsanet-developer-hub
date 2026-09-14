@@ -288,17 +288,18 @@
     </div>
     <div class="topic-band" style="border-left:3px solid var(--orange)">
       <h3><a href="topics/connector-classes.html" style="color:var(--ink)">Two ways to build a connector →</a></h3>
-      <p>One question about your platform — will it run your code inside the member's tenant? — decides who operates the integration, where credentials live, whether connector faults are independent or correlated, and whether shipping a fix means asking every member to upgrade. The taxonomy behind all five platforms on this hub, with the decision procedure for a platform that isn't on it yet.</p>
+      <p>One question about your platform — will it run your code inside the member's tenant? — decides who operates the integration, where credentials live, whether connector faults are independent or correlated, and whether shipping a fix means asking every member to upgrade. The taxonomy behind every connector on this hub, plus a four-question procedure for a platform that is not on it yet.</p>
       <div class="sys-row">
         <a class="sys" href="topics/connector-classes.html">Read the topic</a>
         <span class="sys muted">In-tenant <span>· Salesforce, Dynamics</span></span>
         <span class="sys muted">Partial <span>· Zendesk</span></span>
         <span class="sys muted">Gateway <span>· Fin / Intercom</span></span>
+        <span class="sys muted">Undecided <span>· ServiceNow</span></span>
       </div>
     </div>
     <div class="topic-band" style="border-left:3px solid var(--orange)">
       <h3><a href="topics/entitlement-automation.html" style="color:var(--ink)">Deciding what to accept automatically →</a></h3>
-      <p>Every connector can accept inbound cases without an agent, and they disagree completely about when that is wise. Accepting stops the SLA clock — and tells a partner an engineer is engaged. Four shipping postures, from accept-everything to never-accept, and how to build a rule that asserts something actually true.</p>
+      <p>Every shipped connector can accept inbound cases without an agent, and they disagree completely about when that is wise. Accepting stops the SLA clock and tells a partner an engineer is engaged — so a false acceptance is worse for them than an honest breach. Four shipping postures, and how to build a rule that asserts something actually true.</p>
       <div class="sys-row">
         <a class="sys" href="topics/entitlement-automation.html">Read the topic</a>
         <span class="sys muted">Accept everything <span>· Zendesk</span></span>
@@ -308,40 +309,36 @@
       </div>
     </div>
     <div class="topic-band" style="border-left:3px solid var(--orange)">
+      <h3><a href="topics/file-sharing.html" style="color:var(--ink)">Moving files between members →</a></h3>
+      <p>A file attached to a collaboration case is delivered into the receiving member's own file store — not parked on a portal. The sender never learns how the receiver stores files, which is exactly what makes the system extensible. How sending works, what the normalized receiving contract requires, the five decisions every receiving member makes, and the sharp edges around one-attempt delivery.</p>
+      <div class="sys-row">
+        <a class="sys" href="topics/file-sharing.html">Read the topic</a>
+        <span class="sys muted">Live <span>· normalized HTTPS push</span></span>
+        <span class="sys muted">Sending <span>· connector, SDK, or REST</span></span>
+        <span class="sys muted">Pattern <span>· endpoint fronting object storage</span></span>
+      </div>
+    </div>
+    <div class="topic-band" style="border-left:3px solid var(--orange)">
       <h3><a href="topics/agentic-usage.html" style="color:var(--ink)">Agentic usage with TSANet Connect →</a></h3>
-      <p>Working on Connect with an AI agent, whichever provider's. The four skills TSANet ships and how any assistant loads them, the assistant embedded in this hub and how it is built, what every provider's agent framework needs from the API and where the hosted builders fall short on auth, and a platform assessment of Microsoft Copilot Studio with Claude.</p>
+      <p>Working on Connect with an AI agent rather than by hand, whichever provider's agent it is. The four skills TSANet ships and how any assistant loads them, the assistant embedded in this hub and the recipe for the Copilot Studio agent behind it, what every provider's framework needs from the API and the auth gap that separates hosted builders from code-first ones, plus a documented-only assessment of Copilot Studio with Claude.</p>
       <div class="sys-row">
         <a class="sys" href="topics/agentic-usage.html">Read the topic</a>
-        <span class="sys muted">Skills <span>· four shipped</span></span>
-        <span class="sys muted">Hub assistant <span>· Copilot Studio</span></span>
-        <span class="sys muted">Providers <span>· Anthropic, Microsoft, OpenAI, Google</span></span>
+        <span class="sys muted">Shipped <span>· four agent skills</span></span>
+        <span class="sys muted">Shipped <span>· the hub assistant launcher</span></span>
+        <span class="sys muted">Assessed <span>· Copilot Studio</span></span>
+        <span class="sys muted">Compared <span>· Anthropic, Microsoft, OpenAI, Google</span></span>
       </div>
     </div>
     <div class="topic-band">
-      <h3>AI-focused problem resolution systems</h3>
-      <p>Evaluations, integration notes, and member experience with the new generation of AI-native support platforms — and how each connects to TSANet Connect for multi-vendor cases.</p>
+      <h3>On the list, not written yet</h3>
+      <p>Headings that appear elsewhere on the hub but have no topic page, because nothing has been assessed behind them and a page that summarises nothing would be worse than an empty slot. <a href="topics/index.html#notyet">What each one is waiting on →</a></p>
       <div class="sys-row">
-        <a class="sys" href="connectors/fin-intercom.html">Fin AI <span>· Intercom</span></a>
-        <a class="sys" href="topics/agentic-usage.html#copilot">Copilot Studio <span>· Microsoft, assessed</span></a>
-        <span class="sys muted">Pylon</span>
-        <span class="sys muted">DevRev</span>
-        <span class="sys muted">Wolken</span>
-        <span class="sys muted">Agentforce <span>· Salesforce</span></span>
-        <span class="sys muted">Zendesk AI</span>
-        <span class="sys muted">Now Assist <span>· ServiceNow</span></span>
-      </div>
-      <p style="font-size:13px;color:var(--mute);margin:14px 0 0">Fin&nbsp;/&nbsp;Intercom is written up and Copilot Studio is assessed as an agent platform. The rest are on the list, not yet assessed.</p>
-    </div>
-    <div class="topic-band">
-      <h3>CRM &amp; ticketing, legacy to modern</h3>
-      <p>Migration stories, coexistence patterns, and what changes for collaboration workflows when a member moves platforms.</p>
-      <div class="sys-row">
+        <span class="sys muted">AI-native support platforms <span>· Pylon, DevRev, Wolken, Agentforce, Zendesk AI, Now Assist</span></span>
         <span class="sys muted">Email-to-case patterns</span>
         <span class="sys muted">Swarming &amp; case ownership</span>
-        <span class="sys muted">Entitlement automation</span>
         <span class="sys muted">SLA &amp; escalation design</span>
       </div>
-      <p style="font-size:13px;color:var(--mute);margin:14px 0 0">Planned topic areas. Nothing published here yet.</p>
+      <p style="font-size:13px;color:var(--mute);margin:14px 0 0">Orange-edged cards above have a published write-up. <a href="connectors/fin-intercom.html">Fin / Intercom</a> is the one AI-native platform that has been probed; it has a connector page rather than a topic.</p>
     </div>
   </div>
 </section>

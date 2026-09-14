@@ -86,7 +86,7 @@
       <h2>Read this before you use anything below</h2>
       <p>This page mixes three kinds of claim, and tags each one. Some of it is <strong>shipped</strong> — the agent skills exist, the pages that have one were verified against it, and the hub assistant's launcher is in this site's source. Some of it is <strong>documented, not observed</strong> — read on a vendor's documentation, never watched working against Connect. And some is a <strong>known unknown</strong>. The bar everywhere else on the hub applies here: nothing below describes something as built unless it is.</p>
       <div class="status-grid">
-        <div class="status-item"><b>Agent skills</b><span>Four shipped, in the connector repositories. Plain markdown; load into any assistant.</span></div>
+        <div class="status-item"><b>Agent skills</b><span>Four member-facing skills shipped, in the connector repositories; a fifth, TSANet-internal one covers adapters TSANet builds itself. Plain markdown; load into any assistant.</span></div>
         <div class="status-item"><b>Hub assistant</b><span>Launcher and wiring shipped in this site. The Copilot Studio agent behind it is not yet created.</span></div>
         <div class="status-item"><b>Copilot Studio</b><span>Assessed from Microsoft Learn. No TSANet agent, custom connector or MCP server exists.</span></div>
         <div class="status-item"><b>MCP server for Connect</b><span>None. Every provider's hosted agent would want one; nobody has written it.</span></div>
@@ -106,7 +106,7 @@
     <p class="eyebrow">Shipped</p>
     <h2>Agent skills: the part that already exists</h2>
     <p>An <strong>agent skill</strong> is a folder with a <code>SKILL.md</code> in it — name and description in frontmatter, instructions underneath, optionally reference files and scripts alongside. An assistant reads the description to decide when the skill applies and loads the full instructions only then. Anthropic released the format as an open standard on 18 December 2025; the specification lives at <a href="https://agentskills.io">agentskills.io</a>, and the site lists Claude, OpenAI Codex, Gemini CLI, GitHub Copilot, Cursor and VS Code among the tools that read it. <span class="tag doc">documented</span> That is why the connector pages can say "nothing in it is Claude-specific": the same folder loads into any of them.</p>
-    <p>TSANet ships four. Each was distilled from the production implementation it sits next to, and the Zendesk, Fin / Intercom, SDK and Gateway pages on this hub were verified against their skills' repositories. Salesforce and Dynamics have no skill yet.</p>
+    <p>TSANet ships four member-facing skills (a fifth, internal one covers the adapters TSANet builds itself and is not part of any kit). Each was distilled from the production implementation it sits next to, and the Zendesk, Fin / Intercom, SDK and Gateway pages on this hub were verified against their skills' repositories. Salesforce and Dynamics have no skill yet.</p>
     <div class="twrap">
       <table>
         <thead><tr><th>Skill</th><th>Where</th><th>What it carries</th><th>Get it</th></tr></thead>

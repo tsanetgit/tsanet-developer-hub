@@ -262,7 +262,7 @@ Accept: application/json, application/problem+json</code></pre>
       <div class="diagram">
         <svg viewBox="0 0 800 230" style="min-width:700px" role="img" aria-labelledby="lcT lcD">
           <title id="lcT">TSANet case lifecycle as seen by the Zendesk connector</title>
-          <desc id="lcD">A case moves from Open to Information or Accepted, and then to Closed. Rejected is a terminal state reached from Open or Information. The SLA clock runs only while the case is Open and unresponded.</desc>
+          <desc id="lcD">A case moves from Open to Information or Accepted, and then to Closed. Rejected is a terminal state drawn here from Information; the specification states no precondition for rejection, and the SDK skill's rule is that reject requires INFORMATION, so whether it is also reachable directly from Open is unverified. The SLA clock runs only while the case is Open and unresponded.</desc>
           <defs><marker id="lcA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--slate)"/></marker></defs>
 
           <rect x="20" y="46" width="150" height="52" rx="6" fill="rgba(204,78,11,.08)" stroke="var(--orange)" stroke-width="1.5"/>
@@ -432,10 +432,11 @@ Accept: application/json, application/problem+json</code></pre>
           <li>Get API credentials and service-principal provisioning from TSANet</li>
           <li>Create the five custom ticket fields</li>
           <li>Register a ZIS integration under <strong>your own name</strong> (see below)</li>
-          <li>Create the <code>tsanet_oauth</code> (Entra) and <code>zendesk</code> (self) connections</li>
+          <li>Create the <code>tsanet_oauth</code> (Entra) and <code>zendesk</code> (self) connections — then GET the <code>access_codes</code> URL returned in each response's <code>redirect_url</code>, with the ZIS bearer, to complete creation; the step is required even for client credentials</li>
+        <li>Substitute your instance's connection name into all five <code>action_ts_*</code> actions before deploying the bundle: an incomplete substitution leaves ingest returning 200 while the TSANet calls silently no-op</li>
           <li>Deploy the ZIS bundle from the app's nav-bar screen — no API token needed</li>
-          <li>Run Detect field IDs → Apply</li>
-        <li>Decide on acceptance: the <em>Auto-accept inbound requests</em> app setting (v1.0.69+, off by default, unconditional, takes effect after a bundle redeploy), or a Zendesk trigger on the TSANet Action field for anything conditional — see <a href="../topics/entitlement-automation.html">deciding what to accept automatically</a></li>
+          <li>Run Detect field IDs → Apply, then redeploy the bundle: the upload strips the field actions while the field IDs are unset, so a bundle deployed before this step has none</li>
+        <li>Decide on acceptance: the <em>Auto-accept inbound requests</em> app setting (v1.0.69+, off by default, unconditional, takes effect after a bundle redeploy; <code>engineerEmail</code> falls back to the TSANet API username when the engineer-email setting is blank, and a failed in-flow accept leaves a manual-accept-needed private comment with the case still OPEN and unresponded), or a Zendesk trigger on the TSANet Action field for anything conditional — see <a href="../topics/entitlement-automation.html">deciding what to accept automatically</a></li>
           <li>Register inbound push: two calls, Zendesk then TSANet</li>
           <li>Create the SLA breach trigger and the active-collaborations view</li>
         </ul>
@@ -462,6 +463,7 @@ POST <span class="good-v">/v1/webhooks</span>
 { "callbackUrl": "&lt;ingest URL&gt;",
   "callbackAuth": { "type": "BASIC", "username": "...", "password": "..." } }</code></pre>
     <p>Omit <code>eventTypes</code> and the subscription covers what the bundle expects — <code>collaboration-request.created</code> and <code>note.created</code>. Those are the only two event types v1 delivers — the specification's own v1 tag says so — so omitting <code>eventTypes</code> cannot subscribe the bundle to more; the three v2-only types never reach a v1 subscription. Save the response <code>id</code> for later management and the <code>secret</code> (the HMAC key, returned only at creation).</p>
+      <p><code>callbackAuth</code> arrived in Connect API v3.1.0 and was validated on Beta. Since app v1.0.69 the inbound case's own <code>customFields</code> are surfaced too, appended to the created ticket as a "Partner form fields" block; they arrive unordered, so the bundle sorts them by <code>displayOrder</code>.</p>
     <div class="note"><strong><code>/v2/webhooks</code> silently breaks the bundle.</strong> Both endpoints accept a subscription, so this fails invisibly. <code>/v2</code> delivers CloudEvents with prefixed type strings (<code>org.tsanet.connect.collaboration-request.created</code>), while the bundle's guard matches the bare <code>collaboration-request.created</code> and falls through to a no-op. Every delivery returns 200 and creates nothing, with no error anywhere. Use <code>/v1</code> until the CloudEvents migration ships.</div>
   </div>
 </section>
@@ -513,6 +515,7 @@ PUT  /api/v2/tickets/{id}.json
       <table>
         <thead><tr><th>Date</th><th>What happens</th><th>Impact</th></tr></thead>
         <tbody>
+          <tr><td>2026-01-12</td><td>Zendesk removed password access from remaining accounts</td><td>Already in effect — the bundle-upload path cannot fall back to a password</td></tr>
           <tr><td>2026-07-28</td><td>Zendesk blocks API token creation for new accounts</td><td>New installs cannot mint an API token — use the app's deploy screen, which runs on the admin session</td></tr>
           <tr><td>2026-10-27</td><td>Zendesk blocks API token creation for all accounts</td><td>Any runbook step that says "create an API token" stops working</td></tr>
           <tr><td>2027-01-01</td><td><code>x-sunset</code> on TSANet <code>/v1/webhooks</code></td><td>The CloudEvents migration to <code>/v2</code> must ship before this</td></tr>
@@ -534,7 +537,7 @@ PUT  /api/v2/tickets/{id}.json
   <div class="wrap">
     <p class="eyebrow">Build with an assistant</p>
     <h2>The implementation skill, and how to load it</h2>
-    <p>The connector repository ships an agent skill — <a href="https://github.com/tsanetgit/Zendesk_App/blob/main/SKILL_TSANet_Connect.md"><code>SKILL_TSANet_Connect.md</code></a> — distilled from the production implementation: the two-layer architecture, the OAuth setup and its traps, the custom-field scheme, the lifecycle rules, and the platform gotchas on this page in a form an agentic coding assistant can apply while it works in your codebase. It is a plain markdown file with skill frontmatter, so it loads into Claude Code and any other assistant that accepts an instruction file. Every skill TSANet ships, and how to load one into any assistant, is collected on <a href="../topics/agentic-usage.html#skills">Agentic usage with TSANet Connect</a>.</p>
+    <p>The connector repository ships an agent skill — <a href="https://github.com/tsanetgit/Zendesk_App/blob/main/SKILL_TSANet_Connect.md"><code>SKILL_TSANet_Connect.md</code></a> — distilled from the production implementation: the two-layer architecture, the OAuth setup and its traps, the custom-field scheme, the lifecycle rules, and the platform gotchas on this page in a form an agentic coding assistant can apply while it works in your codebase. It is a plain markdown file with skill frontmatter (<code>name</code>, <code>description</code> and a <code>trigger</code> key), so it loads into Claude Code and any other assistant that accepts an instruction file. It is not quite self-contained: its PII-retention section points at a sibling file, <code>PII_Retention_and_Data_Handling.md</code>, in the same repository, so fetch that alongside it. Every skill TSANet ships, and how to load one into any assistant, is collected on <a href="../topics/agentic-usage.html#skills">Agentic usage with TSANet Connect</a>.</p>
     <h3>Loading it</h3>
     <p><strong>Claude Code</strong> — put it in your integration project's skills directory; from then on it triggers automatically whenever the work touches TSANet, ZAF or ZIS:</p>
     <pre><code>mkdir -p .claude/skills/tsanet-connect

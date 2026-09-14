@@ -187,7 +187,7 @@
           <text class="ts" x="918" y="185">information-request / -response</text>
           <text class="ts" x="918" y="201">notes · file attachment</text>
           <text class="ts" x="918" y="217">login returns a JWT, ~60 min</text>
-          <text class="ts" x="918" y="233">list supports updatedAfter</text>
+          <text class="ts" x="918" y="233">case list — version not re-probed</text>
           <text class="tl" x="918" y="253">BETA and PRODUCTION hosts, plus</text>
           <text class="tl" x="918" y="267">a developer environment</text>
           <text class="tl" x="918" y="283">selected per credential record</text>
@@ -240,7 +240,7 @@
       <figcaption>Everything inside the outlined box is installed by the managed package into the member's own org. Accent edges leave the org; plain edges are in-org calls. The green band is the durable state, held in custom objects the member owns, reports on, and governs with their own sharing model.</figcaption>
     </figure>
     <ul class="legend">
-      <li><span class="n">1</span><span><b>Agent actions.</b> The LWC panel and the quick actions on <code>TSANetCase__c</code> — Accept, Reject, Request Information, Send Information, Create Note, Close, Upload File — each launch either a screen flow or an Aura action.</span></li>
+      <li><span class="n">1</span><span><b>Agent actions.</b> The LWC panel and the quick actions on <code>TSANetCase__c</code> — Accept, Reject, Request Information, Send Information, Create Note, Close, Upload File — each launch either a screen flow or an Aura action. Close is valid on outbound cases only: the API rejects a closure from the receiving company.</span></li>
       <li><span class="n">2</span><span><b>Outbound calls to TSANet.</b> Apex callouts through <code>HttpClient</code>, with the environment host resolved from <code>TSANetEnvironment__mdt</code> and a matching Remote Site Setting.</span></li>
       <li><span class="n">3</span><span><b>Scheduled sync.</b> <code>TSANetScheduledJob</code> sweeps every 15 minutes by default, reconciling anything the push path missed.</span></li>
       <li><span class="n">4</span><span><b>Inbound push.</b> TSANet posts to the Apex REST endpoint exposed through a public Salesforce Site. The handler acknowledges immediately and enqueues a Queueable, which fetches the real case by token — the event itself carries only identifiers.</span></li>
@@ -271,7 +271,7 @@
   <div class="wrap">
     <p class="eyebrow">Authentication</p>
     <h2>Two Salesforce platform limits shape the token handling</h2>
-    <p>Auth is basic authentication against a TSANet API user on the member account, exchanged for a JWT that lives about 60 minutes. Storing and using that token runs into two Salesforce constraints that are worth understanding before you debug anything in this area.</p>
+    <p>Auth is basic authentication against a TSANet API user on the member account, exchanged for a JWT that lives about 60 minutes. That is the API's legacy scheme: OAuth 2.0 client credentials is the current server-to-server path, and it removes the token handling described below — see <a href="../api/index.html#auth">Working with the API → Authentication</a>. The managed package as documented here uses the login path. Storing and using that token runs into two Salesforce constraints that are worth understanding before you debug anything in this area.</p>
 
     <h3>A JWT does not fit in one custom setting field</h3>
     <p>Custom setting text fields cap well below the length of a Connect JWT, so <code>AccessTokenSplitter</code> splits the token at 175 characters into <code>AccessTokenPart1__c</code> and <code>AccessTokenPart2__c</code>, and <code>TokenManager</code> concatenates them on read. If you are inspecting stored credentials and see a truncated-looking token, that is why — check both parts.</p>
@@ -471,7 +471,7 @@ Send Custom Notification        <span class="c">→ to the case owner</span></co
         <li><strong>Exactly one primary credential per org.</strong> Marking a second one primary is the usual cause of "it authenticated as the wrong company" after a sandbox refresh.</li>
         <li><strong>No <code>*/X</code> in Salesforce cron.</strong> Every interval shorter than an hour means multiple schedules. See above.</li>
         <li><strong>A 403 on the webhook is a guest-user permission problem</strong> nine times out of ten — not a TSANet-side issue and not a Site problem.</li>
-        <li><strong>Empty event types on the webhook record deliver nothing, silently.</strong> Select both.</li>
+        <li><strong>Empty event types on the webhook record deliver nothing, silently.</strong> Select both. The platform itself defines five event types — created, closed, response.created, response.updated and note.created; which of them the package handles beyond the two the record offers has not been re-probed.</li>
         <li><strong>Remote Site Settings are required per environment.</strong> A callout to an unregistered host never leaves the org.</li>
       </ul>
       <ul class="tight">
@@ -479,6 +479,8 @@ Send Custom Notification        <span class="c">→ to the case owner</span></co
         <li><strong>The stored token is split across two fields.</strong> Neither half is a valid token on its own.</li>
         <li><strong>"View Encrypted Data" is a separate permission set</strong> and should be granted narrowly — it exposes encrypted field values wherever they appear.</li>
         <li><strong>Cases auto-close after 30 days of inactivity.</strong> Worth knowing before you build reporting that assumes a manual close.</li>
+        <li><strong>Two v1 paths are on a 2027-01-01 sunset.</strong> <code>GET /v1/collaboration-requests</code> and the <code>/v1/webhooks</code> subscription paths. The API page records this connector on v1 webhooks (documented, not re-probed), and <code>updatedAfter</code> lives on <code>/v2/collaboration-requests/list</code>, so which list path the scheduled sync calls matters — it has not been re-probed either. See <a href="../api/index.html#versions">deprecation clocks</a>.</li>
+        <li><strong>Two API rules this page does not repeat.</strong> Rejections arrive as HTTP 500 unless the caller sends <code>Accept: application/problem+json</code>, and there is no idempotency key on create — a retried create is a second case. Both on <a href="../api/index.html">Working with the API</a>.</li>
         <li><strong>Check <code>TSANetError__c</code> first.</strong> It is where <code>ErrorLogger</code> writes, and it is faster than a trace flag for most failures.</li>
       </ul>
     </div>

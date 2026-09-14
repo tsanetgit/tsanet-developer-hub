@@ -105,13 +105,13 @@
   <div class="wrap">
     <p class="eyebrow">The sending side</p>
     <h2>One call, three ways to make it</h2>
-    <p>Sending is a single API call on the collaboration case: attach one or more files (multipart) to the case token you already hold. The platform resolves the receiving side's configuration and does the rest. The official reference is the <a href="https://tsanet.gitbook.io/connect/api-reference/case-attachments">case attachments documentation</a>.</p>
+    <p>Sending is a single API call on the collaboration case: attach one or more files (multipart, with a required <code>description</code> of up to 500 characters in the form body — the GitBook reference shows it as a query parameter; see <a href="../api/index.html#ref-drift">the API page</a>) to the case token you already hold. The platform resolves the receiving side's configuration and does the rest. The official reference is the <a href="https://tsanet.gitbook.io/connect/api-reference/case-attachments">case attachments documentation</a>.</p>
     <ul class="tight">
       <li><strong>Your connector does it.</strong> On platforms with a shipped <a href="../connectors/index.html">connector</a>, attachment support arrives as connector functionality — no member code involved.</li>
       <li><strong>The Connect SDK.</strong> The <a href="../connectors/connect-sdk.html">Java SDK</a> carries attachment forwarding as a library call, for members building their own integration — and the <a href="../connectors/connect-gateway.html">Connect Gateway</a> sends through the same library, so gateway-class connectors inherit attachment sending rather than reimplementing it.</li>
       <li><strong>Direct REST.</strong> The endpoint is the contract; any stack that can make an authenticated multipart request can send. Nothing requires the SDK.</li>
     </ul>
-    <p>Delivery is per destination: with two configured stores on a case, each gets its own attempt and the response distinguishes complete from partial success. There is <strong>one attempt per destination — no automatic retries</strong> — so a failure is loud for the caller and invisible to everyone else until someone acts on it.</p>
+    <p>Delivery is per destination: with two configured stores on a case, each gets its own attempt and the response distinguishes complete from partial success. There is <strong>one attempt per destination — no automatic retries</strong> (documented behaviour, not probed on this hub) — so a failure is loud for the caller and invisible to everyone else until someone acts on it.</p>
   </div>
 </section>
 
@@ -134,7 +134,7 @@ Content-Type: &lt;the file's own media type&gt;
 
 &lt;raw file bytes&gt;                                      <span class="c">← not multipart</span></code></pre>
     <p>Anything that answers this request qualifies as a receiver — it is an afternoon of work in any stack, and a small ingest service in front of object storage (S3, Azure Files, or similar) is the common pattern. Any 2xx you return counts as delivered, which is a sharper contract than it looks: see <a href="#edges">sharp edges</a>.</p>
-    <div class="note"><strong>When your store cannot answer a PUT.</strong> Members with an established file repository that has its own upload protocol do not have to bolt an endpoint onto it — TSANet can implement a member-specific delivery method against the repository's existing interface, configured platform-side. The normalized method is the default; member-specific methods are how established repositories join without changing. If yours is in that camp, <a href="../community/index.html">start the conversation</a> with what your store's upload interface looks like.</div>
+    <div class="note"><strong>When your store cannot answer a PUT.</strong> Members with an established file repository that has its own upload protocol do not have to bolt an endpoint onto it — TSANet can implement a member-specific delivery method against the repository's existing interface, configured platform-side. The normalized method is the default; member-specific methods are how established repositories join without changing. They are arranged with TSANet rather than exposed on the API — the published surface registers only the normalized HTTPS configuration. If yours is in that camp, <a href="../community/index.html">start the conversation</a> with what your store's upload interface looks like.</div>
   </div>
 </section>
 

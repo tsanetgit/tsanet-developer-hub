@@ -220,6 +220,11 @@
       <p>Calling <code>/closure</code> as the receiver returns an error. Show the action only on outbound cases. And note the asymmetry with acceptance: a case cannot be closed while still OPEN by <em>either</em> party, so every case that ends cleanly must pass through acceptance first.</p>
       <p class="where">Probed and diagrammed on <a href="../connectors/fin-intercom.html#class">Fin / Intercom → lifecycle</a></p>
     </div>
+      <div class="gotcha">
+        <h4>Cases auto-close after 30 days of inactivity</h4>
+        <p>The one closure that does not come from the submitter. Reporting that assumes a manual close is wrong on every connector, and an integration that mirrors status should expect a CLOSED it never sent.</p>
+        <p class="where">Documented on the <a href="../connectors/salesforce.html">Salesforce</a> and <a href="../connectors/dynamics.html">Dynamics</a> connector pages — not probed here</p>
+      </div>
     <h3>Statuses</h3>
     <p>The enum is <code>OPEN</code>, <code>INFORMATION</code>, <code>ACCEPTED</code>, <code>REJECTED</code>, <code>CLOSED</code>, <code>PENDINGACTION</code> — plus <code>ALL</code> as a list filter. <code>PENDINGACTION</code> surfaces cases awaiting an action from your side; it is thinly documented, so treat an unrecognised value as unknown rather than guessing. A stale status is visibly wrong; a guessed one is invisibly wrong.</p>
     <div class="gotcha">
@@ -254,7 +259,8 @@
     <div class="gotcha">
       <h4>Attachments are a two-party setup, and the platform stores nothing</h4>
       <p>A forward is delivered straight to the other party's registered endpoint — there is no attachment store, and no endpoint that lists files on a case. Delivery also fans out to <em>your own</em> registered endpoint, so an integration that only ever sends still wants one: without it every forward reports <code>submitterStatus: CONFIG_MISSING</code> and you keep no copy of what you sent.</p>
-      <p>Two things the platform will not do for you: it creates <strong>no case note</strong> announcing the file, and it keeps <strong>no history</strong>. Both are yours to build.</p>
+      <p>Configuration is per case and readable before you act: <code>GET …/attachments/config</code> returns the <code>submitter</code> and <code>receiver</code> configurations, <code>POST …/attachments/config/https/analyze</code> proposes a normalized configuration without saving it, and <code>PUT …/attachments/config/https</code> registers one. Check it before offering an attachment action rather than discovering <code>CONFIG_MISSING</code> afterwards. Delivery attempts are not specified here: the <a href="../topics/file-sharing.html">file-sharing topic</a> documents one attempt per destination with no automatic retry, which is documented rather than probed — so build the receiver so that a 2xx means durably stored.</p>
+        <p>Two things the platform will not do for you: it creates <strong>no case note</strong> announcing the file, and it keeps <strong>no history</strong>. Both are yours to build.</p>
       <p class="where">Full model in <a href="../docs/tsanet-2026-002-case-attachments.html">TSANET-2026-002</a></p>
     </div>
     <div class="gotcha" id="ref-drift">
@@ -337,7 +343,7 @@ org.tsanet.connect.collaboration-request.note.created</code></pre>
       <table>
         <thead><tr><th>Integration</th><th>Posture</th><th>Where it stands</th><th>Evidence</th></tr></thead>
         <tbody>
-          <tr><td><a href="../connectors/fin-intercom.html">Fin / Intercom</a></td><td><span class="pill ok">v2</span></td><td>Consumes CloudEvents with prefixed type strings end to end.</td><td>Gateway source</td></tr>
+          <tr><td><a href="../connectors/fin-intercom.html">Fin / Intercom</a></td><td><span class="pill ok">v2</span></td><td>Consumes CloudEvents with prefixed type strings end to end.</td><td>Connector source — <code>TsanetWebhookController</code>, v2 only</td></tr>
           <tr><td><a href="../connectors/zendesk.html">Zendesk</a></td><td><span class="pill warn">v1 · deliberate</span></td><td>The ZIS flow matches bare type strings, so a v2 subscription would deliver into a no-op. The CloudEvents migration is tracked and ships with a future app release; until then v1 is the correct choice for this connector.</td><td>Connector source and setup guide</td></tr>
           <tr><td><a href="../connectors/salesforce.html">Salesforce</a></td><td><span class="pill warn">v1</span></td><td>The Apex REST endpoint receives the v1 flat payload.</td><td>Documented — not re-probed</td></tr>
           <tr><td><a href="../connectors/connect-sdk.html">Connect SDK</a> v2.0.0</td><td><span class="pill warn">split</span></td><td>List reads already call <code>/v2/collaboration-requests/list</code>, but the whole webhook surface is still v1 — subscribe and list through the generated v1 client, and delete, secret rotation and deliveries through v1 paths that are not deprecated and have no v2 equivalent. The generated v2 webhook client is unused. Only the deprecated half of this split can actually move.</td><td>SDK source, generated client and <code>openapi.yaml</code></td></tr>

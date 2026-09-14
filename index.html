@@ -234,7 +234,7 @@
       <a class="card" href="api/index.html#partners"><span class="chip">Partners</span><h3>Discovery &amp; forms</h3><p>Fetch the process form fresh every time, and parse its SELECT options on newlines rather than commas.</p></a>
       <a class="card" href="api/index.html#cases"><span class="chip">Cases</span><h3>Collaboration requests</h3><p>Save the token immediately. There is no idempotency key on create, and <code>responded</code> — not the status name — is what gates the SLA.</p></a>
       <a class="card" href="api/index.html#content"><span class="chip">Content</span><h3>Notes &amp; attachments</h3><p>Two note fields rendered as two sections, so never copy one into the other. Attachments need both sides configured.</p></a>
-      <a class="card" href="api/index.html#webhooks"><span class="chip">Webhooks</span><h3>Event delivery</h3><p>v1 and v2 both accept your subscription and deliver different type strings. Payloads are thin; delivery is a single attempt.</p></a>
+      <a class="card" href="api/index.html#webhooks"><span class="chip">Webhooks</span><h3>Event delivery</h3><p>v1 and v2 both accept your subscription and deliver different type strings. Payloads are thin; delivery is at-least-once, so build for duplicates.</p></a>
       <a class="card" href="api/index.html#versions"><span class="chip">Sunset</span><h3>Deprecation clocks</h3><p>Three v1 paths sunset on 2027-01-01: the case list and both webhook paths. Everything else has no v2 and no clock, so the migration is smaller than it sounds.</p></a>
     </div>
   </div>

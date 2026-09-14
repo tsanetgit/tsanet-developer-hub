@@ -266,7 +266,7 @@
 
           <!-- RIGHT: TSANet world -->
           <rect class="bx-ext" x="916" y="72" width="228" height="170" rx="8"/>
-          <text class="tt" x="930" y="94">TSANet Connect API · /v1</text>
+          <text class="tt" x="930" y="94">TSANet Connect API · v1/v2</text>
           <text class="ts" x="930" y="113">entity search · process form</text>
           <text class="ts" x="930" y="129">createCollaborationRequest</text>
           <text class="ts" x="930" y="145">approve · reject · request-info</text>
@@ -338,7 +338,7 @@
       <li><span class="n">1</span><span><b>Canvas requests.</b> <code>POST /canvas/initialize</code> and <code>/canvas/submit</code>, signed <code>X-Body-Signature</code>, HMAC-SHA256 over the raw body with the Intercom app client secret.</span></li>
       <li><span class="n">2</span><span><b>Intercom webhooks.</b> <code>POST /webhooks/intercom</code>, signed <code>X-Hub-Signature</code>, HMAC-SHA1 (<code>sha1=&lt;hex&gt;</code>), same client secret. Note the two schemes differ in both algorithm and prefix. <strong>Today this edge carries nothing:</strong> no handler consumes an Intercom event, so the reference deployment subscribes no topics (verified 2026-08-20 — a full inbound E2E ran green with the list empty). The intake stays signature-gated for the day a feature needs a topic.</span></li>
       <li><span class="n">3</span><span><b>TSANet push.</b> <code>POST /webhooks/tsanet</code>, CloudEvents v2, signed <code>x-hub-signature-256</code>, HMAC-SHA256. Non-routable bodies are refused loudly but still answered 200.</span></li>
-      <li><span class="n">4</span><span><b>Connect API calls.</b> REST <code>/v1</code>, bearer injected per request by interceptor; OAuth pre-refreshes on a 30s expiry skew. Hard deadlines: 1500ms reads, 4000ms mutations, on virtual threads.</span></li>
+      <li><span class="n">4</span><span><b>Connect API calls.</b> REST — the v1 case paths, <code>/v2/collaboration-requests/list</code> reads and v2 webhooks — with the bearer injected per request by interceptor; OAuth pre-refreshes on a 30s expiry skew. Hard deadlines: 1500ms reads, 4000ms mutations, on virtual threads.</span></li>
       <li><span class="n">5</span><span><b>Intercom API calls.</b> Tickets, admin notes, ticket-state writes. Every mutation is read back and asserted: the API 200s while ignoring unknown fields.</span></li>
     </ul>
   </div>
@@ -504,7 +504,7 @@
   <div class="wrap">
     <p class="eyebrow">Flow 3 · recovery</p>
     <h2>Re-driving what push dropped</h2>
-    <p>Between a single push attempt and a drain that catches internally, anything lost in the middle used to be lost permanently. The reconciliation poller closes that gap: it lists INBOUND cases via <code>listInboundUpdatedSince(cursor − 120s)</code> and drives anything with no link back through the same claim-before-create path.</p>
+    <p>Between an at-least-once push that can still be lost and a drain that catches internally, anything lost in the middle used to be lost permanently. The reconciliation poller closes that gap: it lists INBOUND cases via <code>listInboundUpdatedSince(cursor − 120s)</code> and drives anything with no link back through the same claim-before-create path.</p>
     <div class="cols">
       <ul class="tight">
         <li><strong>Cursoring on <code>updatedAt</code> was verified, not assumed:</strong> a live-created case came back with <code>updatedAt == createdAt</code> to the nanosecond, and a filter set 60s earlier returned it. A naive reading of the data suggested <code>updatedAt</code> only moved on modification, which would have missed new cases for 24h.</li>

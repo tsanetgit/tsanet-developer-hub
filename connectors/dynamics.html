@@ -236,9 +236,9 @@
     <p class="eyebrow">Data model</p>
     <h2>Six Dataverse tables</h2>
     <div class="obj-grid">
-      <div class="obj"><h4>ap_tsanetcase</h4><p>The collaboration record. <code>ap_name</code> is the TSANet identifier (100 chars), <code>ap_direction</code> is inbound or outbound, and <code>statuscode</code> carries Open, Information, Accepted, Rejected or Closed. <code>ap_formjson</code> holds the live form payload as a 200,000-character memo.</p></div>
-      <div class="obj"><h4>ap_tsanetnote</h4><p>Notes against a case — <code>ap_description</code> up to 2,000 characters, plus creator name and email, related back through <code>ap_tsanetcaseid</code>.</p></div>
-      <div class="obj"><h4>ap_tsanetresponse</h4><p>Formal replies on inbound cases. The response type option set covers approval, rejection, information request, information response, close and approval update.</p></div>
+      <div class="obj"><h4>ap_tsanetcase</h4><p>The collaboration record. <code>ap_name</code> is the TSANet identifier (100 chars), <code>ap_direction</code> is inbound or outbound, and <code>statuscode</code> carries Open, Information, Accepted, Rejected or Closed — the API enum also has <code>PENDINGACTION</code>, which this option set has no value for; how the solution handles it has not been verified. <code>ap_formjson</code> holds the live form payload as a 200,000-character memo.</p></div>
+      <div class="obj"><h4>ap_tsanetnote</h4><p>Notes against a case — <code>ap_description</code> up to 2,000 characters, plus creator name and email, related back through <code>ap_tsanetcaseid</code>. The API's note carries a required <code>summary</code> (500 characters) and an optional <code>description</code> (5,000), so a longer partner note is truncated here, and how the solution fills <code>summary</code> on outbound notes has not been verified.</p></div>
+      <div class="obj"><h4>ap_tsanetresponse</h4><p>Formal replies on inbound cases. The response type option set covers approval, rejection, information request, information response, close and approval update. Close applies to outbound cases only — the API rejects a closure from the receiving company.</p></div>
       <div class="obj"><h4>ap_tsanetsetting</h4><p>Connection configuration: client id, secret, and the environment URI (capped at 400 characters). Edited through the Connection Settings canvas app.</p></div>
       <div class="obj"><h4>ap_casemapping</h4><p>The declarative field-mapping configuration — see below. This is the table that makes the connector reconfigurable without code.</p></div>
       <div class="obj"><h4>ap_tsanetlog</h4><p>Integration logging. The first place to look when a sync cycle or a plugin step misbehaves.</p></div>
@@ -253,7 +253,7 @@
   <div class="wrap">
     <p class="eyebrow">Authentication</p>
     <h2>OAuth2 or Bearer, and they are mutually exclusive</h2>
-    <p>Credentials live in <code>ap_tsanetsetting</code> and are entered through the TSANET Configuration app: a client id, a secret, and the environment URI. A given environment uses <strong>either</strong> OAuth2 <strong>or</strong> a bearer token — not both, and not a fallback from one to the other. Picking the wrong one for the credentials TSANet issued you is a common first-install failure.</p>
+    <p>Credentials live in <code>ap_tsanetsetting</code> and are entered through the TSANET Configuration app: a client id, a secret, and the environment URI. A given environment uses <strong>either</strong> OAuth2 <strong>or</strong> a bearer token — not both, and not a fallback from one to the other. Picking the wrong one for the credentials TSANet issued you is a common first-install failure. The API page documents two schemes — OAuth 2.0 client credentials, the current path, and the legacy <code>POST /v1/login</code> JWT; how the solution's Bearer mode maps onto those has not been verified against the solution source.</p>
     <ul class="tight">
       <li><strong>The URI field caps at 400 characters.</strong> Not usually a constraint, but worth knowing if you are templating environment URLs.</li>
       <li><strong>Three environments:</strong> Developer (for modifying the package), Beta (member testing), and Production. Credentials and endpoints come from <code>membership@tsanet.org</code>.</li>
@@ -408,6 +408,7 @@
         <li><strong><code>ap_formjson</code> caps at 200,000 characters.</strong> Large process forms with many fields and long option lists are the realistic way to approach it.</li>
         <li><strong>Lookup search attributes target a single entity only.</strong> A polymorphic lookup will not resolve through Case Mapping.</li>
         <li><strong>The URI field caps at 400 characters.</strong></li>
+        <li><strong>Two API rules this page does not repeat.</strong> Rejections arrive as HTTP 500 unless the caller sends <code>Accept: application/problem+json</code>, and there is no idempotency key on create — a retried create is a second case. Both on <a href="../api/index.html">Working with the API</a>.</li>
       </ul>
       <ul class="tight">
         <li><strong>Scheduled flows are the default, not real time.</strong> If a member expects instant inbound delivery, register the webhook — otherwise plan around a 15-minute worst case.</li>

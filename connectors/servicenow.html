@@ -218,7 +218,7 @@
       <li><strong>"eBonding" is the platform's own word</strong> for cross-company ticket exchange, and it is the vocabulary to use with ServiceNow-side stakeholders. There is an out-of-the-box eBonding spoke for ServiceNow-to-ServiceNow, and an established third-party middleware market — so an externally hosted hub bonding tickets across companies is a well-precedented pattern here, not a novel one. <span class="tag doc">documented</span></li>
       <li><strong>The eBonding convention for a foreign identifier</strong> is the Task table's <code>correlation_id</code> and <code>correlation_display</code>. Whether that field is efficiently searchable decides how load-bearing an integration's own link table has to be. <span class="tag probe">needs probe</span></li>
       <li><strong>Whether a CSM case type can be created via API</strong> rather than by admin action is unverified. <span class="tag probe">needs probe</span></li>
-      <li><strong>Status mapping is deliberately not proposed here.</strong> OPEN / INFORMATION / ACCEPTED / CLOSED / REJECTED have to land on whichever object model a member uses, and inventing a ServiceNow-local convention before that choice is made would add a dialect rather than settle one.</li>
+      <li><strong>Status mapping is deliberately not proposed here.</strong> OPEN / INFORMATION / ACCEPTED / CLOSED / REJECTED — and <code>PENDINGACTION</code>, which the API enum also carries — have to land on whichever object model a member uses, and inventing a ServiceNow-local convention before that choice is made would add a dialect rather than settle one.</li>
     </ul>
   </div>
 </section>

@@ -169,7 +169,7 @@
           <text class="ts" x="914" y="149">approval · rejection · closure</text>
           <text class="ts" x="914" y="165">information-request / -response</text>
           <text class="ts" x="914" y="181">notes (summary + description)</text>
-          <text class="ts" x="914" y="197">/v2 list: paginated, updatedAfter</text>
+          <text class="ts" x="914" y="197">/v2/…/list supports updatedAfter</text>
           <text class="ts" x="914" y="213">errors default to 500 — opt into</text>
           <text class="ts" x="914" y="229">problem+json via Accept</text>
           <text class="tl" x="914" y="248">prod: connect2.tsanet.org</text>
@@ -460,7 +460,7 @@ POST /api/services/zis/inbound_webhooks/generic/{integration}
 POST <span class="good-v">/v1/webhooks</span>
 { "callbackUrl": "&lt;ingest URL&gt;",
   "callbackAuth": { "type": "BASIC", "username": "...", "password": "..." } }</code></pre>
-    <p>Omit <code>eventTypes</code> — the default covers both <code>collaboration-request.created</code> and <code>note.created</code>, which is what the bundle expects. Save the response <code>id</code> for later management and the <code>secret</code> (the HMAC key, returned only at creation).</p>
+    <p>Omit <code>eventTypes</code> and the subscription covers what the bundle expects — <code>collaboration-request.created</code> and <code>note.created</code>. The platform defines five event types and what a default subscription actually includes has not been re-probed, so if in doubt pass those two explicitly. Save the response <code>id</code> for later management and the <code>secret</code> (the HMAC key, returned only at creation).</p>
     <div class="note"><strong><code>/v2/webhooks</code> silently breaks the bundle.</strong> Both endpoints accept a subscription, so this fails invisibly. <code>/v2</code> delivers CloudEvents with prefixed type strings (<code>org.tsanet.connect.collaboration-request.created</code>), while the bundle's guard matches the bare <code>collaboration-request.created</code> and falls through to a no-op. Every delivery returns 200 and creates nothing, with no error anywhere. Use <code>/v1</code> until the CloudEvents migration ships.</div>
   </div>
 </section>

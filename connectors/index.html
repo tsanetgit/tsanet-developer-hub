@@ -98,7 +98,7 @@
     </div>
     <div class="twrap matrix">
       <table>
-        <caption>ServiceNow columns are empty because nothing is built, not because the answers are unknown — the <a href="servicenow.html">assessment</a> covers what the platform forces either way.</caption>
+        <caption>ServiceNow columns are empty because nothing is built. The <a href="servicenow.html">assessment</a> covers what the platform forces either way, and lists the questions that are still open.</caption>
         <thead>
           <tr>
             <th scope="col">&nbsp;</th>
@@ -113,20 +113,20 @@
           <tr><th scope="row">Class</th><td>In-tenant</td><td>In-tenant</td><td>Partial</td><td>Gateway</td><td class="na">Undecided</td></tr>
           <tr><th scope="row">Status</th><td><span class="pill ok">GA</span></td><td><span class="pill ok">GA</span></td><td><span class="pill ok">GA</span></td><td><span class="pill warn">Early access</span></td><td><span class="pill bad">Not built</span></td></tr>
           <tr><th scope="row">Operated by</th><td>You</td><td>You</td><td>You</td><td>TSANet</td><td class="na">—</td></tr>
-          <tr><th scope="row">Agent surface</th><td>LWC on the Case record page</td><td>HTML + JS web resources on the Case form</td><td>ZAF sidebar app</td><td>Canvas Kit panel in the Help Desk</td><td class="na">—</td></tr>
+          <tr><th scope="row">Agent surface</th><td>LWC on the Case record page</td><td>HTML + JS web resources on the Case form</td><td>ZAF sidebar app + nav-bar screen</td><td>Canvas Kit panel in the Help Desk</td><td class="na">—</td></tr>
           <tr><th scope="row">Where state lives</th><td>Custom objects</td><td>Dataverse tables</td><td>Ticket fields and tags</td><td>The gateway's own durable store</td><td class="na">—</td></tr>
-          <tr><th scope="row">Inbound delivery</th><td>Apex REST on a public Site</td><td>Registered webhook to Power Automate</td><td>ZIS generic inbound webhook</td><td>TSANet push to the adapter</td><td class="na">—</td></tr>
+          <tr><th scope="row">Inbound delivery</th><td>Apex REST on a public Site</td><td>Scheduled poll by default; optional webhook to Power Automate</td><td>ZIS generic inbound webhook</td><td>TSANet push to the adapter</td><td class="na">—</td></tr>
           <tr><th scope="row">Reconciliation</th><td>Scheduled job, 15&nbsp;min default</td><td>Scheduled flow, 15&nbsp;min default</td><td>ZAF background poller, 60&nbsp;s</td><td>Reconciliation poller</td><td class="na">—</td></tr>
           <tr><th scope="row">Extension point</th><td>Clonable Flow library</td><td>Case Mapping configuration table</td><td>Zendesk triggers and ZIS flows</td><td>Server-side, by TSANet</td><td class="na">—</td></tr>
-          <tr><th scope="row">Auto-accept</th><td>Asset-match flow, rejects on no match</td><td>Auto-routing by case number</td><td>Built-in setting, or a scoped trigger</td><td>Deliberately manual</td><td class="na">—</td></tr>
-          <tr><th scope="row">Distribution</th><td>Managed package</td><td>Managed solution / AppSource</td><td>App upload + ZIS bundle</td><td>Nothing to install</td><td class="na">—</td></tr>
+          <tr><th scope="row">Auto-accept</th><td>Asset-match flow, rejects on no match</td><td>Auto-routing by case number, then customer name</td><td>Built-in setting, or a scoped trigger</td><td>Deliberately manual</td><td class="na">—</td></tr>
+          <tr><th scope="row">Distribution</th><td>Managed package</td><td>Managed solution / AppSource</td><td>App upload + ZIS bundle</td><td>A connected Intercom app plus a hosted service</td><td class="na">—</td></tr>
           <tr><th scope="row">Shipping a fix</th><td>Members upgrade</td><td>Members upgrade</td><td>Members upgrade</td><td>Central, nothing to do</td><td class="na">—</td></tr>
-          <tr><th scope="row">Connector faults</th><td>Isolated</td><td>Isolated</td><td>Isolated</td><td>Shared — runs clustered</td><td class="na">—</td></tr>
+          <tr><th scope="row">Connector faults</th><td>Isolated</td><td>Isolated</td><td>Isolated</td><td>Shared — one hosted service</td><td class="na">—</td></tr>
           <tr><th scope="row">Platform outage</th><td colspan="5" style="text-align:center;color:var(--orange)">Affects every member in every class — the Connect API is the shared floor</td></tr>
         </tbody>
       </table>
     </div>
-    <p>Two rows are worth pausing on. <strong>Reconciliation</strong> tells you what happens when a push is missed — and the Zendesk poller runs in a browser page, so it only catches up while an agent has a tab open. The <strong>two failure rows</strong> belong together: every class depends on the Connect API, so a platform outage reaches everyone regardless of where connector code runs. What the gateway changes is that connector faults become correlated rather than independent — which is why it is built to run clustered, and why deployment discipline matters more there. The <a href="../topics/connector-classes.html">connector classes topic</a> works the trade through.</p>
+    <p>Two rows are worth pausing on. <strong>Reconciliation</strong> tells you what happens when a push is missed — and the Zendesk poller runs in a browser page, so it only catches up while an agent has a tab open. The <strong>two failure rows</strong> belong together: every class depends on the Connect API, so a platform outage reaches everyone regardless of where connector code runs. What the gateway changes is that connector faults become correlated rather than independent — a design input for the gateway (the reference deployment runs a single replica today, so its resilience is durability and recovery rather than replication), and the reason deployment discipline matters more there. On Dynamics, note, there may be no push at all: the scheduled poll is the default and the webhook is opt-in. The <a href="../topics/connector-classes.html">connector classes topic</a> works the trade through.</p>
     <p><strong>Auto-accept</strong> is the row where the connectors disagree most sharply — from a Zendesk setting that accepts everything to a Salesforce flow that will reject a request it cannot verify, and a Fin/Intercom guardrail that keeps the commitment with a person. Accepting stops the SLA clock <em>and</em> tells a partner an engineer is engaged, so which posture you pick is a real decision: <a href="../topics/entitlement-automation.html">deciding what to accept automatically</a>.</p>
   </div>
 </section>
@@ -170,7 +170,7 @@
       <a class="card" href="connect-gateway.html">
         <span class="chip beta">Work in progress · v2.0.0</span>
         <h3>Build on the Connect Gateway</h3>
-        <p>TSANet supplies the engine, the contract and a conformance harness that certifies the seam; you write only the half that talks to your own platform — and never touch the Connect API or its errors.</p>
+        <p>TSANet supplies the engine, the contract and a conformance harness that certifies the seam; you write only the half that talks to your own platform — and never touch the Connect API or its errors. The repository is private; adapter authors get access at onboarding.</p>
         <span class="card-foot">Design &amp; adapter guide →</span>
       </a>
       <a class="card" href="connect-sdk.html">

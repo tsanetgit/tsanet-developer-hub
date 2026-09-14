@@ -93,12 +93,12 @@
         </tbody>
       </table>
     </div>
-    <p><a href="../connectors/fin-intercom.html">Fin / Intercom</a> and <a href="../connectors/servicenow.html">ServiceNow</a> have no public tracker — the first is in early access and the second is not built. Route both through membership.</p>
+    <p><a href="../connectors/fin-intercom.html">Fin / Intercom</a>, the <a href="../connectors/connect-gateway.html">Connect Gateway</a> and <a href="../connectors/servicenow.html">ServiceNow</a> have no public tracker — the first two are private repositories during early access, with access granted at onboarding, and the third is not built. Route all three through membership.</p>
     <h3>What makes a report easy to act on</h3>
     <ul class="tight">
       <li><strong>Which environment.</strong> Beta and Production behave differently often enough that it is the first question anyone will ask.</li>
       <li><strong>The case token</strong>, if there is one. It keys everything on the platform side and turns a description into something reproducible.</li>
-      <li><strong>What you expected versus what happened.</strong> Several behaviours on this platform look like bugs and are not — silent 200s on unknown fields, notes that read back empty, a case that cannot be closed while OPEN. The <a href="../api/index.html">API guidance</a> covers the ones we know about.</li>
+      <li><strong>What you expected versus what happened.</strong> Several behaviours look like bugs and are not — a Connect case that cannot be closed while OPEN, Intercom returning 200 on fields it silently ignores, ServiceNow journal fields that read back empty. The <a href="../api/index.html">API guidance</a> and the connector pages cover the ones we know about.</li>
       <li><strong>Whether it is reproducible.</strong> A one-off during a deploy window is a different problem from something that happens every time.</li>
     </ul>
   </div>

@@ -107,7 +107,7 @@
           <li>TSANet operates it</li>
           <li>Credentials sit with TSANet, one set per member</li>
           <li>The gateway must hold lifecycle state itself</li>
-          <li>Connector faults are shared, so it runs clustered</li>
+          <li>Connector faults are shared — one hosted service for every member on it</li>
           <li>Fixes ship centrally, with nothing to upgrade</li>
         </ul>
       </div>
@@ -115,7 +115,7 @@
 
     <figure>
       <div class="diagram">
-        <svg viewBox="0 0 1000 278" style="min-width:880px" role="img" aria-label="A spectrum from fully in-tenant to fully gateway-hosted showing where Salesforce and Dynamics, Zendesk and Intercom fall. Connector faults are isolated per member in-tenant and shared on the gateway, which runs clustered; a platform outage affects everyone in all three classes.">
+        <svg viewBox="0 0 1000 278" style="min-width:880px" role="img" aria-label="A spectrum from fully in-tenant to fully gateway-hosted showing where Salesforce and Dynamics, Zendesk and Intercom fall. Connector faults are isolated per member in-tenant and shared on the gateway, one hosted service for every member on it; a platform outage affects everyone in all three classes.">
           <line x1="180" y1="70" x2="940" y2="70" stroke="var(--line)" stroke-width="2"/>
 
           <circle cx="265" cy="70" r="9" fill="var(--green)"/>
@@ -143,7 +143,7 @@
           <text class="tl" x="16" y="196">Connector fault</text>
           <text class="ts" x="265" y="196" text-anchor="middle">one member</text>
           <text class="ts" x="570" y="196" text-anchor="middle">one member</text>
-          <text class="ts" x="858" y="196" text-anchor="middle" style="fill:var(--orange)">shared — runs clustered</text>
+          <text class="ts" x="858" y="196" text-anchor="middle" style="fill:var(--orange)">shared — one hosted service</text>
 
           <text class="tl" x="16" y="224">Platform outage</text>
           <text class="ts" x="265" y="224" text-anchor="middle" style="fill:var(--orange)">everyone</text>
@@ -178,7 +178,7 @@
           <tr><th scope="row">Inbound delivery</th><td>An endpoint inside the tenant, or the platform's own event machinery</td><td class="next">Your endpoint, your signature verification, your dedupe</td></tr>
           <tr><th scope="row">Deployment</th><td>A package a member installs and later upgrades</td><td class="next">A service you deploy; members install little or nothing</td></tr>
           <tr><th scope="row">Data residency</th><td>Case content never leaves the member's tenant</td><td class="next">Case content transits infrastructure TSANet operates</td></tr>
-          <tr><th scope="row">Connector faults</th><td>Independent — one member's misconfiguration cannot affect another</td><td class="next">Correlated across members on the gateway, which is why it is built to run clustered</td></tr>
+          <tr><th scope="row">Connector faults</th><td>Independent — one member's misconfiguration cannot affect another</td><td class="next">Correlated across members on the gateway — one shared service, which is what its durability and rollout design exists to manage</td></tr>
           <tr><th scope="row">Platform outage</th><td colspan="2" style="text-align:center">Affects everyone, in every class — the Connect API is a shared dependency regardless of where connector code runs</td></tr>
           <tr><th scope="row">Release cadence</th><td>Gated by member upgrade appetite and any store review</td><td class="next">As fast as you can deploy safely</td></tr>
         </tbody>
@@ -188,7 +188,7 @@
     <p>The two failure rows are the ones most often reasoned about badly, including by us — an earlier version of this page got them wrong, so it is worth being precise.</p>
     <p><strong>Every class already shares a dependency.</strong> The Connect API is the shared floor: a platform outage stops collaboration for every member regardless of where their connector code runs. An in-tenant Salesforce package does not keep working when the platform is down. So "in-tenant means one member is affected" is only ever true of faults <em>in the connector itself</em>, and stating it without that qualifier flatters the in-tenant column.</p>
     <p><strong>What the gateway changes is correlation, not fragility.</strong> It adds one more component shared by the members on it, so a fault there is correlated rather than independent. That is a design input, not a verdict: correlation is what clustering, replication and staged rollout exist to manage, and a gateway built that way targets availability in the same range members expect from the platform itself. The honest comparison is that in-tenant distributes connector faults across members while a gateway concentrates them into something engineered — and operated — to a higher standard than any individual member's install.</p>
-    <p>Where that genuinely bites is not uptime but <em>change</em>. A bad release to a clustered gateway still reaches everyone on it at once, which is why deployment discipline matters more there than in a world where each member upgrades on their own schedule.</p>
+    <p>Where that genuinely bites is not uptime but <em>change</em>. A bad release to the gateway still reaches everyone on it at once, which is why deployment discipline matters more there than in a world where each member upgrades on their own schedule.</p>
   </div>
 </section>
 

@@ -434,6 +434,7 @@ Accept: application/json, application/problem+json</code></pre>
           <li>Create the <code>tsanet_oauth</code> (Entra) and <code>zendesk</code> (self) connections</li>
           <li>Deploy the ZIS bundle from the app's nav-bar screen — no API token needed</li>
           <li>Run Detect field IDs → Apply</li>
+        <li>Decide on acceptance: the <em>Auto-accept inbound requests</em> app setting (v1.0.69+, off by default, unconditional, takes effect after a bundle redeploy), or a Zendesk trigger on the TSANet Action field for anything conditional — see <a href="../topics/entitlement-automation.html">deciding what to accept automatically</a></li>
           <li>Register inbound push: two calls, Zendesk then TSANet</li>
           <li>Create the SLA breach trigger and the active-collaborations view</li>
         </ul>

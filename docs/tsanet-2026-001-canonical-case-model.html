@@ -38,8 +38,8 @@
     <h1>The canonical case model, and how connectors map onto it</h1>
     <p class="abstract">Every TSANet connector maps the same canonical collaboration case onto a different platform's data model. This document specifies that canonical model, the places where the write schema and the read schema deliberately diverge, and the mapping decisions each connector has to make. It is for anyone building or reviewing an integration against the Connect API.</p>
     <div class="meta-table">
-      <div class="meta-cell"><b>Date</b><span>2026-08-15</span></div>
-      <div class="meta-cell"><b>Version</b><span>0.1</span></div>
+      <div class="meta-cell"><b>Date</b><span>2026-09-13</span></div>
+      <div class="meta-cell"><b>Version</b><span>0.2</span></div>
       <div class="meta-cell"><b>Audience</b><span>Member integrators</span></div>
       <div class="meta-cell"><b>Verified against</b><span>Connect API OpenAPI spec</span></div>
     </div>
@@ -55,7 +55,7 @@
 
     <div class="callout">
       <b>Related</b>
-      Behavioural guidance for working with these endpoints is on <a href="../api/index.html">Working with the Connect API</a>. Platform-specific mappings are on the individual <a href="../connectors/index.html">connector pages</a>.
+      Behavioural guidance for working with these endpoints is on <a href="../api/index.html">Working with the Connect API</a>. Platform-specific mappings are on the individual <a href="../connectors/index.html">connector pages</a>. File transfer is specified separately in <a href="tsanet-2026-002-case-attachments.html">TSANET-2026-002</a>; every endpoint there is scoped by the <code>token</code> this document introduces.
     </div>
 
     <h2><span class="sec-no">2</span>Two schemas, one case</h2>
@@ -69,6 +69,7 @@
       <tr><td>Your own case number</td><td><code>internalCaseNumber</code></td><td><code>submitterCaseNumber</code> or <code>receiverCaseNumber</code>, depending which side you are</td></tr>
       <tr><td>Submitter contact</td><td><code>submitterContactDetails</code> object</td><td>flattened onto the case</td></tr>
       <tr><td>Counterparty identity</td><td>implied by the form target</td><td><code>submitCompanyName</code> / <code>receiveCompanyName</code> and their IDs</td></tr>
+      <tr><td>Test flag</td><td><code>testSubmission</code></td><td><code>testCase</code></td></tr>
     </table>
 
     <div class="callout warn">
@@ -156,6 +157,7 @@
     <h2><span class="sec-no">6</span>Revision history</h2>
     <table class="doc">
       <tr><th>Version</th><th>Date</th><th>Change</th></tr>
+      <tr><td>0.2</td><td>2026-09-13</td><td>Add the <code>testSubmission</code> / <code>testCase</code> row to the divergence table; cross-reference TSANET-2026-002.</td></tr>
       <tr><td>0.1</td><td>2026-08-15</td><td>Initial draft. Field names verified against the OpenAPI specification rather than taken from connector source.</td></tr>
     </table>
 
@@ -165,7 +167,7 @@
 <footer>
   <div class="wrap">
     <div>TSANet Connect Platform Engineering · <a href="../index.html">Developer Hub</a></div>
-    <div class="mono">TSANET-2026-001 · v0.1</div>
+    <div class="mono">TSANET-2026-001 · v0.2</div>
   </div>
 </footer>
 

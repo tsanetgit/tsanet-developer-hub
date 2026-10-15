@@ -190,7 +190,7 @@
       <h4><code>adminNote</code> is HTML to render, not to strip</h4>
       <p>The form's "Partner instructions" field is authored HTML with links. Escaping shows raw tags; stripping loses the links. Sanitize against a tag allowlist and render it. This is the one field that is the exception to stripping HTML.</p>
     </div>
-    <p>Search returns an array: a company with several departments returns several results. Use <code>departmentId</code> for precise routing when it is available, and remember that <code>/v1/partners/search</code> takes a natural-language <code>query</code> if plain matching is not enough.</p>
+    <p>Search returns an array: a company with several departments returns several results. Use <code>departmentId</code> for precise routing when it is available, and use <code>/v1/partners/{searchTerm}</code> for lookup. Do not use <code>/v1/partners/search</code>: it is being deprecated and does not currently work.</p>
   </div>
 </section>
 

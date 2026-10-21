@@ -50,7 +50,7 @@
       <span><b>Status</b> GA · managed package</span>
       <span><b>Surface</b> Case record page + TSANet Case object</span>
       <span><b>Repo</b> tsanetgit/SFDC_App</span>
-      <span><b>Updated</b> 2026-09-13</span>
+      <span><b>Updated</b> 2026-10-20</span>
     </div>
     <div class="toc">
       <a href="#class">Connector class</a>
@@ -85,6 +85,14 @@
       </table>
     </div>
     <div class="note"><strong>The consequence worth planning for is the inverse of the gateway trade-off.</strong> Nothing here is shared infrastructure, so nothing here fails for everyone at once — but equally, nobody operates it for you. The scheduled job, the Site, the guest-user permissions and the credential record are all yours to keep healthy.</div>
+    <div class="note"><strong>Coming in 2.14 — beta, subject to change.</strong> This page documents v2.13, the current release. A 2.14 beta is published on the <a href="https://github.com/tsanetgit/SFDC_App/releases">SFDC_App releases page</a> and is marked not for production; its notes and the repository's <code>main</code> describe changes worth planning for:
+      <ul class="tight">
+        <li><strong>Credentials:</strong> calls go only through Named and External Credentials. Basic auth, the <code>/v1/login</code> JWT and the shipped Remote Site Settings are removed.</li>
+        <li><strong>Inbound:</strong> the public Site and guest user go away. The endpoint is reached through an External Client App, and the webhook registers with OAuth2 client-credentials callback authentication — a <code>callbackAuth</code> type that is live on Beta and not yet on Production. The permission set <code>TSANet_Webhook_Guest_Access</code> becomes <code>TSANet_Integration_User_Access</code>, and events arrive as the platform event <code>TSANetWebhookEvent__e</code>.</li>
+        <li><strong>Current API:</strong> subscriptions move to <code>/v2/webhooks</code> with prefixed types, and the sync reads <code>/v2/collaboration-requests/list</code>.</li>
+        <li><strong>Behaviour:</strong> Case Feed notes drop Company, Type and Direction; <em>Find Parent Case</em> matches the Receiver Case Number inbound and the Submitter Case Number outbound.</li>
+      </ul>
+      Nothing here changes until 2.14 is released; plan an upgrade window for the inbound rework.</div>
   </div>
 </section>
 
@@ -190,7 +198,7 @@
           <text class="ts" x="918" y="185">information-request / -response</text>
           <text class="ts" x="918" y="201">notes · file attachment</text>
           <text class="ts" x="918" y="217">login returns a JWT, ~60 min</text>
-          <text class="ts" x="918" y="233">case list — version not re-probed</text>
+          <text class="ts" x="918" y="233">case list — deprecated v1 path</text>
           <text class="tl" x="918" y="253">BETA and PRODUCTION hosts, plus</text>
           <text class="tl" x="918" y="267">a developer environment</text>
           <text class="tl" x="918" y="283">selected per credential record</text>
@@ -442,7 +450,7 @@ Send Custom Notification        <span class="c">→ to the case owner</span></co
         <h3>Package and Access</h3>
         <ul class="tight">
           <li>Request credentials from <code>membership@tsanet.org</code></li>
-          <li>Install the latest release package from the GitHub releases page, choosing all users or specific profiles</li>
+          <li>Install the latest release package from the <a href="https://github.com/tsanetgit/SFDC_App/releases">GitHub releases page</a> — the release marked Latest, not a beta pre-release — choosing all users or specific profiles</li>
           <li>Grant third-party website access when prompted</li>
           <li>Assign <strong>TSANet Connect Permissions (Admin)</strong> and <strong>(Employee)</strong> to the right users</li>
           <li>Create the credential record, pick the environment, mark it <strong>Primary</strong>, designate the integration user</li>
@@ -474,7 +482,7 @@ Send Custom Notification        <span class="c">→ to the case owner</span></co
         <li><strong>Exactly one primary credential per org.</strong> Marking a second one primary is the usual cause of "it authenticated as the wrong company" after a sandbox refresh.</li>
         <li><strong>No <code>*/X</code> in Salesforce cron.</strong> Every interval shorter than an hour means multiple schedules. See above.</li>
         <li><strong>A 403 on the webhook is a guest-user permission problem</strong> nine times out of ten — not a TSANet-side issue and not a Site problem.</li>
-        <li><strong>Delivery signing is not described here.</strong> The API signs every delivery with <code>X-Hub-Signature-256</code>, and the Dynamics, Zendesk and Fin / Intercom pages each verify a secret or signature; whether the package verifies it has not been re-probed. The only controls documented on this endpoint are Site activation and guest permissions.</li>
+        <li><strong>Delivery signing is not described here.</strong> The API signs every delivery with <code>X-Hub-Signature-256</code>; this page does not describe how the 2.13 package handles it. 2.14 moves the endpoint behind an External Client App with OAuth2 client-credentials callback authentication (see the 2.14 note under <a href="#class">Connector class</a>).</li>
         <li><strong>Empty event types on the webhook record deliver nothing, silently.</strong> Select both. On v1 those two — <code>collaboration-request.created</code> and <code>note.created</code> — are the whole set the platform delivers; the three v2-only types (closed, response.created, response.updated) never reach a v1 subscription, so closures and responses arrive through the scheduled sync.</li>
         <li><strong>Remote Site Settings are required per environment.</strong> A callout to an unregistered host never leaves the org.</li>
       </ul>
@@ -483,7 +491,7 @@ Send Custom Notification        <span class="c">→ to the case owner</span></co
         <li><strong>The stored token is split across two fields.</strong> Neither half is a valid token on its own.</li>
         <li><strong>"View Encrypted Data" is a separate permission set</strong> and should be granted narrowly — it exposes encrypted field values wherever they appear.</li>
         <li><strong>Cases auto-close after 30 days of inactivity.</strong> Worth knowing before you build reporting that assumes a manual close.</li>
-        <li><strong>Two v1 paths are on a 2027-01-01 sunset.</strong> <code>GET /v1/collaboration-requests</code> and the <code>/v1/webhooks</code> subscription paths. The API page records this connector on v1 webhooks (documented, not re-probed), and the deprecated v1 list accepts <code>updatedAfter</code> too, so the sync keeps working until the sunset; which list path the package calls has not been re-probed. See <a href="../api/index.html#versions">deprecation clocks</a>.</li>
+        <li><strong>Two v1 paths are on a 2027-01-01 sunset.</strong> <code>GET /v1/collaboration-requests</code> and the <code>/v1/webhooks</code> subscription paths. Verified against the package source at <code>Release-v2.13</code>: it registers on <code>/v1/webhooks</code> and lists cases on the deprecated <code>GET /v1/collaboration-requests</code>, which accepts <code>updatedAfter</code> too, so the sync keeps working until the sunset. The 2.14 beta moves both to v2. See <a href="../api/index.html#versions">deprecation clocks</a>.</li>
         <li><strong>Two API rules this page does not repeat.</strong> Rejections arrive as HTTP 500 unless the caller sends <code>Accept: application/problem+json</code>, and there is no idempotency key on create — a retried create is a second case. Both on <a href="../api/index.html">Working with the API</a>.</li>
         <li><strong>Check <code>TSANetError__c</code> first.</strong> It is where <code>ErrorLogger</code> writes, and it is faster than a trace flag for most failures.</li>
       </ul>

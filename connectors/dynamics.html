@@ -48,7 +48,7 @@
       <span><b>Status</b> GA · managed solution</span>
       <span><b>Surface</b> Case form + TSANET Configuration app</span>
       <span><b>Repo</b> tsanetgit/MS_Power_App</span>
-      <span><b>Updated</b> 2026-09-13</span>
+      <span><b>Updated</b> 2026-10-20</span>
     </div>
     <div class="toc">
       <a href="#class">Connector class</a>
@@ -230,7 +230,7 @@
       <li><span class="n">3</span><span><b>Flow callouts.</b> The scheduled sync and the auto-route flow, authenticating through the child Login flow.</span></li>
       <li><span class="n">4</span><span><b>Inbound push.</b> Optional. Registering a webhook points TSANet at a Power Automate endpoint for near-real-time case and note delivery, instead of waiting for the next poll.</span></li>
     </ul>
-    <div class="note"><strong>On the UI mechanism.</strong> The published user guide describes the Case form integration as a "Lightning Web Component". That is Salesforce terminology and does not apply here — the Dynamics solution ships an HTML web resource (<code>ap_CaseCreateForm.html</code>) plus a set of JavaScript web resources. If you are following that guide, read "LWC" as "web resource".</div>
+    <div class="note"><strong>On the UI mechanism.</strong> The published user guide sends agents to "TSANet Cases (LWC located on the Case Form)". LWC — Lightning Web Component — is Salesforce terminology and does not apply here — the Dynamics solution ships an HTML web resource (<code>ap_CaseCreateForm.html</code>) plus a set of JavaScript web resources. If you are following that guide, read "LWC" as "web resource".</div>
   </div>
 </section>
 
@@ -297,7 +297,7 @@
     <p>Three environment variables toggle the automatic behaviours, so a member can adopt them one at a time rather than all at once.</p>
     <div class="cols">
       <ul class="tight">
-        <li><strong>Auto Create TSANote by Email</strong> — a Dynamics email activity linked to the case becomes a TSANet note, so partner-visible correspondence does not have to be re-entered.</li>
+        <li><strong>Auto Create TSANote by Email</strong> — a Dynamics email activity linked to the case becomes a TSANet note, so partner-visible correspondence does not have to be re-entered. From v2.14.0.0 the note opens with a header block — <strong>From, To, Cc, Subject</strong> — before the body, which is still cut at 1,600 characters; the correspondents' email addresses therefore reach the partner too.</li>
         <li><strong>Auto Create TSANote by Note</strong> — the same for notes added manually to the Dynamics Case. Both toggles make platform-internal content partner-visible with no filter; unlike <a href="zendesk.html#notes">Zendesk's public-only rule</a>, nothing here separates internal notes, so leave them off unless every note on a collaborating case is meant for the partner.</li>
         <li><strong>Auto Routing of New Case</strong> — the inbound path described below.</li>
       </ul>
@@ -357,7 +357,11 @@
     <p>The solution ships with scheduled Power Automate flows that poll the Connect API on a <strong>15-minute</strong> interval, retrieving case status and creating inbound cases, responses and notes. Agents can force an update from the main navigation rather than waiting for the next cycle.</p>
     <p>Near-real-time delivery is opt-in: the <strong>Register webhook</strong> button in the configuration app points TSANet at a Power Automate endpoint so case and note events arrive as they happen. Registering it does not retire the schedule — the poll remains the backstop, the same belt-and-braces arrangement <a href="salesforce.html">Salesforce</a> and <a href="fin-intercom.html">Fin / Intercom</a> use; <a href="zendesk.html">Zendesk</a>'s poller runs only while an agent has a tab open.</p>
     <p>The registration is on the current webhook API: the flow behind the button subscribes on <code>/v2/webhooks</code> with prefixed CloudEvents types. Two details worth knowing. First, the subscription covers case creation and new notes only — <strong>responses and closures arrive with the next poll</strong>, so a case that seems slow to update after the partner acts is the schedule at work, not a fault. Second, the endpoint flow never branches on the event-type string: it validates the secret, reads the token from either payload shape, and fetches the case, which makes it immune to the <a href="../api/index.html#webhooks">bare-versus-prefixed no-op trap</a> that catches consumers that match type strings.</p>
-    <div class="note">Verified against the solution source at release v2.13.0.1: the registration flow calls the v2 child flow; a v1 registration flow still ships in the solution with nothing calling it, and the cleanup flow deletes subscriptions on both versions.</div>
+    <p>Since v2.14.0.0 the solution keeps the id of the subscription it registered. Registering again deletes that subscription first and replaces it, rather than adding a duplicate, and <strong>Delete webhooks</strong> now removes only that one subscription instead of every subscription on the account. The register call also sets <code>payloadVersion</code> to <code>V2</code>.</p>
+    <h3>Webhook Authorization</h3>
+    <p><strong>Register webhook</strong> now opens a pop-up asking how TSANet should authenticate its deliveries. <em>None</em> registers the endpoint without callback authentication, as before. <em>OAuth2</em> takes your own Entra tenant id, client id and secret; per Install Guide 2.4, TSANet stores your service principal credentials to authenticate deliveries — they are not kept in Dataverse. On the platform side, OAuth2 client-credentials callback authentication is live on Beta and not yet on Production.</p>
+    <div class="note"><strong>Two sources disagree — needs probe.</strong> Install Guide 2.4 says to leave the <em>HTTP Webhook Endpoint</em> trigger's authorization type as none, and also says that, after choosing OAuth2, you set it to <em>User</em> with your service principal's Object ID on each environment. The trigger as shipped in v2.14.0.0 is already set to <em>User</em>, with one fixed allowed user. Which configuration a member must end up with — and whether a None registration is refused by Power Automate before the flow runs — has not been probed on this hub.</div>
+    <div class="note">Verified against the solution source at release v2.14.0.0: the registration flow calls the v2 child flow and sends <code>payloadVersion: V2</code>; the endpoint hands off to a processor flow that still validates the signature, reads the token from either payload shape and fetches the case. A v1 registration flow still ships with nothing calling it, and the delete-all cleanup flows for both versions still ship but are no longer called from the configuration app.</div>
     <div class="twrap">
       <table>
         <thead><tr><th>Path</th><th>Latency</th><th>Setup</th></tr></thead>
@@ -380,7 +384,8 @@
         <h3>Import the Solution</h3>
         <ul class="tight">
           <li>Request credentials and environment URLs from <code>membership@tsanet.org</code></li>
-          <li>Install from Microsoft AppSource, or download the managed solution from the GitHub releases page</li>
+          <li>Install from Microsoft AppSource, or download the managed solution from the <a href="https://github.com/tsanetgit/MS_Power_App/releases">GitHub releases page</a></li>
+          <li><strong>Upgrading to v2.14.0.0:</strong> install 2.13.0.14 first — the <code>PLUGINFIX</code> asset on the v2.14.0.0 release. From 2.14 the plugins are signed by TSANet, and the release notes require that step before the new version</li>
           <li>At <code>make.powerapps.com</code>, select the target environment and run Import Solution</li>
           <li>Create the connections when prompted — the import validates every connection reference before it completes</li>
           <li>Supply the TSANet credentials and endpoint during import</li>
@@ -393,7 +398,7 @@
           <li>Assign the <strong>TSANET User</strong> security role at <code>admin.powerplatform.microsoft.com</code></li>
           <li>Set the three environment variables to match the automation you want</li>
           <li>Create Case Mapping records for the three mapping types</li>
-          <li>Optionally click <strong>Register webhook</strong> for near-real-time delivery</li>
+          <li>Optionally click <strong>Register webhook</strong> for near-real-time delivery, choosing None or OAuth2 authorization (see <a href="#sync">Sync &amp; webhooks</a>)</li>
           <li>Add the TSANet Case subgrid to the Case form, and to any custom table you want collaborations against</li>
         </ul>
       </div>

@@ -93,7 +93,7 @@
       <div class="tool">
         <span class="chip live">Public</span>
         <h3>The API Reference in GitBook</h3>
-        <p>Request and response schemas, parameters and status codes for all 27 paths, generated from the specification. One known drift from the spec is flagged on the <a href="../api/index.html#ref-drift">API page</a>. The behaviours the reference does not tell you about — the default HTTP 500 error mode, the two note fields, the webhook version trap — are what <a href="../api/index.html">Working with the API</a> is for.</p>
+        <p>Request and response schemas, parameters and status codes for all 27 paths, generated from the specification. It now runs ahead of Production in places — it documents some Beta-only webhook options, and a secret-rotation call that Beta answers with 501 — and the <a href="../api/index.html#ref-drift">API page</a> flags where. The behaviours the reference does not tell you about — the default HTTP 500 error mode, the two note fields, the webhook version trap — are what <a href="../api/index.html">Working with the API</a> is for.</p>
         <p class="get"><b>Get it</b> in GitBook, alongside the <a href="https://tsanet.gitbook.io/connect/api-reference/integration-guide">integration guide</a> and the <a href="https://tsanet.gitbook.io/connect/api-reference/models">models</a>.</p>
         <a class="foot" href="https://tsanet.gitbook.io/connect/api-reference">API Reference →</a>
       </div>
@@ -116,7 +116,7 @@
       <div class="tool">
         <span class="chip live">Public</span>
         <h3>connect-library</h3>
-        <p>The Java client, generated from the specification and wrapped in nine typed facades. Published to GitHub Packages as a public package; only the current release, v2.0.0, is published and supported. A token with <code>read:packages</code> is still required to resolve it, even for public artifacts.</p>
+        <p>The Java client, generated from the specification and wrapped in ten typed facades. Published to GitHub Packages as a public package; only the current release, v3.0.0, is supported. 3.0.0 is a breaking major — read its upgrade note before moving from 2.0.0. A token with <code>read:packages</code> is still required to resolve it, even for public artifacts.</p>
         <p class="get"><b>Get it</b> as a Maven dependency from GitHub Packages; the coordinates and the token requirement are on the SDK page.</p>
         <a class="foot" href="../connectors/connect-sdk.html#getting">Connect SDK → Getting it →</a>
       </div>
@@ -146,13 +146,13 @@
         <span class="chip">Access at onboarding</span>
         <h3>The Gateway Conformance Harness</h3>
         <p>For anyone writing an adapter on the <a href="../connectors/connect-gateway.html">Connect Gateway</a>: it drives your real adapter through Connect's failure modes — timeouts, ambiguous submits, duplicate inbound deliveries — and certifies the seam between your code and the engine. Run it continuously from day one, not once at the end.</p>
-        <p class="get"><b>Get it</b> the <code>conformance</code> module publishes with the gateway at v2.0.0 from the repository's package registry; the repository is private and access comes with adapter onboarding. Details under Building an adapter.</p>
+        <p class="get"><b>Get it</b> the <code>conformance</code> module publishes with the gateway at v3.0.0 from the repository's package registry; the repository is private and access comes with adapter onboarding. Details under Building an adapter.</p>
         <a class="foot" href="../connectors/connect-gateway.html#build">Building an adapter →</a>
       </div>
       <div class="tool pending">
         <span class="chip beta">Not yet public</span>
         <h3>The Connector Test Harness</h3>
-        <p>TSANet's own local harness for testing connectors end to end against the Connect API: contract tests, connector unit suites, and end-to-end drivers for the shipped CRM connectors. It is internal today. Whether members should see it, and in what form, has not been decided.</p>
+        <p>TSANet's own local harness for testing connectors end to end against the Connect API: contract, webhook (v1 and v2 CloudEvents) and SDK-conformance suites, connector unit suites, and end-to-end drivers for the shipped CRM connectors. It is internal today. Whether members should see it, and in what form, has not been decided.</p>
         <p class="get"><b>Until then</b> the Beta environment with test-flagged submissions is the member-facing test bed, and the connector issue trackers are where a failing case goes.</p>
         <a class="foot" href="../community/index.html#trackers">Connector issue trackers →</a>
       </div>

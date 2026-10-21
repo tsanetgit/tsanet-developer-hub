@@ -47,7 +47,7 @@
       <span><b>Status</b> GA</span>
       <span><b>Surface</b> Ticket sidebar + nav bar</span>
       <span><b>Repo</b> tsanetgit/Zendesk_App</span>
-      <span><b>Updated</b> 2026-09-13</span>
+      <span><b>Updated</b> 2026-10-20</span>
     </div>
     <div class="toc">
       <a href="#class">Connector class</a>
@@ -421,12 +421,13 @@ Accept: application/json, application/problem+json</code></pre>
               <tr><td>TSANet Token</td><td>Text — primary key</td></tr>
               <tr><td>TSANet Tokens Multi</td><td>Text — optional</td></tr>
               <tr><td>TSANet Status</td><td>Dropdown (tagger)</td></tr>
-              <tr><td>TSANet Partner</td><td>Text</td></tr>
-              <tr><td>TSANet Respond By</td><td>Date</td></tr>
+              <tr><td>TSANet Partner</td><td>Text — the partner company: submitter on inbound, receiver on outbound</td></tr>
+              <tr><td>TSANet Respond By</td><td>Date — the acknowledgment deadline, cleared once the case is acknowledged</td></tr>
             </tbody>
           </table>
         </div>
         <p style="font-size:13.5px"><strong>Do not copy field IDs out of Admin Center URLs.</strong> Create the fields, then open the app from the left nav bar and use <strong>Detect field IDs</strong> → <strong>Apply</strong>. It matches by title, shows the mapping before writing, and writes the IDs into its own settings. It refuses to guess when two fields share a title or a title match has the wrong type — fix the field and re-run.</p>
+        <p style="font-size:13.5px"><strong>Upgrading to v1.0.71 takes two steps.</strong> Before it, the ZIS bundle and the sidebar each wrote Partner and Respond By by their own rules and overwrote each other on every partner reply. The bundle's update path now applies the sidebar's rules and writes a field only when its value changes. Update the app <em>and</em> redeploy the ZIS bundle; the fix is in the bundle (<a href="https://github.com/tsanetgit/Zendesk_App/releases/tag/v1.0.71">release notes</a>).</p>
       </div>
       <div>
         <h3>Order of Operations</h3>
@@ -465,7 +466,7 @@ POST <span class="good-v">/v1/webhooks</span>
 { "callbackUrl": "&lt;ingest URL&gt;",
   "callbackAuth": { "type": "BASIC", "username": "...", "password": "..." } }</code></pre>
     <p>Omit <code>eventTypes</code> and the subscription covers what the bundle expects — <code>collaboration-request.created</code> and <code>note.created</code>. Those are the only two event types v1 delivers — the specification's own v1 tag says so — so omitting <code>eventTypes</code> cannot subscribe the bundle to more; the three v2-only types never reach a v1 subscription. Save the response <code>id</code> for later management and the <code>secret</code> (the HMAC key, returned only at creation).</p>
-      <p><code>callbackAuth</code> arrived in Connect API v3.1.0 and was validated on Beta. Since app v1.0.69 the inbound case's own <code>customFields</code> are surfaced too, appended to the created ticket as a "Partner form fields" block; they arrive unordered, so the bundle sorts them by <code>displayOrder</code>.</p>
+      <p><code>callbackAuth</code> is listed under Connect API v3.2.1 in the public changelog and was validated on Beta. Since app v1.0.69 the inbound case's own <code>customFields</code> are surfaced too, appended to the created ticket as a "Partner form fields" block; they arrive unordered, so the bundle sorts them by <code>displayOrder</code>.</p>
     <div class="note"><strong><code>/v2/webhooks</code> silently breaks the bundle.</strong> Both endpoints accept a subscription, so this fails invisibly. <code>/v2</code> delivers CloudEvents with prefixed type strings (<code>org.tsanet.connect.collaboration-request.created</code>), while the bundle's guard matches the bare <code>collaboration-request.created</code> and falls through to a no-op. Every delivery returns 200 and creates nothing, with no error anywhere. Use <code>/v1</code> until the CloudEvents migration ships.</div>
   </div>
 </section>
@@ -525,6 +526,7 @@ PUT  /api/v2/tickets/{id}.json
         </tbody>
       </table>
     </div>
+    <p>Releases now carry a <em>Security review status</em> line. The release gate marks a build "not covered" once a TSANet deprecation is within 90 days, so until the v2 webhook migration (<a href="https://github.com/tsanetgit/Zendesk_App/issues/101">Zendesk_App#101</a>) ships, expect that flag on every release; it reflects the <code>/v1/webhooks</code> sunset above, not a new finding.</p>
     <ul class="tight">
       <li><strong>The <code>zendesk</code> connection is now OAuth, not basic auth.</strong> It runs a client-credentials grant against the member's own instance, with <code>token_url</code> pointed at <code>https://{subdomain}.zendesk.com/oauth/tokens</code>. Tokens from clients created on or after 2026-04-30 expire in 30 minutes, so a static bearer connection is not viable — only the auto-renewing OAuth type works.</li>
       <li><strong>The backing client must be <code>kind: "confidential"</code> at creation.</strong> The grant rejects public clients with <code>unauthorized_client</code>, and changing <code>kind</code> afterwards regenerates the secret while only ever displaying it truncated.</li>

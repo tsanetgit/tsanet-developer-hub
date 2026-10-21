@@ -40,10 +40,10 @@
     <h1>Case Attachments and the Direct-Push Model</h1>
     <p class="abstract">File transfer on TSANet Connect is a direct push between members: the platform brokers the exchange but never stores the file. That single design choice determines everything an integrator has to build, and it is the reason attachments require setup on both sides before they work at all. This document specifies the model, the responsibilities it leaves to the connector, and what to expect while enablement is still rolling out.</p>
     <div class="meta-table">
-      <div class="meta-cell"><b>Date</b><span>2026-09-13</span></div>
-      <div class="meta-cell"><b>Version</b><span>0.3</span></div>
+      <div class="meta-cell"><b>Date</b><span>2026-10-20</span></div>
+      <div class="meta-cell"><b>Version</b><span>0.4</span></div>
       <div class="meta-cell"><b>Audience</b><span>Member integrators</span></div>
-      <div class="meta-cell"><b>Verified against</b><span>Connect API OpenAPI spec — the published attachment surface</span></div>
+      <div class="meta-cell"><b>Verified against</b><span>Connect API OpenAPI spec as served by Production and Beta, 2026-10-20; forward-call behaviour source-read</span></div>
     </div>
   </div>
 </header>
@@ -81,7 +81,11 @@
     </div>
 
     <h2><span class="sec-no">3</span>Delivery Reaches Both Parties</h2>
-    <p>A forward is not one delivery, it is two. The result object reports a <code>receiverStatus</code> <em>and</em> a <code>submitterStatus</code>, along with <code>completeSuccess</code> when both landed and <code>partialSuccess</code> when exactly one did. The sending member gets a copy of what they sent, delivered to their own registered endpoint.</p>
+    <p>A forward is not one delivery, it is two. The result object reports a <code>receiverStatus</code> <em>and</em> a <code>submitterStatus</code>, along with <code>completeSuccess</code> when both landed and <code>partialSuccess</code> when exactly one did. The sending member gets a copy of what they sent, delivered to their own registered endpoint. Each destination gets one delivery attempt with no automatic retry (source-read).</p>
+    <div class="callout warn">
+      <b>Constraint</b>
+      The forward call answers <strong>HTTP 200 whatever the outcome</strong>, including when neither side received the file. The result body is the only place the outcome lives. Branch on <code>completeSuccess</code>, <code>partialSuccess</code> and the per-side statuses, never on the status code. Source-read on both environments.
+    </div>
     <div class="callout warn">
       <b>Constraint</b>
       If you send files but have never registered a receive configuration of your own, every forward you make will report <code>submitterStatus: CONFIG_MISSING</code>. Nothing is broken — but you are keeping no copy of what you sent. Registering a receive endpoint is worth doing even for an integration that only ever sends.
@@ -98,7 +102,7 @@
       <tr><td><code>CONTENT_ERROR</code></td><td>The file itself could not be processed</td></tr>
       <tr><td><code>UNKNOWN</code></td><td>Outcome could not be determined</td></tr>
     </table>
-    <p>Treat <code>partialSuccess</code> as a first-class outcome in your UI rather than folding it into success or failure. An engineer who sees "sent" when only one side received the file will find out later, in the worst way.</p>
+    <p>Treat <code>partialSuccess</code> as a first-class outcome in your UI rather than folding it into success or failure. An engineer who sees "sent" when only one side received the file will find out later, in the worst way. Because the status code is always 200, this is also the only way a total failure becomes visible.</p>
 
     <div class="figure">
       <svg viewBox="0 0 640 200" width="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A forward from the sending connector reaches the Connect API, which delivers the file to both the receiver's and the submitter's registered endpoints; the platform stores nothing and creates no case note.">
@@ -139,9 +143,9 @@
     <h3>4.2 No Attachment History Is Kept</h3>
     <p>There is no endpoint that lists the files previously forwarded on a case, because there is nothing server-side holding them. Any "attachments on this case" view is something your integration maintains from its own record of what it sent and received.</p>
 
-    <div class="callout warn">
-      <b>Documentation drift</b>
-      The published API reference currently shows <code>description</code> as a <em>query</em> parameter on the forward call. In the canonical specification it is part of the multipart form and is required, with a maximum length of 500. Where the reference and the specification disagree, the specification is authoritative — this is worth checking against a live call before you build around either.
+    <div class="callout">
+      <b>Documentation drift — resolved</b>
+      Earlier revisions flagged the published API reference for showing <code>description</code> as a <em>query</em> parameter on the forward call. The reference now matches the specification: <code>description</code> is part of the multipart form, required, with a maximum length of 500.
     </div>
 
     <h2><span class="sec-no">5</span>Current State and Planning Guidance</h2>
@@ -154,9 +158,18 @@
       <li><strong>Surface <code>partialSuccess</code> honestly.</strong> It will be the common case early on, while one side of a given pairing is enabled and the other is not.</li>
     </ul>
 
+    <h3>5.1 In Development: Direct-to-Storage Delivery (Alpha, Beta Only)</h3>
+    <p>Beta serves a second model, Attachment V2, with every operation marked <code>x-stability-level: alpha</code>. None of it is on Production. Instead of relaying the bytes, the platform issues the sender a short-lived grant to upload straight into the receiver's own storage (S3 or Azure Blob) and confirms completion. The file still never comes to rest at TSANet, so the model in section 1 holds. Two things change on Beta that are worth knowing now:</p>
+    <ul>
+      <li>A receiver that has registered V2 storage can refuse the v1 forward with <strong>409</strong> <code>attachment-direct-path-required</code>. A sender testing on Beta should expect it.</li>
+      <li>The grants on a case can be listed. That is the first server-side record of attachment activity, though it is not a store of the files.</li>
+    </ul>
+    <p>Section 4.1 is unaffected: a completed V2 grant does not post a case note or emit a webhook today, so your connector still writes the note. Do not build production flows on V2 until it leaves alpha. The Java client's V2 support is described on <a href="../connectors/connect-sdk.html#direct">Connect SDK</a>.</p>
+
     <h2><span class="sec-no">6</span>Revision History</h2>
     <table class="doc">
       <tr><th>Version</th><th>Date</th><th>Change</th></tr>
+      <tr><td>0.4</td><td>2026-10-20</td><td>Add the always-200 constraint on the forward call (section 3) and the source-read single-attempt delivery; mark the reference drift resolved; add section 5.1 on the alpha, Beta-only direct-to-storage model; Verified-against names both environments.</td></tr>
       <tr><td>0.3</td><td>2026-09-13</td><td>Add the <em>Verified against</em> cell in place of a second status cell; state that token-scoped configuration is the per-case override over the per-member registration; cross-reference TSANET-2026-001.</td></tr>
       <tr><td>0.2</td><td>2026-08-25</td><td>Cross-link the companion topic page (Moving files between members), which carries the design guidance around this specification.</td></tr>
       <tr><td>0.1</td><td>2026-08-15</td><td>Initial draft covering the published attachment surface and the connector-side responsibilities it implies.</td></tr>

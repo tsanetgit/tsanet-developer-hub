@@ -173,8 +173,8 @@
       <a class="sec-link" href="build/index.html">Start here →</a>
     </div>
     <div class="grid g2">
-      <a class="card" href="connectors/connect-gateway.html"><span class="chip beta">Work in progress · v2.0.0</span><h3>Build on the Connect Gateway</h3><p>TSANet supplies the engine, the contract and a conformance harness; you write only the half that talks to your platform. The route when the platform will not run your code in the member's tenant.</p><span class="card-foot">Design &amp; adapter guide →</span></a>
-      <a class="card" href="connectors/connect-sdk.html"><span class="chip live">v2.0.0 · Java</span><h3>Use the SDK</h3><p>A Java client with typed facades, validation and both auth modes, as a public package. The shortest JVM path that is not hand-rolled HTTP.</p><span class="card-foot">Library reference →</span></a>
+      <a class="card" href="connectors/connect-gateway.html"><span class="chip beta">Work in progress · v3.0.0</span><h3>Build on the Connect Gateway</h3><p>TSANet supplies the engine, the contract and a conformance harness; you write only the half that talks to your platform. The route when the platform will not run your code in the member's tenant.</p><span class="card-foot">Design &amp; adapter guide →</span></a>
+      <a class="card" href="connectors/connect-sdk.html"><span class="chip live">v3.0.0 · Java</span><h3>Use the SDK</h3><p>A Java client with typed facades, validation and both auth modes, as a public package. The shortest JVM path that is not hand-rolled HTTP.</p><span class="card-foot">Library reference →</span></a>
       <a class="card" href="api/index.html"><span class="chip">Pattern</span><h3>Build Against the API</h3><p>Your platform's events in, Connect API calls out, <code>updatedAfter</code> polling back. For any stack; read the behaviour guide before you design.</p><span class="card-foot">Working with the API →</span></a>
       <a class="card" href="community/index.html"><span class="chip">Wish list</span><h3>Tell Us the Platform</h3><p>Which platform your team runs on decides which connector gets built next. If yours is common, waiting may be the right route.</p><span class="card-foot">Community →</span></a>
     </div>
@@ -192,7 +192,7 @@
       <a class="sec-link" href="api/index.html">Working with the API →</a>
     </div>
     <div class="grid g3">
-      <a class="card" href="api/index.html#reference"><span class="chip">Reference</span><h3>The Endpoint Reference</h3><p>Schemas, parameters and status codes for all 27 paths live in the GitBook reference, generated from the spec. Not duplicated here — but one known drift from the spec is flagged.</p></a>
+      <a class="card" href="api/index.html#reference"><span class="chip">Reference</span><h3>The Endpoint Reference</h3><p>Schemas, parameters and status codes for all 27 Production paths live in the GitBook reference, generated from the spec. Not duplicated here — where GitBook and the spec disagree, the hub says so.</p></a>
       <a class="card" href="api/index.html#errors"><span class="chip">Errors</span><h3>Two Response Modes</h3><p>By default most rejections return HTTP 500 — indistinguishable from an outage. One <code>Accept</code> header gets you documented status codes and RFC 7807 bodies.</p></a>
       <a class="card" href="api/index.html#auth"><span class="chip">Auth</span><h3>Login &amp; Identity</h3><p>OAuth 2.0 client credentials is the current server-to-server path; <code>POST /v1/login</code> is legacy. Watch the scope format — the obvious one fails.</p></a>
       <a class="card" href="api/index.html#partners"><span class="chip">Partners</span><h3>Discovery &amp; Forms</h3><p>Fetch the process form fresh every time, and parse its SELECT options on newlines rather than commas.</p></a>
@@ -244,15 +244,15 @@
         <span class="card-foot">Architecture &amp; platform notes →</span>
       </a>
       <a class="card" href="connectors/connect-gateway.html">
-        <span class="chip beta">Work in progress · v2.0.0</span>
+        <span class="chip beta">Work in progress · v3.0.0</span>
         <h3>Connect Gateway</h3>
         <p>One shared TSANet-facing engine, thin per-platform adapters: the machinery behind Fin / Intercom, and the contract a member or vendor builds their own adapter against. The least effort when your platform has no connector.</p>
         <span class="card-foot">Design &amp; adapter guide →</span>
       </a>
       <a class="card" href="connectors/connect-sdk.html">
-        <span class="chip live">v2.0.0 · Java</span>
+        <span class="chip live">v3.0.0 · Java</span>
         <h3>TSANet Connect SDK</h3>
-        <p>A Java client generated from the Connect API spec, wrapped in nine typed facades — plus a console app, attachment receiver and web demo. Python and TypeScript not started.</p>
+        <p>A Java client generated from the Connect API spec, wrapped in ten typed facades — plus a console app, attachment receiver and web demo. Python and TypeScript not started.</p>
         <span class="card-foot">Library reference →</span>
       </a>
       <a class="card" href="api/index.html">
@@ -341,6 +341,7 @@
         <span class="sys muted">Live <span>· normalized HTTPS push</span></span>
         <span class="sys muted">Sending <span>· connector, SDK, or REST</span></span>
         <span class="sys muted">Pattern <span>· endpoint fronting object storage</span></span>
+        <span class="sys muted">Alpha on Beta <span>· direct-to-storage delivery</span></span>
       </div>
     </div>
     <div class="topic-band" style="border-left:3px solid var(--orange)">

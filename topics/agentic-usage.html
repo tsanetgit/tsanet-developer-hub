@@ -67,7 +67,7 @@
       <span><b>Shipped</b> Four agent skills · the hub assistant launcher</span>
       <span><b>Assessed</b> Copilot Studio</span>
       <span><b>Providers</b> Anthropic · Microsoft · OpenAI · Google</span>
-      <span><b>Updated</b> 2026-09-13</span>
+      <span><b>Updated</b> 2026-10-20</span>
     </div>
     <div class="toc">
       <a href="#status">Where this stands</a>
@@ -146,7 +146,7 @@ cp -R Connect_SDK/skills/connect-sdk-deploy  your-project/.claude/skills/</code>
     <h3 class="sub">Building the Agent</h3>
     <ol class="steps">
       <li><b>Admin switches first.</b> Claude appears in the model picker only after the <a href="#copilot-admin">three switches</a> below are on: Anthropic enabled as a subprocessor in the Microsoft 365 admin center (with the maker in the allowed users or groups), external models on for the environment in the Power Platform admin center, and data movement across regions if the tenant is outside the United States. Skip Claude, and the default GPT-4.1 needs none of them. <span class="tag doc">documented</span></li>
-      <li><b>Create the agent on the standard harness</b> and pick the model in the <strong>Model</strong> section of its Overview page. Claude Sonnet 4.6 is the general-category Claude that is GA there; Sonnet 5 needs the GitHub Copilot harness, which does not offer the custom-website embed this site uses. <span class="tag doc">documented</span></li>
+      <li><b>Create the agent on the standard harness</b> and pick the model in the <strong>Model</strong> section of its Overview page. Claude Sonnet 4.6 is the general-category Claude that is GA there. Sonnet 5, Opus 5 and the Fable models need the GitHub Copilot harness, which now lists a Web app channel that embeds the agent in an iframe — but its pages do not say whether the "No authentication" mode this recipe depends on is available there, so the recipe stays on the standard harness. <span class="tag doc">documented</span> <span class="tag probe">needs probe</span></li>
       <li><b>Instructions.</b> Something close to this, adjusted as testing shows:
 <pre><code>You help software developers integrate with TSANet Connect. Answer only from
 your knowledge sources: the TSANet Developer Hub, the Connect API reference on
@@ -209,7 +209,7 @@ repeat the contradiction rather than resolving it.</code></pre></li>
   <div class="wrap">
     <p class="eyebrow">Platform assessment</p>
     <h2>Microsoft Copilot Studio, with Claude</h2>
-    <p>One hosted way to build an agent over Connect, assessed in detail because it is the platform behind the <a href="#assistant">hub assistant</a> and the one a Dynamics member already has an environment for. Everything here is <strong>documented, not observed</strong>: read on Microsoft Learn (dates in the <a href="#sources">sources</a>) and in the source of the shipped Dynamics solution. No Copilot Studio agent has been built against Connect. Assessed 2026-09-13.</p>
+    <p>One hosted way to build an agent over Connect, assessed in detail because it is the platform behind the <a href="#assistant">hub assistant</a> and the one a Dynamics member already has an environment for. Everything here is <strong>documented, not observed</strong>: read on Microsoft Learn (dates in the <a href="#sources">sources</a>) and in the source of the shipped Dynamics solution. No Copilot Studio agent has been built against Connect. Assessed 2026-09-13; the model, harness and channel tables re-read 2026-10-20.</p>
 
     <h3 class="sub" id="copilot-model">Which Claude It Offers, and Where It Runs</h3>
     <p>A maker picks the agent's primary model from a dropdown on the agent's <strong>Overview</strong> page, and picks again, separately, for each prompt tool. Since 7 January 2026 Anthropic operates as a <strong>Microsoft subprocessor</strong> for these models, so Microsoft's Product Terms and Data Protection Addendum apply rather than Anthropic's commercial terms — except for models Microsoft labels "with Data Retention", which stay off by default and need a separate opt-in. <span class="tag doc">documented</span></p>
@@ -218,16 +218,19 @@ repeat the contradiction rather than resolving it.</code></pre></li>
         <caption>Claude models a maker can pick, from the availability tables on Microsoft Learn. "Cross-geo" means the request may be processed outside the tenant's region; only United States tenants avoid it.</caption>
         <thead><tr><th>Model</th><th>Where it can be picked</th><th>Status</th><th>Notes</th></tr></thead>
         <tbody>
-          <tr><td>Claude Sonnet 4.6</td><td>Agent primary model · prompt tools</td><td><span class="pill ok">GA</span></td><td>General-category. Cross-geo everywhere except the United States. Standard rate in prompt tools, 200K-token context per call. <strong>The model this page assumes.</strong></td></tr>
-          <tr><td>Claude Sonnet 5</td><td>Agent primary model</td><td><span class="pill ok">GA</span></td><td>Only for agents on the GitHub Copilot harness. Not offered in Australia or Saudi Arabia; in the United States, GA only in early-access environments.</td></tr>
-          <tr><td>Claude Opus 4.6 · 4.7</td><td>Agent primary model · prompt tools (4.6)</td><td><span class="pill ok">GA</span></td><td>Deep-category: highest latency and cost. Premium rate in prompt tools.</td></tr>
+          <tr><td>Claude Sonnet 4.6</td><td>Agent primary model, both harnesses · prompt tools</td><td><span class="pill ok">GA</span></td><td>General-category. Cross-geo everywhere except the United States. Standard rate in prompt tools, 200K-token context per call. <strong>The model this page assumes.</strong></td></tr>
+          <tr><td>Claude Sonnet 5</td><td>Agent primary model, GitHub Copilot harness</td><td><span class="pill ok">GA</span></td><td>Only for agents on the GitHub Copilot harness. Not offered in Australia or Saudi Arabia; in the United States, GA only in early-access environments.</td></tr>
+          <tr><td>Claude Opus 4.6 · 4.7</td><td>Agent primary model, standard harness · prompt tools (4.6)</td><td><span class="pill ok">GA</span></td><td>Deep-category: highest latency and cost. Premium rate in prompt tools.</td></tr>
+          <tr><td>Claude Opus 4.8</td><td>Agent primary model, both harnesses</td><td><span class="pill ok">GA</span></td><td>Deep-category. Cross-geo everywhere except the United States.</td></tr>
+          <tr><td>Claude Opus 5</td><td>Agent primary model, GitHub Copilot harness</td><td><span class="pill ok">GA</span></td><td>Deep-category. GA in every region, the United States included, with no early-access condition.</td></tr>
+          <tr><td>Claude Fable 5 · 5.1</td><td>Agent primary model, GitHub Copilot harness</td><td><span class="pill ok">GA</span></td><td>Deep-category. The same footprint as Sonnet 5: not offered in Australia or Saudi Arabia; in the United States, GA only in early-access environments.</td></tr>
           <tr><td>Claude Sonnet 4.5</td><td>—</td><td><span class="pill bad">Retired</span></td><td>GA in March 2026; retired in every region by the September 2026 table.</td></tr>
-          <tr><td>Claude Haiku (any version)</td><td>—</td><td><span class="pill bad">Not offered</span></td><td>Absent from the agent-model table, the prompt-tool table and every release note. See below.</td></tr>
+          <tr><td>Claude Haiku (any version)</td><td>—</td><td><span class="pill bad">Not offered</span></td><td>Absent from both harnesses' agent-model tables, the prompt-tool table and every release note. See below.</td></tr>
         </tbody>
       </table>
     </div>
     <ul class="tight">
-      <li><strong>Two Learn pages disagree about Claude's status in prompt tools.</strong> The March 2026 release notes say Claude Sonnet and Opus are "generally available globally (excluding GCC)". The prompt-builder settings page, updated in August 2026, says "Anthropic Claude models are at the experimental stage, even though they don't display a tag" — and experimental models are subject to preview terms and not recommended for production. A member deciding whether an agent is production-grade should ask Microsoft which is current. <span class="tag doc">documented</span></li>
+      <li><strong>Two Learn pages disagree about Claude's status in prompt tools.</strong> The March 2026 release notes say Claude Sonnet and Opus are "generally available globally (excluding GCC)". The prompt-builder settings page, last updated in September 2026, says "Anthropic Claude models are at the experimental stage, even though they don't display a tag" — and experimental models are subject to preview terms and not recommended for production. A member deciding whether an agent is production-grade should ask Microsoft which is current. <span class="tag doc">documented</span></li>
       <li><strong>The same two pages disagree about hosting.</strong> The subprocessor page says Microsoft's terms and DPA govern Anthropic models; the prompt-builder page still says "Anthropic models are hosted outside Microsoft and are subject to Anthropic terms and data handling". The subprocessor page is dated later and is the admin-facing one; the hub reports both. <span class="tag doc">documented</span></li>
       <li><strong>Content moderation is Microsoft's slider, and it is unavailable for Claude.</strong> The per-prompt moderation level applies only to Microsoft-managed models. Temperature still applies. <span class="tag doc">documented</span></li>
       <li><strong>Revoking Anthropic after agents are built does not stop them cleanly.</strong> Agents switch to "another suitable internal model" if one exists and error out if not, until a maker changes the model by hand. <span class="tag doc">documented</span></li>
@@ -331,21 +334,21 @@ repeat the contradiction rather than resolving it.</code></pre></li>
     </div>
 
     <h3 class="sub" id="copilot-harness">The Harness Decides the Model and the Tools Together</h3>
-    <p>Copilot Studio runs agents on one of two harnesses, and since June 2026 the choice is real. The Claude model and the Connect tooling are not chosen independently: each harness admits a different Claude and a different set of tool types. <span class="tag doc">documented</span></p>
+    <p>Copilot Studio now names three harnesses. The third, the Copilot chat harness, extends Microsoft Copilot Chat and publishes to internal teams only, so it is no route to a public assistant or a Connect agent; the choice that matters here is between the other two, and since June 2026 it is real. The Claude model and the Connect tooling are not chosen independently: each harness admits a different Claude and a different set of tool types. <span class="tag doc">documented</span></p>
     <div class="twrap">
       <table>
         <thead><tr><th>&nbsp;</th><th>Standard harness</th><th>GitHub Copilot harness</th></tr></thead>
         <tbody>
-          <tr><th scope="row">Claude available</th><td>Sonnet 4.6 · Opus 4.6 · Opus 4.7</td><td>Sonnet 5 (GA), plus the standard set</td></tr>
+          <tr><th scope="row">Claude available</th><td>Sonnet 4.6 · Opus 4.6 · Opus 4.7 · Opus 4.8</td><td>Sonnet 4.6 · Sonnet 5 · Opus 4.8 · Opus 5 · Fable 5 · Fable 5.1 — not Opus 4.6 or 4.7</td></tr>
           <tr><th scope="row">Status</th><td>GA; the rule-based runtime</td><td>"Production-ready preview" since June 2026</td></tr>
           <tr><th scope="row">Reaches Connect by</th><td>REST API tool (preview) · custom connector · flows · MCP wizard</td><td>MCP server or workflow as a tool (preview) · connected agents</td></tr>
-          <tr><th scope="row">Embeds in a website by</th><td>Custom website channel (iframe) or Web Chat with a token endpoint</td><td>Not documented for this harness</td></tr>
+          <tr><th scope="row">Embeds in a website by</th><td>Custom website channel (iframe) or Web Chat with a token endpoint</td><td>Web app channel (iframe) and a demo website; whether anonymous visitors can use it is not documented <span class="tag probe">needs probe</span></td></tr>
           <tr><th scope="row">Billing</th><td>Copilot Credits at the standard-harness rates; Sonnet 4.6 standard rate, Opus premium rate in prompts</td><td>Usage-based Copilot Credits, including build and test</td></tr>
         </tbody>
       </table>
     </div>
     <ul class="tight">
-      <li><strong>Sonnet 5 costs you the REST API tool and the iframe embed.</strong> Both are documented for the standard harness only. An agent that wants Sonnet 5 is on the newer harness, where the documented ways to reach an external API are an MCP server or a workflow. <span class="tag doc">documented</span></li>
+      <li><strong>The newest Claude models cost you the REST API tool, and perhaps the anonymous embed.</strong> Sonnet 5, Opus 5 and the Fable models are on the GitHub Copilot harness only. The REST API tool is documented for the standard harness only; the newer harness does list an iframe channel, but not the "No authentication" mode a public embed needs. An agent on that harness is one where the documented ways to reach an external API are an MCP server or a workflow. <span class="tag doc">documented</span></li>
       <li><strong>A conversational turn is many model calls.</strong> The standard harness does not enforce a token limit across the planner, retrieval and tool-summary calls one user message triggers; the 200K context applies per call. <span class="tag doc">documented</span></li>
       <li><strong>Every new agent gets a Microsoft Entra Agent ID</strong> from July 2026, and the environment-level opt-out is gone. It is not a Connect identity and does not replace the service principal TSANet provisions. <span class="tag doc">documented</span></li>
     </ul>
@@ -365,6 +368,7 @@ repeat the contradiction rather than resolving it.</code></pre></li>
           <tr><td>Can a standard-harness agent read the Dynamics solution's <code>ap_</code> tables and invoke its flows as tools, end to end</td><td>Route A — the cheapest pilot for a Dynamics member</td></tr>
           <tr><td>Does a custom connector with a Client Credentials grant actually send an app-only token when Copilot Studio calls it</td><td>Route B without a flow in between</td></tr>
           <tr><td>Do the OpenAI Agents SDK and Google ADK attach a Streamable HTTP MCP server the way Copilot Studio and the Claude API do</td><td>Whether one MCP server for Connect serves every provider</td></tr>
+          <tr><td>Does the GitHub Copilot harness's Web app channel serve visitors with no authentication, as the standard harness's custom-website channel does</td><td>Moving the hub assistant onto a newer Claude than Sonnet 4.6</td></tr>
           <tr><td>Which Learn page is right about Claude in Copilot Studio prompt tools — GA, or experimental under preview terms</td><td>Whether a member can call a Copilot Studio agent production-grade</td></tr>
           <tr><td>Whether an MCP server for Connect should be TSANet-hosted (gateway class) or member-hosted</td><td>Route C entirely, and who operates it</td></tr>
         </tbody>
@@ -389,13 +393,15 @@ repeat the contradiction rather than resolving it.</code></pre></li>
           <tr><td>2026-07-21 · upd. 2026-08-03</td><td><a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/knowledge-add-public-website">Add a public website as a knowledge source</a></td><td>Bing grounding; the two-level URL rule; the Bing-indexed requirement</td></tr>
           <tr><td>2026-05-04 · upd. 2026-08-03</td><td><a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/customize-default-canvas">Customize the look and feel of an agent</a></td><td>Where the token endpoint lives (Channels → Email)</td></tr>
           <tr><td>undated</td><td><a href="https://adoption.microsoft.com/files/copilot-studio/Deploying-Microsoft-Copilot-Studio-agents-externally.pdf">Deploying Copilot Studio agents externally</a> (Microsoft adoption guide)</td><td>The custom-website iframe shape and its no-authentication condition</td></tr>
-          <tr><td>2026-05-28 · upd. 2026-09-05</td><td><a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/authoring-select-agent-model">Select a primary AI model for your agent</a></td><td>The model availability table; cross-geo; fallback and retirement rules</td></tr>
+          <tr><td>2026-10-19 · upd. 2026-10-20</td><td><a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/authoring-select-agent-model">Select a primary AI model for your agent</a></td><td>The standard-harness model availability table, Opus 4.8 included; cross-geo; fallback and retirement rules</td></tr>
+          <tr><td>2026-10-02 · upd. 2026-10-12</td><td><a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/agents-experience/authoring-agent-model-availability">Model availability and controls (GitHub Copilot)</a></td><td>The GitHub Copilot harness model table: Sonnet 5, Opus 5, Fable 5 and 5.1, and no Opus 4.6 or 4.7</td></tr>
+          <tr><td>2026-06-23 · upd. 2026-10-16</td><td><a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/agents-experience/publication-channels-overview">Available channels for agents (GitHub Copilot)</a></td><td>The Web app iframe channel and the demo website on the newer harness</td></tr>
           <tr><td>2026-05-28 · upd. 2026-09-05</td><td><a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/authoring-select-external-response-model">Choose an external model as the primary AI model</a></td><td>Anthropic as subprocessor; behaviour when access is revoked; the two gates</td></tr>
-          <tr><td>2026-08-04 · upd. 2026-08-05</td><td><a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/prompt-model-settings">Change the model version and settings (prompt builder)</a></td><td>Claude in prompt tools, rates, the "experimental stage" note, the moderation slider</td></tr>
+          <tr><td>2026-08-04 · upd. 2026-09-17</td><td><a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/prompt-model-settings">Change the model version and settings (prompt builder)</a></td><td>Claude in prompt tools, rates, the "experimental stage" note, the moderation slider</td></tr>
           <tr><td>2026-07-14 · upd. 2026-08-03</td><td><a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/bring-your-own-model-prompts">Bring your own model for your prompts</a></td><td>The chat-completions requirement that rules out Haiku via Foundry</td></tr>
           <tr><td>2026-09-11</td><td><a href="https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/claude-models">Claude models in Microsoft Foundry</a></td><td>Haiku 4.5 GA in Foundry; the Messages API endpoint shape</td></tr>
-          <tr><td>2026-07-28 · upd. 2026-09-09</td><td><a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/harnesses-overview">Harnesses in Copilot Studio</a></td><td>Standard versus GitHub Copilot harness; billing split</td></tr>
-          <tr><td>2026-08-18 · upd. 2026-08-20</td><td><a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/whats-new">What's new in Copilot Studio</a></td><td>Release dates: Claude GA March 2026, Sonnet 5 June 2026, MCP-as-tool and Entra Agent ID July 2026</td></tr>
+          <tr><td>2026-10-19 · upd. 2026-10-20</td><td><a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/harnesses-overview">Harnesses in Copilot Studio</a></td><td>The three harnesses; publishing reach; billing split</td></tr>
+          <tr><td>2026-10-05 · upd. 2026-10-06</td><td><a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/whats-new">What's new in Copilot Studio</a></td><td>Release dates: Claude GA March 2026, Sonnet 5 June 2026, MCP-as-tool and Entra Agent ID July 2026, the GitHub Copilot harness model dropdown September 2026</td></tr>
           <tr><td>2026-04-17 · upd. 2026-08-19</td><td><a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/agent-extend-action-rest-api">Extend your agent with tools from a REST API (preview)</a></td><td>OpenAPI v2 JSON; the three auth shapes</td></tr>
           <tr><td>2026-05-28 · upd. 2026-08-19</td><td><a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/mcp-add-existing-server-to-agent">Connect your agent to an existing MCP server</a></td><td>Streamable-only transport; auth flavours; DLP applies through connectors</td></tr>
           <tr><td>2026-07-28 · upd. 2026-07-29</td><td><a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/agents-experience/tools-add-mcp-server">Add an MCP server as a tool (GitHub Copilot harness, preview)</a></td><td>MCP on the newer harness</td></tr>

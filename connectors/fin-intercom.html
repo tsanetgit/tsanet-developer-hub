@@ -52,8 +52,8 @@
       <span><b>Class</b> Gateway adapter</span>
       <span><b>Status</b> Early access</span>
       <span><b>Surface</b> Canvas Kit sidebar, Help Desk</span>
-      <span><b>Last verified</b> 2026-08-21</span>
-      <span><b>Updated</b> 2026-09-13</span>
+      <span><b>Last verified</b> 2026-10-20</span>
+      <span><b>Updated</b> 2026-10-20</span>
       <span><b>Repo</b> tsanetgit/Fin-Intercom_App (private during early access)</span>
     </div>
     <div class="toc">
@@ -178,7 +178,7 @@
   <div class="wrap">
     <p class="eyebrow">Topology</p>
     <h2>The System at a Glance</h2>
-    <p>One headless Spring Boot process sits between the two platforms. Everything TSANet-facing lives in an embedded <code>gateway-engine</code> shared across adapters — the <a href="connect-gateway.html">Connect Gateway</a>, which this connector was the proving ground for and now consumes as a published artifact; everything Intercom-facing goes through a REST gateway. The process border <em>is</em> the trust boundary: signature verification is default-deny, so a route matching no scheme is rejected 401, and a missing secret fails closed. <code>/healthz</code> is the only open route; the TSANet-internal admin plane under <code>/admin/*</code> is a fourth signed edge, under <code>CONNECTOR_ADMIN_API_SECRET</code>.</p>
+    <p>One headless Spring Boot process sits between the two platforms. Everything TSANet-facing lives in an embedded <code>gateway-engine</code> shared across adapters — the <a href="connect-gateway.html">Connect Gateway</a>, which this connector was the proving ground for and now consumes as a published artifact — <code>gateway-engine</code> 3.0.0 with <code>connect-library</code> 3.0.0 since 2026-10-20, the two pins moved together by the build; everything Intercom-facing goes through a REST gateway. The process border <em>is</em> the trust boundary: signature verification is default-deny, so a route matching no scheme is rejected 401, and a missing secret fails closed. <code>/healthz</code> is the only open route; the TSANet-internal admin plane under <code>/admin/*</code> is a fourth signed edge, under <code>CONNECTOR_ADMIN_API_SECRET</code>.</p>
     <figure>
       <div class="diagram">
         <svg viewBox="0 0 1160 700" style="min-width:1050px" role="img" aria-label="Topology: the Intercom platform and Intercom REST API on the left; the connector process in the centre containing the canvas flow, webhook intake, event queue and handlers, the reconciliation poller, the link table and the embedded gateway engine; the TSANet Connect API, webhook push and partner member on the right. Five numbered edges cross the process boundary.">
@@ -329,7 +329,7 @@
           <path class="ln" d="M568,524 H596 V218 H606" marker-end="url(#ahI)"/>
           <text class="tl" x="607" y="374" transform="rotate(-90 607 374)">listInboundUpdatedSince</text>
           <path class="ln" d="M456,496 V478 H700 V466" marker-end="url(#ahI)"/>
-          <text class="tl" x="474" y="474">handle() direct · bypasses the queue</text>
+          <text class="tl" x="474" y="476">handle() direct · bypasses the queue</text>
           <path class="ln" d="M568,560 H606" marker-end="url(#ahI)"/>
           <text class="tl" x="562" y="602" text-anchor="end">cursor →</text>
           <path class="ln" d="M1030,242 V280" marker-end="url(#ahI)"/>
@@ -633,7 +633,7 @@
     <div class="cols">
       <div>
         <h3>Connect API Environments</h3>
-          <p>Credentials arrive through TSANet staff until a member is on the self-service integration portal, which is in the September 2026 release.</p>
+          <p>Credentials arrive through TSANet staff until a member is on the self-service integration portal, which was announced for the September 2026 release; that has not been re-verified for this page.</p>
         <div class="twrap">
           <table>
             <thead><tr><th>Env</th><th>Host</th></tr></thead>
@@ -666,12 +666,13 @@
     <h2>Recent Changes, and What Is Tracked Next</h2>
     <div class="cols">
       <div>
-        <h3>Landed (August 2026)</h3>
+        <h3>Landed (August–October 2026)</h3>
         <ul class="tight">
           <li><strong>First full design-level security review</strong> against the connector security taxonomy (supply chain, credential lifecycle, authentication boundaries, data flow and retention, audit, untrusted-content rendering), with the authentication boundary live-probed. Findings are filed as <code>security</code>-labelled issues in the repository; several of the items below are its outcomes.</li>
           <li><strong>Hardened deployment profile:</strong> no webhook topics (verified functionally free), tickets-only mode, verified-minimum grants with a documented provision-then-revoke step — all in the deployment skill's <code>intercom-setup.md</code>.</li>
           <li><strong>SDK-cache retention sweep:</strong> age-based eviction of terminal-case content on a per-deployment window, default off (see the persistence table). The eviction itself now lives in <a href="connect-sdk.html"><code>connect-library</code></a> (since 0.2.0); the connector keeps only the schedule and the window, and its interim hand-rolled sweep is retired.</li>
           <li><strong>Backups gained history:</strong> hourly dated snapshots on a 48-hour window beside the 5-minute latest copy, with a delete-first restore procedure that survives a snapshot lacking a WAL file.</li>
+          <li><strong>Engine and library at 3.0.0</strong> (2026-10-20): the connector moved to <code>gateway-engine</code> 3.0.0 and <code>connect-library</code> 3.0.0. On first start the library adds four columns to the SDK cache's note table automatically; that migration was probed against an existing 2.0.0 cache. The connector's own release is still v0.1.0.</li>
           <li><strong>Build provenance:</strong> the deployable image is built in CI from a repository commit and pushed with a secretless, registry-scoped identity (no admin credential); images are addressed by digest. Dependency updates are automated; workflow actions are SHA-pinned.</li>
         </ul>
       </div>
@@ -679,7 +680,7 @@
         <h3>Tracked Next (Not Promises)</h3>
         <ul class="tight">
           <li><strong>Registry pull by managed identity</strong> and retirement of the registry admin credential — the live-touching half of the provenance work.</li>
-          <li><strong>Notes in both directions and status sync</strong> still wait on estate-wide decisions shared with the <a href="zendesk.html">Zendesk connector</a>: a note summary convention, severity mapping, and a platform direction field on notes.</li>
+          <li><strong>Notes in both directions and status sync</strong> still wait on estate-wide decisions shared with the <a href="zendesk.html">Zendesk connector</a>: a note summary convention, severity mapping, and a platform direction field on notes. That last one now exists on Beta, where notes carry a direction, the author's company and a note type; it has not reached Production.</li>
           <li><strong>Outbound closure policy</strong> — see Known gaps.</li>
         </ul>
         <p style="font-size:13.5px">Evidence standard: everything under "Landed" is merged and was probed; everything under "Tracked next" has an open issue and no merged code.</p>
@@ -703,7 +704,7 @@
         <li><strong>Inbound ambiguity is transient:</strong> an ambiguous response action tells the acting agent, but the recorded state has moved, so a later render shows a cleanly answered case. Outbound has UNRESOLVED for this; inbound has no equivalent yet.</li>
         <li><strong>Dedupe strategy beyond the CloudEvent id</strong> is a later decision; the reconciliation poller remains the source of truth in both directions.</li>
         <li><strong><code>PENDINGACTION</code></strong> is thinly documented in both contracts; what this adapter should do with it is an open question for TSANet.</li>
-        <li><strong>Attachments</strong> are not covered on this page. Whether this adapter implements the contract's <code>forwardAttachments</code> and <code>AttachmentDeliveryHandler</code> has not been verified; see <a href="../topics/file-sharing.html">moving files between members</a>.</li>
+        <li><strong>Attachments</strong> are not covered on this page. This adapter does not implement the contract's <code>forwardAttachments</code> or <code>AttachmentDeliveryHandler</code>: no code in the repository references either (checked at <code>417af2f</code>); see <a href="../topics/file-sharing.html">moving files between members</a>.</li>
         <li><strong>Orphaned claims</strong> hold the poller cursor loudly and indefinitely until a human releases them. Alert on consecutive held cycles, not on consecutive failures.</li>
       </ul>
     </div>

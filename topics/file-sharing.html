@@ -41,7 +41,7 @@
       <span><b>Topic</b> Case attachments</span>
       <span><b>Grounded in</b> The live normalized method + the API</span>
       <span><b>Audience</b> Members planning file exchange</span>
-      <span><b>Updated</b> 2026-09-13</span>
+      <span><b>Updated</b> 2026-10-20</span>
     </div>
     <div class="toc">
       <a href="#conduit">A conduit, not a drive</a>
@@ -96,7 +96,7 @@
         <thead><tr><th>Attaching a file does this</th><th>Which means</th></tr></thead>
         <tbody>
           <tr><td>Delivers into the receiver's registered store</td><td>The partner's engineers get the file in their own tooling. There is no portal step and no second login.</td></tr>
-          <tr><td>Reports the delivery outcome to the caller</td><td>The sender learns whether each destination succeeded. Nobody else is told automatically.</td></tr>
+          <tr><td>Reports the delivery outcome to the caller</td><td>The sender learns whether each destination succeeded, in the response <em>body</em>. The HTTP status is 200 whatever happened, so read <code>completeSuccess</code> and the per-side statuses. Nobody else is told automatically.</td></tr>
           <tr><td>Creates no case note by itself</td><td>Announcing the file on the case is the connector's job — see <a href="#edges">sharp edges</a>.</td></tr>
         </tbody>
       </table>
@@ -108,13 +108,14 @@
   <div class="wrap">
     <p class="eyebrow">The sending side</p>
     <h2>One Call, Three Ways to Make It</h2>
-    <p>Sending is a single API call on the collaboration case: attach one or more files (multipart, with a required <code>description</code> of up to 500 characters in the form body — the GitBook reference shows it as a query parameter; see <a href="../api/index.html#ref-drift">the API page</a>) to the case token you already hold. The platform resolves the receiving side's configuration and does the rest. The official reference is the <a href="https://tsanet.gitbook.io/connect/api-reference/case-attachments">case attachments documentation</a>.</p>
+    <p>Sending is a single API call on the collaboration case: attach one or more files (multipart, with a required <code>description</code> of up to 500 characters in the form body) to the case token you already hold. The platform resolves the receiving side's configuration and does the rest. The official reference is the <a href="https://tsanet.gitbook.io/connect/api-reference/case-attachments">case attachments documentation</a>.</p>
     <ul class="tight">
       <li><strong>Your connector does it.</strong> On platforms with a shipped <a href="../connectors/index.html">connector</a>, attachment support arrives as connector functionality — no member code involved.</li>
       <li><strong>The Connect SDK.</strong> The <a href="../connectors/connect-sdk.html">Java SDK</a> carries attachment forwarding as a library call, for members building their own integration — and the <a href="../connectors/connect-gateway.html">Connect Gateway</a> sends through the same library, so <a href="connector-classes.html">gateway-class</a> connectors inherit attachment sending rather than reimplementing it.</li>
       <li><strong>Direct REST.</strong> The endpoint is the contract; any stack that can make an authenticated multipart request can send. Nothing requires the SDK.</li>
     </ul>
-    <p>Delivery is per destination: with two configured stores on a case, each gets its own attempt and the response distinguishes complete from partial success. There is <strong>one attempt per destination — no automatic retries</strong> (documented behaviour, not probed on this hub) — so a failure is loud for the caller and invisible to everyone else until someone acts on it.</p>
+    <p>Delivery is per destination: with two configured stores on a case, each gets its own attempt and the response distinguishes complete from partial success. There is <strong>one attempt per destination — no automatic retries</strong> (source-read, not probed on this hub) — so a failure is loud for the caller and invisible to everyone else until someone acts on it. "Loud" means the response body: the call answers 200 either way, so a caller that checks only the status code hears nothing.</p>
+    <div class="note"><strong>In development: direct-to-storage delivery (alpha, Beta only).</strong> Beta also serves Attachment V2. The receiver registers its own storage (S3 or Azure Blob), and the sender gets a short-lived grant to upload straight into it, so the bytes never pass through TSANet. The conduit model above still holds: nothing comes to rest on the platform. Every V2 operation is marked alpha and none is on Production. On Beta, a receiver that has registered V2 storage can refuse the relay call with <code>409 attachment-direct-path-required</code>. The <a href="../connectors/connect-sdk.html#direct">Connect SDK</a> already carries a V2 client, and <a href="../docs/tsanet-2026-002-case-attachments.html">TSANET-2026-002</a> §5.1 has the specification-level summary. Don't build production flows on it yet.</div>
   </div>
 </section>
 
@@ -137,7 +138,7 @@ Content-Type: &lt;the file's own media type&gt;
 
 &lt;raw file bytes&gt;                                      <span class="c">← not multipart</span></code></pre>
     <p>Anything that answers this request qualifies as a receiver — it is an afternoon of work in any stack, and a small ingest service in front of object storage (S3, Azure Files, or similar) is the common pattern. Any 2xx you return counts as delivered, which is a sharper contract than it looks: see <a href="#edges">sharp edges</a>.</p>
-    <div class="note"><strong>When your store cannot answer a PUT.</strong> Members with an established file repository that has its own upload protocol do not have to bolt an endpoint onto it — TSANet can implement a member-specific delivery method against the repository's existing interface, configured platform-side. The normalized method is the default; member-specific methods are how established repositories join without changing. They are arranged with TSANet rather than exposed on the API — the published surface registers only the normalized HTTPS configuration. If yours is in that camp, <a href="../community/index.html">start the conversation</a> with what your store's upload interface looks like.</div>
+    <div class="note"><strong>When your store cannot answer a PUT.</strong> Members with an established file repository that has its own upload protocol do not have to bolt an endpoint onto it — TSANet can implement a member-specific delivery method against the repository's existing interface, configured platform-side. The normalized method is the default; member-specific methods are how established repositories join without changing. They are arranged with TSANet rather than exposed on the API — Production's published surface registers only the normalized HTTPS configuration. Member-registered storage is coming through Attachment V2, which is alpha and on Beta only (see <a href="#sending">Sending</a>). If yours is in that camp, <a href="../community/index.html">start the conversation</a> with what your store's upload interface looks like.</div>
   </div>
 </section>
 
@@ -166,7 +167,7 @@ Content-Type: &lt;the file's own media type&gt;
     <p class="eyebrow">Sharp edges</p>
     <h2>What Goes Wrong, in the Order You Will Meet It</h2>
     <ul class="tight">
-      <li><strong>2xx is a promise.</strong> One attempt, no retries — so return success only after the file is durably committed. A receiver that answers 200 from a buffer and fails afterwards has converted a recoverable error into silent loss, and nobody upstream will retry on your behalf.</li>
+      <li><strong>2xx is a promise.</strong> One attempt, no retries (source-read) — so return success only after the file is durably committed. A receiver that answers 200 from a buffer and fails afterwards has converted a recoverable error into silent loss, and nobody upstream will retry on your behalf.</li>
       <li><strong>The note is not automatic.</strong> The platform delivers the file and stops; announcing it on the case is the sending connector's job. If you build a sender, create the note. If you build a receiver, do not treat the note as the signal that a file exists — it may arrive before, after, or not at all.</li>
       <li><strong>Same-name uploads.</strong> The live receivers do not agree on collision behavior, and some ignore duplicates silently. Pick a policy, implement it, and write it down where partners can see it.</li>
       <li><strong>Filenames travel in URLs.</strong> On the normalized method the filename becomes a path segment. Conservative ASCII names survive everywhere; spaces and non-ASCII characters are where interoperability goes to die.</li>

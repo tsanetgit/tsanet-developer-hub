@@ -157,6 +157,44 @@
         </tbody>
       </table>
     </div>
+
+    <h3 id="self-issue">Issuing Your Own Client Secret</h3>
+    <p>Members now create the client secrets for their OAuth client themselves, in the TSANet webapp, instead of asking TSANet for one. TSANet still creates the client, meaning the app registration and its client ID, and still maps it to your member company. What moves to you is the secret, and with it the rotation.</p>
+    <p><span class="pill ok">Beta</span> <span class="pill ok">Development</span> live now. <span class="pill warn">Production</span> rolling out the week of 26 October 2026.</p>
+    <p>The page is open to users with the <strong>Program Manager</strong> or <strong>Business Manager</strong> role on the member company. Standard users and the API user can't reach it.</p>
+    <ul class="legend">
+      <li><span class="n">1</span><span><b>Open the Integration page.</b> In the webapp, go to <em>Admin → Company</em> and choose <em>Integration</em>.</span></li>
+      <li><span class="n">2</span><span><b>Find your client.</b> Under <em>API Authentication</em>, the <em>Oauth2 M2M</em> block shows your client ID. If the block isn't there, TSANet hasn't set up an OAuth client for your company yet, so ask TSANet support for one first.</span></li>
+      <li><span class="n">3</span><span><b>Create the secret.</b> Choose <em>Manage Secret Keys</em>, enter a description, and choose <em>Create Client Secret</em>. The description is required and is the only label the secret will ever have, so name the system that will hold it, for example <code>Zendesk ZIS production, 2026-10</code>.</span></li>
+      <li><span class="n">4</span><span><b>Copy the value before you close the dialog.</b> The dialog shows the secret once, with its Secret ID, description and expiry date. TSANet doesn't keep the value and can't show it again. If you lose it, create another one.</span></li>
+      <li><span class="n">5</span><span><b>Use it.</b> Mint tokens exactly as before, with your client ID and the new secret. The token URL, tenant and scope don't change. Call <code>GET /v1/me</code> to confirm the new secret resolves to your company.</span></li>
+    </ul>
+    <div class="twrap">
+      <table>
+        <thead><tr><th>Behaviour</th><th>What to expect</th></tr></thead>
+        <tbody>
+          <tr><td>Lifetime</td><td>One year from creation. The period is fixed, and you can't choose it.</td></tr>
+          <tr><td>Several secrets</td><td>Each create adds a secret alongside the ones you already have. Existing secrets keep working until they expire, which is what lets you rotate without downtime.</td></tr>
+          <tr><td><em>Registered Keys</em> list</td><td>Shows each secret created on this page, by Secret ID, description and expiry date. It never shows a value.</td></tr>
+          <tr><td>Revoking</td><td>The page can't delete or revoke a secret. A secret you create stays valid until its expiry date. To end one early, for example after a leak, ask TSANet.</td></tr>
+          <tr><td>Secrets TSANet issued earlier</td><td>They keep working until their own expiry date, but they don't appear in <em>Registered Keys</em>. Ask TSANet for the date if you don't have it.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="gotcha">
+      <h4>Rotate by overlapping, because you can't delete</h4>
+      <p>Create the new secret, deploy it to every system that holds the old one, and confirm each with <code>GET /v1/me</code>. Then let the old secret lapse on its date. Start well ahead of the expiry: a month leaves room for a change freeze. A rotation done because a secret leaked isn't finished until TSANet has revoked the old one, since it otherwise stays valid for the rest of its year.</p>
+    </div>
+    <div class="gotcha">
+      <h4>Production's page changes under you at the rollout</h4>
+      <p>Until the rollout, Production's Integration page displays the secret TSANet issued you. After it, the page displays no secret values at all, only the <em>Manage Secret Keys</em> flow. If that page is the only place your current Production secret lives, put it in your secret store before the week of 26 October.</p>
+    </div>
+    <div class="gotcha">
+      <h4>Only for a client TSANet created</h4>
+      <p>The webapp issues secrets on the app registration TSANet created for your company. If your company authenticates with an app registration in its own Entra tenant instead, you keep managing that registration's secrets in your own tenant, and the Integration page doesn't apply.</p>
+      <p class="where">Read from the webapp's Beta branch source on 2026-10-24; working on Beta and Development per TSANet; not yet probed by the hub</p>
+    </div>
+
     <div class="gotcha">
       <h4>The scope that looks right and isn't</h4>
       <p>Use the <strong>bare audience GUID</strong> plus <code>/.default</code>. The <code>api://</code> prefix fails with <code>AADSTS500011</code> because the app registration publishes no Application ID URI. This reads like a typo in the working version, and it is not.</p>
@@ -164,7 +202,7 @@
     </div>
     <div class="gotcha">
       <h4>Provisioning is a prerequisite, not a formality</h4>
-      <p>An app-only token is accepted only once TSANet has provisioned your service principal's object ID — that provisioning is also what maps your tokens to your member company. Ask before you start building, not when auth fails.</p>
+      <p>An app-only token is accepted only once TSANet has provisioned your service principal's object ID — that provisioning is also what maps your tokens to your member company. Ask before you start building, not when auth fails. <a href="#self-issue">Self-issued secrets</a> don't change this: TSANet still sets up the client, and you issue its secrets.</p>
     </div>
     <div class="gotcha">
       <h4>Store secrets verbatim</h4>
@@ -172,8 +210,8 @@
     </div>
     <div class="gotcha">
       <h4>Tokens renew themselves; the credential behind them does not</h4>
-      <p>It is easy to read "no static token to refresh" as "nothing to maintain". The <em>token</em> re-mints automatically — the <strong>client secret it re-mints from has its own expiry</strong>, and rotating it before that date is the member's responsibility. When it lapses, every call stops at once, and it presents as a sudden total auth failure rather than a gradual degradation.</p>
-      <p>Confirm the expiry date and the rotation process with TSANet at onboarding, put the date somewhere that will actually alert you, and rehearse the rotation before you need it. This is the single most predictable outage available to an otherwise healthy integration.</p>
+      <p>It is easy to read "no static token to refresh" as "nothing to maintain". The <em>token</em> re-mints automatically — the <strong>client secret it re-mints from has its own expiry</strong>, and rotating it before that date is the member's responsibility. Rotation is now <a href="#self-issue">self-service</a>, but nothing rotates for you. When it lapses, every call stops at once, and it presents as a sudden total auth failure rather than a gradual degradation.</p>
+      <p>Every secret you issue shows its expiry date in <em>Registered Keys</em>; for a secret TSANet issued before self-issue, ask TSANet for the date. Put the date somewhere that will actually alert you, and rehearse the rotation before you need it. This is the single most predictable outage available to an otherwise healthy integration.</p>
     </div>
     <p>Always call <code>GET /v1/me</code> during development to confirm which company your credentials actually resolve to. On a platform where every call is scoped to your member identity, that is the cheapest sanity check available.</p>
   </div>

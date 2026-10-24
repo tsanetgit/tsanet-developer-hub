@@ -51,7 +51,7 @@
       <span><b>Topic</b> Inbound automation</span>
       <span><b>Grounded in</b> Four connectors</span>
       <span><b>Audience</b> Anyone configuring inbound</span>
-      <span><b>Updated</b> 2026-09-13</span>
+      <span><b>Updated</b> 2026-10-24</span>
     </div>
     <div class="toc">
       <a href="#commitment">What acceptance commits you to</a>
@@ -103,8 +103,8 @@
       <div class="posture p3">
         <h3>Accept What You Can Verify</h3>
         <div class="who">Salesforce — asset match</div>
-        <p>Resolve the serial number to an asset you actually have a record of. On a match, create the case and accept. <strong>On no match, reject.</strong></p>
-        <p class="trade">Buys: acceptance means something checkable. Spends: needs clean asset data, and rejects legitimate requests when that data is stale.</p>
+        <p>Resolve the request to an asset you actually have a record of. On a match, create the case and accept. <strong>On no match, ask the partner for more information</strong> instead of accepting.</p>
+        <p class="trade">Buys: acceptance means something checkable. Spends: needs clean asset data, and an unmatched request waits on the partner's answer while the clock runs.</p>
       </div>
       <div class="posture p4">
         <h3>Never Accept Automatically</h3>
@@ -167,17 +167,17 @@
     <p>Crucially, <strong>trigger conditions are the scoping mechanism</strong>. A condition on the partner field turns "accept everything" into "accept everything from this partner" — which moves you along the spectrum without writing anything. Cases that do not match simply stay open for normal triage.</p>
     <div class="note">The published guide is honest about the cost: auto-accept commits you instantly, and the triage options are skipped for auto-accepted cases. If some cases should still be looked at first, use the trigger path and put those conditions in the trigger. <a href="https://tsanet.gitbook.io/connect/documentation/zendesk-app/auto-accepting-inbound-cases">Setup guide →</a></div>
 
-    <h3>Salesforce: Verify, Then Accept — Or Reject</h3>
-    <p>The shipped flow is the most opinionated of the four, and the only one that will say no. It fires on TSANet Case creation where no local case is linked, direction is inbound, and a serial number is present:</p>
-    <pre><code>Get Asset by serial number
-  └─ no match  <span class="c">→ reject the collaboration request</span>
+    <h3>Salesforce: Verify, Then Accept — Or Ask</h3>
+    <p>The shipped template, <em>Trigger Handler (Asset)</em>, is the most opinionated of the four. It ships deactivated, for you to clone and activate. It fires on TSANet Case creation where direction is inbound and no local case is linked:</p>
+    <pre><code>Get Asset                            <span class="c">as shipped, Asset Name = the case's email field</span>
+  └─ no match  <span class="c">→ send the partner an information request</span>
   └─ match     <span class="c">→ continue</span>
-Get Contact by customer email        <span class="c">(enrichment, optional)</span>
-Create the Salesforce Case           <span class="c">asset, contact, subject, description</span>
-Update the TSANet Case               <span class="c">attach the new Case Id</span>
-Approve the collaboration request    <span class="c">with engineer details</span>
+Create the Salesforce Case
+Link it to the TSANet Case
+Approve the collaboration request
 Notify the case owner</code></pre>
-    <p>Rejecting on no asset match <em>is</em> the entitlement check. A partner escalating about hardware you have no record of does not become a case your team has to triage — and the partner finds out immediately rather than after a silent wait.</p>
+    <p>Asking on no match is the entitlement check in its softer form. A partner escalating about something you have no record of does not become a case your team owns. It gets a question back straight away instead of a silent wait.</p>
+    <div class="note"><strong>The published guide says this branch rejects. The shipped flow does not.</strong> Verified against the package source at <code>Release-v2.13</code> and 2.14: the no-match branch calls the Request Information automation. If rejection is your policy, it is a one-element change in your clone. Replace the lookup while you are there, because matching an Asset Name against an email field is a placeholder. Details on the <a href="../connectors/salesforce.html#flows">Salesforce page</a>.</div>
 
     <h3>Dynamics: Attach to Work That Already Exists</h3>
     <p>Auto-routing is a feature toggle rather than a flow to activate, and it solves a different problem: not "should we take this" but "where does this belong". It searches for an existing case by the partner's case number, falls back to a customer-name lookup, and on a match creates and relates the local case before approving.</p>
@@ -193,7 +193,7 @@ Notify the case owner</code></pre>
   <div class="wrap">
     <p class="eyebrow">Designing yours</p>
     <h2>Building a Rule That Asserts Something True</h2>
-    <p>The Salesforce flow is the useful template even on other platforms, because its shape generalises: <em>resolve an identifier, branch on whether you found it, and be willing to say no.</em> What varies is the identifier.</p>
+    <p>The Salesforce flow is the useful template even on other platforms, because its shape generalises: <em>resolve an identifier, branch on whether you found it, and decide what no match means.</em> What varies is the identifier.</p>
     <div class="twrap">
       <table>
         <thead><tr><th>Match on</th><th>Asserts</th><th>Fails when</th></tr></thead>
@@ -208,7 +208,7 @@ Notify the case owner</code></pre>
     </div>
     <p>Two design rules worth adopting whichever identifier you pick:</p>
     <ul class="tight">
-      <li><strong>Decide what "no match" means before you build.</strong> Rejecting is a real answer and it is kinder than silence — but only if your matching is good enough that a rejection is usually correct. If it is not, leave unmatched cases open for a human instead. Rejecting wrongly is worse than not automating.</li>
+      <li><strong>Decide what "no match" means before you build.</strong> There are three answers. Rejecting is a real answer, and kinder than silence, but only if your matching is good enough that a rejection is usually correct. Asking for information, which is what the Salesforce template does, is safer when the partner may just have quoted a different identifier. Leaving the case open for a human is the fallback when you are unsure. Rejecting wrongly is worse than not automating.</li>
       <li><strong>Start scoped, then widen.</strong> One partner, or one product line, with everything else falling through to normal triage. Every connector that automates acceptance supports a conditional form, and it converts a policy question into an observation: run it narrow for a month and count how often the rule was right.</li>
     </ul>
   </div>

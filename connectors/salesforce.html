@@ -47,16 +47,16 @@
     <p class="lede">A managed package that installs entirely into your own org: custom objects, Apex services, Lightning Web Components, and a library of Flows you can clone. The most configurable connector TSANet ships — and the one where the automation surface is a Flow library you clone and edit, where <a href="dynamics.html">Dynamics</a> gives you a configuration table and <a href="zendesk.html">Zendesk</a> its triggers.</p>
     <div class="meta-row">
       <span><b>Class</b> In-tenant</span>
-      <span><b>Status</b> GA · managed package</span>
+      <span><b>Status</b> GA · managed package v2.14</span>
       <span><b>Surface</b> Case record page + TSANet Case object</span>
       <span><b>Repo</b> tsanetgit/SFDC_App</span>
-      <span><b>Updated</b> 2026-10-20</span>
+      <span><b>Updated</b> 2026-10-24</span>
     </div>
     <div class="toc">
       <a href="#class">Connector class</a>
       <a href="#topology">Architecture</a>
       <a href="#data">Data model</a>
-      <a href="#auth">Auth &amp; tokens</a>
+      <a href="#auth">Auth &amp; credentials</a>
       <a href="#inbound">Inbound webhooks</a>
       <a href="#sync">Scheduled sync</a>
       <a href="#flows">Flows &amp; automation</a>
@@ -73,26 +73,20 @@
     <p>TSANet connectors divide by one question: will the platform run your code inside the member's own tenant? Salesforce is the fullest yes on the list — Apex is real server-side code, running on Salesforce's infrastructure, inside your org, under your governance. <a href="fin-intercom.html">Intercom is the opposite pole</a>, where nothing can run in-tenant at all and TSANet hosts a gateway; <a href="zendesk.html">Zendesk sits in between</a>, with client-side apps and declarative flows but no arbitrary server code.</p>
     <div class="twrap">
       <table>
-        <caption>Everything below runs in the member's org. TSANet operates nothing, holds no credentials, and a broken install affects exactly one member.</caption>
+        <caption>Everything below runs in the member's org. TSANet operates nothing, and a broken install affects exactly one member. The one credential TSANet holds is the External Client App secret it uses to authenticate deliveries into your org.</caption>
         <thead><tr><th scope="col">&nbsp;</th><th scope="col">Where it runs</th><th scope="col" class="next">What that buys you</th></tr></thead>
         <tbody>
           <tr><th scope="row">Business logic</th><td>Apex, in your org</td><td class="next">Real server-side code with governor limits, tests and debug logs</td></tr>
           <tr><th scope="row">Automation</th><td>Flow, in your org</td><td class="next">Clone and edit any shipped flow without writing Apex</td></tr>
-          <tr><th scope="row">Inbound delivery</th><td>Apex REST on a public Site</td><td class="next">Push, not polling — plus a scheduled sweep as backstop</td></tr>
+          <tr><th scope="row">Inbound delivery</th><td>Apex REST on your My Domain, behind an External Client App</td><td class="next">Push, not polling — plus a scheduled sweep as backstop</td></tr>
           <tr><th scope="row">State</th><td>Custom objects</td><td class="next">Reportable, dashboard-able, and subject to your sharing model</td></tr>
-          <tr><th scope="row">Credentials</th><td>Custom object in your org</td><td class="next">Never leaves your tenant</td></tr>
+          <tr><th scope="row">Credentials</th><td>Named and External Credentials in your org</td><td class="next">The platform mints and attaches the token; the package stores none</td></tr>
         </tbody>
       </table>
     </div>
-    <div class="note"><strong>The consequence worth planning for is the inverse of the gateway trade-off.</strong> Nothing here is shared infrastructure, so nothing here fails for everyone at once — but equally, nobody operates it for you. The scheduled job, the Site, the guest-user permissions and the credential record are all yours to keep healthy.</div>
-    <div class="note"><strong>Coming in 2.14 — beta, subject to change.</strong> This page documents v2.13, the current release. A 2.14 beta is published on the <a href="https://github.com/tsanetgit/SFDC_App/releases">SFDC_App releases page</a> and is marked not for production; its notes and the repository's <code>main</code> describe changes worth planning for:
-      <ul class="tight">
-        <li><strong>Credentials:</strong> calls go only through Named and External Credentials. Basic auth, the <code>/v1/login</code> JWT and the shipped Remote Site Settings are removed.</li>
-        <li><strong>Inbound:</strong> the public Site and guest user go away. The endpoint is reached through an External Client App, and the webhook registers with OAuth2 client-credentials callback authentication — a <code>callbackAuth</code> type that is live on Beta and not yet on Production. The permission set <code>TSANet_Webhook_Guest_Access</code> becomes <code>TSANet_Integration_User_Access</code>, and events arrive as the platform event <code>TSANetWebhookEvent__e</code>.</li>
-        <li><strong>Current API:</strong> subscriptions move to <code>/v2/webhooks</code> with prefixed types, and the sync reads <code>/v2/collaboration-requests/list</code>.</li>
-        <li><strong>Behaviour:</strong> Case Feed notes drop Company, Type and Direction; <em>Find Parent Case</em> matches the Receiver Case Number inbound and the Submitter Case Number outbound.</li>
-      </ul>
-      Nothing here changes until 2.14 is released; plan an upgrade window for the inbound rework.</div>
+    <div class="note"><strong>The consequence worth planning for is the inverse of the gateway trade-off.</strong> Nothing here is shared infrastructure, so nothing here fails for everyone at once — but equally, nobody operates it for you. The scheduled jobs, the External Client App, the integration user and the credential record are all yours to keep healthy.</div>
+    <div class="note" style="border-left-color:var(--red)"><strong>2.14 is a breaking upgrade.</strong> This page documents TSANet Connect 2.14, released on 2026-10-21. It replaces username-and-password login with Named Credentials and replaces the public Site with an External Client App. The release notes say Basic Auth credentials and the old webhooks stop working after the upgrade, so set up the Named Credential and the External Client App first. The post-install script changes nothing, so disconnecting the old credential records and aborting leftover scheduled jobs are manual steps. Details are under <a href="#auth">Auth</a>, <a href="#inbound">Inbound</a> and <a href="#setup">Setup</a>.</div>
+    <div class="note" style="border-left-color:var(--red)"><strong>On Production, 2.14 cannot register its webhook yet.</strong> The package always registers with <code>callbackAuth</code> type <code>OAUTH2_CLIENT_CREDENTIALS</code>, and it has no other option. The spec Production serves still offers only <code>NONE</code>, <code>BASIC</code>, <code>BEARER</code> and <code>HEADER</code> (re-read 2026-10-24); Beta has the OAuth type. Until it reaches Production, expect registration on a Production credential to be refused, which leaves the <a href="#sync">15-minute sweep</a> as the only inbound path. This is spec-read and has not been probed. See <a href="../api/index.html#webhooks">Working with the API → webhooks</a>.</div>
   </div>
 </section>
 
@@ -103,7 +97,7 @@
     <p>Four layers, all inside the org: Lightning components the agent works in, a Flow library that drives the business logic, Apex services that talk to TSANet, and custom objects that hold the state. Two integration points cross the org boundary — an outbound scheduled sync and an inbound Apex REST endpoint.</p>
     <figure>
       <div class="diagram">
-        <svg viewBox="0 0 1160 700" style="min-width:1040px" role="img" aria-label="Architecture: the service agent on the left; inside the Salesforce org, a Lightning component layer, a Flow library, Apex services, auth and token storage, custom objects, a scheduled sync job and an Apex REST webhook endpoint; the TSANet Connect API and webhook push on the right.">
+        <svg viewBox="0 0 1160 700" style="min-width:1040px" role="img" aria-label="Architecture: the service agent on the left; inside the Salesforce org, a Lightning component layer, a Flow library, Apex services, Named and External Credentials, custom objects, a scheduled sync job and an Apex REST webhook endpoint behind an External Client App; the TSANet Connect API and webhook push on the right.">
           <defs>
             <marker id="sI" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--slate)"/></marker>
             <marker id="sA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--blue)"/></marker>
@@ -121,8 +115,8 @@
           <rect class="bx-ext" x="16" y="290" width="238" height="106" rx="8"/>
           <text class="tt" x="30" y="312">Salesforce admin</text>
           <text class="ts" x="30" y="331">clones and edits shipped Flows</text>
-          <text class="ts" x="30" y="347">assigns the two permission sets</text>
-          <text class="ts" x="30" y="363">owns the Site + guest user</text>
+          <text class="ts" x="30" y="347">assigns the three permission sets</text>
+          <text class="ts" x="30" y="363">owns the External Client App</text>
           <text class="ts" x="30" y="379">tunes the scheduled job cron</text>
 
           <rect class="bx-ext" x="16" y="450" width="238" height="90" rx="8"/>
@@ -153,26 +147,26 @@
 
           <rect class="bx" x="326" y="240" width="240" height="116" rx="8"/>
           <text class="tt" x="338" y="262">Apex services</text>
-          <text class="ts" x="338" y="281">TSANetService · HttpClient</text>
+          <text class="ts" x="338" y="281">TSANetAPIService · HttpRouter</text>
           <text class="ts" x="338" y="297">ParserManager · UpsertExecutor</text>
           <text class="ts" x="338" y="313">TriggerDispatcher · handlers</text>
           <text class="ts" x="338" y="329">ErrorLogger → TSANetError__c</text>
-          <text class="tl" x="338" y="347">EndpointManager resolves the environment</text>
+          <text class="tl" x="338" y="347">AuthModeManager picks the credential</text>
 
           <rect class="bx" x="596" y="240" width="240" height="116" rx="8"/>
-          <text class="tt" x="608" y="262">Auth &amp; token storage</text>
-          <text class="ts" x="608" y="281">AuthManager · CredentialManager</text>
-          <text class="ts" x="608" y="297">TokenManager caches in memory</text>
-          <text class="ts" x="608" y="313">AccessTokenSplitter: 2 × 175 chars</text>
-          <text class="ts" x="608" y="329">commit AFTER callouts, never before</text>
-          <text class="tl" x="608" y="347">a JWT does not fit one custom setting field</text>
+          <text class="tt" x="608" y="262">Named Credentials</text>
+          <text class="ts" x="608" y="281">Named + External Credential</text>
+          <text class="ts" x="608" y="297">OAuth 2.0 client credentials</text>
+          <text class="ts" x="608" y="313">platform mints the token</text>
+          <text class="ts" x="608" y="329">four shipped: Prod · Beta · Test · Dev</text>
+          <text class="tl" x="608" y="347">the package stores no token at all</text>
 
           <rect class="bx-grn" x="326" y="388" width="510" height="120" rx="8"/>
           <text class="tt" x="338" y="410">Custom objects · the durable state, and it is yours</text>
           <text class="ts" x="338" y="429">TSANetCase__c — status · type · priority · token (ExternalID) · Case lookup</text>
           <text class="ts" x="338" y="445">TSANetNote__c · TSANetResponse__c · TSANetError__c · TSANetWebhook__c</text>
-          <text class="ts" x="338" y="461">TSANet_Credentials__c (one primary per org) · TSANet_Tokens__c (org defaults)</text>
-          <text class="ts" x="338" y="477">TSANetCaseUpdated__e · TSANetNoteFeedItemRequested__e — platform events</text>
+          <text class="ts" x="338" y="461">TSANet_Credentials__c — one primary per org, names a Named Credential</text>
+          <text class="ts" x="338" y="477">platform events: TSANetWebhookEvent__e · TSANetCaseUpdated__e · …</text>
           <text class="tl" x="338" y="497">TSANetEnvironment__mdt and TSANetCustomField__mdt carry configuration, not data</text>
 
           <rect class="bx" x="326" y="540" width="240" height="98" rx="8"/>
@@ -186,29 +180,29 @@
           <text class="tt" x="608" y="562">Apex REST endpoint</text>
           <text class="ts" x="608" y="581">/services/apexrest/</text>
           <text class="ts" x="608" y="597">  tsanetconnect/webhook</text>
-          <text class="ts" x="608" y="613">public Site + guest user</text>
+          <text class="ts" x="608" y="613">My Domain · External Client App</text>
           <text class="tl" x="608" y="630">fast-ack 200, enqueue a Queueable</text>
 
           <!-- RIGHT -->
           <rect class="bx-ext" x="904" y="96" width="240" height="196" rx="8"/>
-          <text class="tt" x="918" y="118">TSANet Connect API · /v1</text>
+          <text class="tt" x="918" y="118">TSANet Connect API</text>
           <text class="ts" x="918" y="137">partner search · process form</text>
           <text class="ts" x="918" y="153">collaboration-requests</text>
           <text class="ts" x="918" y="169">approval · rejection · closure</text>
           <text class="ts" x="918" y="185">information-request / -response</text>
           <text class="ts" x="918" y="201">notes · file attachment</text>
-          <text class="ts" x="918" y="217">login returns a JWT, ~60 min</text>
-          <text class="ts" x="918" y="233">case list — deprecated v1 path</text>
-          <text class="tl" x="918" y="253">BETA and PRODUCTION hosts, plus</text>
-          <text class="tl" x="918" y="267">a developer environment</text>
-          <text class="tl" x="918" y="283">selected per credential record</text>
+          <text class="ts" x="918" y="217">token from Microsoft Entra ID</text>
+          <text class="ts" x="918" y="233">case list + webhooks on /v2</text>
+          <text class="tl" x="918" y="253">Production and Beta, plus</text>
+          <text class="tl" x="918" y="267">test and dev environments</text>
+          <text class="tl" x="918" y="283">one Named Credential each</text>
 
           <rect class="bx-ext" x="904" y="352" width="240" height="116" rx="8"/>
           <text class="tt" x="918" y="374">TSANet webhook push</text>
           <text class="ts" x="918" y="393">registered per credential as a</text>
           <text class="ts" x="918" y="409">TSANetWebhook__c record</text>
-          <text class="ts" x="918" y="425">collaboration request + note events</text>
-          <text class="tl" x="918" y="445">thin payload: tokens, not content</text>
+          <text class="ts" x="918" y="425">created + note events, V2 payload</text>
+          <text class="tl" x="918" y="445">OAuth to your org · tokens only</text>
 
           <rect class="bx-ext" x="904" y="520" width="240" height="90" rx="8"/>
           <text class="tt" x="918" y="542">Partner member</text>
@@ -252,9 +246,9 @@
     </figure>
     <ul class="legend">
       <li><span class="n">1</span><span><b>Agent actions.</b> The LWC panel and the quick actions on <code>TSANetCase__c</code> — Accept, Reject, Request Information, Send Information, Create Note, Close, Upload File — each launch either a screen flow or an Aura action. Close is valid on outbound cases only: the API rejects a closure from the receiving company.</span></li>
-      <li><span class="n">2</span><span><b>Outbound calls to TSANet.</b> Apex callouts through <code>HttpClient</code>, with the environment host resolved from <code>TSANetEnvironment__mdt</code> and a matching Remote Site Setting.</span></li>
+      <li><span class="n">2</span><span><b>Outbound calls to TSANet.</b> Apex callouts to <code>callout:tsanetconnect__TSANetAPI</code>, or the Beta, Test or Dev equivalent, whichever Named Credential the primary credential record names. The External Credential behind it fetches and attaches the OAuth token, so no Apex in the package handles one.</span></li>
       <li><span class="n">3</span><span><b>Scheduled sync.</b> <code>TSANetScheduledJob</code> sweeps every 15 minutes by default, reconciling anything the push path missed.</span></li>
-      <li><span class="n">4</span><span><b>Inbound push.</b> TSANet posts to the Apex REST endpoint exposed through a public Salesforce Site. The handler acknowledges immediately and enqueues a Queueable, which fetches the real case by token — the event itself carries only identifiers.</span></li>
+      <li><span class="n">4</span><span><b>Inbound push.</b> TSANet gets a token from your org's External Client App, then posts to the Apex REST endpoint on your My Domain, which runs as the integration user. The handler acknowledges immediately and enqueues a Queueable, which fetches the real case by token. The event itself carries only identifiers.</span></li>
     </ul>
   </div>
 </section>
@@ -265,14 +259,14 @@
     <h2>Custom Objects, and Why That Matters</h2>
     <p>As on <a href="dynamics.html">Dynamics</a>, and unlike Zendesk and Fin / Intercom, collaboration state here lands in first-class Salesforce objects. That is the single biggest practical difference: the data is reportable, dashboard-able, subject to your sharing rules, and addressable from any Flow or Apex you write yourself.</p>
     <div class="obj-grid">
-      <div class="obj"><h4>TSANetCase__c</h4><p>The collaboration record. Status, Type (inbound/outbound), Priority, Summary, Description, Request Date, Response SLA, both parties' company and engineer contact details, and a lookup to the standard Case. <code>Token</code> is the ExternalID.</p></div>
-      <div class="obj"><h4>TSANetNote__c</h4><p>Notes on a case — summary, description, creator, status, priority, created-at. Token is the ExternalID, which is what makes upserts idempotent.</p></div>
+      <div class="obj"><h4>TSANetCase__c</h4><p>The collaboration record. Status, Direction (inbound/outbound), Priority, Summary, Description, Request Date, Response SLA, both parties' company, case-number and engineer contact details, and a lookup to the standard Case. 2.14 adds Document Id and name, which identify the partner's inbound process form. <code>Token</code> is the ExternalID.</p></div>
+      <div class="obj"><h4>TSANetNote__c</h4><p>Notes on a case: summary, description, creator, status, priority, direction, created-at, and since 2.14 a Type (<code>public</code>, <code>partner</code>, <code>system</code>, <code>escalation</code>, <code>status</code>). Token is the ExternalID, which is what makes upserts idempotent.</p></div>
       <div class="obj"><h4>TSANetResponse__c</h4><p>Formal replies and actions on inbound cases: type, note, engineer email and phone, created-at.</p></div>
-      <div class="obj"><h4>TSANet_Credentials__c</h4><p>Username, password, environment (<code>DEVELOPER</code>, <code>BETA</code>, <code>PRODUCTION</code>), an integration-user designation, and <code>isPrimary</code> — of which exactly one per org may be true.</p></div>
-      <div class="obj"><h4>TSANet_Tokens__c</h4><p>Org-default custom setting holding the access token in two parts plus its expiry. Not something you edit by hand.</p></div>
-      <div class="obj"><h4>TSANetWebhook__c</h4><p>The inbound subscription: parent credential, active flag, callback URL and selected event types. A child of the credential record.</p></div>
+      <div class="obj"><h4>TSANet_Credentials__c</h4><p>Which Named Credential to call through, the integration user, <code>isPrimary</code> (exactly one per org may be true) and <code>isConnected</code>, which the package sets after a successful callout, along with your TSANet company id and name. No password or token is stored here since 2.14.</p></div>
+      <div class="obj"><h4>TSANetWebhook__c</h4><p>The inbound subscription: parent credential, TSANet's webhook id, active flag, callback URL and event types, stored in their prefixed v2 form. A child of the credential record. The client id and secret you enter on it go to TSANet and are not stored in Salesforce.</p></div>
+      <div class="obj"><h4>Named &amp; External Credentials</h4><p>Setup metadata, not data. The package ships four of each, for Production, Beta, Test and Dev. You enter the client id and secret TSANet gives you on the External Credential's <code>TSANetApp</code> principal.</p></div>
       <div class="obj"><h4>TSANetError__c</h4><p>Where <code>ErrorLogger</code> writes. First place to look when a webhook or a sync cycle misbehaves.</p></div>
-      <div class="obj"><h4>Platform events</h4><p><code>TSANetCaseUpdated__e</code> and <code>TSANetNoteFeedItemRequested__e</code>. The former lets an open LWC show a live indicator while an async job is still processing an inbound event.</p></div>
+      <div class="obj"><h4>Platform events</h4><p><code>TSANetWebhookEvent__e</code> is published for every inbound event, for your own subscribers. <code>TSANetCaseUpdated__e</code> lets an open LWC show a live indicator while the async job is still processing, and <code>TSANetNoteFeedItemRequested__e</code> drives Case Feed posts.</p></div>
     </div>
     <p style="margin-top:18px"><code>TSANetEnvironment__mdt</code> and <code>TSANetCustomField__mdt</code> are custom metadata, not data — they carry environment hosts and field-mapping configuration, and they deploy with the package rather than living in your data.</p>
   </div>
@@ -281,54 +275,51 @@
 <section id="auth">
   <div class="wrap">
     <p class="eyebrow">Authentication</p>
-    <h2>Two Salesforce Platform Limits Shape the Token Handling</h2>
-    <p>Auth is basic authentication against a TSANet API user on the member account, exchanged for a JWT that lives about 60 minutes. That is the API's legacy scheme: OAuth 2.0 client credentials is the current server-to-server path, and it removes the token handling described below — see <a href="../api/index.html#auth">Working with the API → Authentication</a>. The managed package as documented here uses the login path. Storing and using that token runs into two Salesforce constraints that are worth understanding before you debug anything in this area.</p>
+    <h2>Named Credentials, and No Token in the Package</h2>
+    <p>Since 2.14 every call to TSANet goes through a Salesforce Named Credential backed by an External Credential. Both ship in the package and are preconfigured for OAuth 2.0 client credentials against TSANet's Microsoft Entra ID token endpoint. You add one thing: the client id and secret TSANet supplies for that environment, entered on the External Credential's <code>TSANetApp</code> principal. Salesforce then fetches the token, caches it and attaches it to each callout. This is the API's current server-to-server scheme; see <a href="../api/index.html#auth">Working with the API → Authentication</a>.</p>
+    <p>What 2.14 removed: username-and-password login, the <code>/v1/login</code> JWT, the token split across two custom-setting fields, the <code>TSANet_Tokens__c</code> setting and the shipped Remote Site Settings. A Named Credential carries its own endpoint, so no Remote Site Setting is needed. If you are upgrading from 2.13, the old password fields are gone and the post-install script migrates nothing, so a credential record has to name a Named Credential before the package will make a callout.</p>
 
-    <h3>A JWT Does Not Fit in One Custom Setting Field</h3>
-    <p>Custom setting text fields cap well below the length of a Connect JWT, so <code>AccessTokenSplitter</code> splits the token at 175 characters into <code>AccessTokenPart1__c</code> and <code>AccessTokenPart2__c</code>, and <code>TokenManager</code> concatenates them on read. If you are inspecting stored credentials and see a truncated-looking token, that is why — check both parts.</p>
+    <h3>Run the Setup as the Integration User</h3>
+    <p>The guide has you enter the client id and secret as your own administrator, then <strong>log in as the integration user</strong> to create the credential record. The record is then owned by that user, and the package's scheduled jobs run as that user. Saving the record starts an account probe. On success the package sets <em>Is Connected</em>, fills in your company id and name, syncs any existing webhooks from TSANet and schedules the sweep. On failure it marks the record disconnected and aborts the jobs. Refresh the page to see the result.</p>
 
-    <h3>DML Before a Callout Is Not Allowed</h3>
-    <p>Salesforce refuses a callout when there is uncommitted DML in the transaction. A naive implementation — log in, save the token, then immediately call the API — hits <code>You have uncommitted work pending</code> on the very first request. <code>TokenManager</code> therefore holds a freshly minted token in a static in-memory field and defers persistence until after the callouts complete.</p>
-    <pre><code><span class="c">// getAccessToken() returns the pending token without touching the database</span>
-<span class="c">// commitTokenIfPending() runs after the callouts, not before</span>
-String token = TokenManager.getAccessToken();   <span class="c">// no DML</span>
-<span class="c">... callouts ...</span>
-TokenManager.commitTokenIfPending();            <span class="c">// DML now safe</span></code></pre>
-    <p>If you extend the package with your own Apex callouts, follow the same ordering. Persisting the token first is the natural thing to write and it will fail.</p>
+    <h3>If You Extend the Package with Your Own Apex</h3>
+    <p>Call through the same Named Credential (<code>callout:tsanetconnect__TSANetAPI</code> and its siblings) rather than handling tokens yourself. The platform rule that shaped the old token code still applies to anything you write: Salesforce refuses a callout when there is uncommitted DML in the transaction (<code>You have uncommitted work pending</code>), so make the callouts first and write afterwards.</p>
 
     <h3>Environments</h3>
-    <p>The environment is selected on the credential record and resolved through <code>TSANetEnvironment__mdt</code> at runtime. Each environment also needs its matching <strong>Remote Site Setting</strong>, which the package ships — a callout to a host with no Remote Site Setting is refused by the platform before it leaves the org.</p>
+    <p>The credential record's <em>Named Credential</em> field selects the environment. The installation guide documents Production and Beta. The package also ships a Test and a Dev Named Credential for TSANet-operated environments.</p>
     <div class="twrap">
       <table>
-        <thead><tr><th>Credential environment</th><th>Host</th></tr></thead>
+        <thead><tr><th>Named Credential</th><th>Environment</th><th>Host</th></tr></thead>
         <tbody>
-          <tr><td><code>BETA</code></td><td><code>connect2.tsanet.net</code></td></tr>
-          <tr><td><code>PRODUCTION</code></td><td><code>connect2.tsanet.org</code></td></tr>
-          <tr><td><code>DEVELOPER</code></td><td>TSANet-operated development environment, by arrangement</td></tr>
+          <tr><td><code>TSANetAPI</code></td><td>Production</td><td><code>connect2.tsanet.org</code></td></tr>
+          <tr><td><code>TSANetAPIBeta</code></td><td>Beta</td><td><code>connect2.tsanet.net</code></td></tr>
+          <tr><td><code>TSANetAPITest</code></td><td>Test</td><td>TSANet-operated test environment, by arrangement</td></tr>
+          <tr><td><code>TSANetAPIDev</code></td><td>Dev</td><td>TSANet-operated development environment, by arrangement</td></tr>
         </tbody>
       </table>
     </div>
+    <p>Each environment has its own External Credential with its own token scope. Enter the client id and secret TSANet issued for that environment on that environment's principal.</p>
   </div>
 </section>
 
 <section id="inbound">
   <div class="wrap">
     <p class="eyebrow">Inbound</p>
-    <h2>Push Arrives Through a Public Salesforce Site</h2>
-    <p>TSANet cannot authenticate into your org, so inbound events land on an Apex REST endpoint exposed through a Salesforce Site running as a guest user. This is the part of the setup with the most moving pieces and by far the most common source of installation failures.</p>
+    <h2>Push Arrives Through an External Client App</h2>
+    <p>Since 2.14 TSANet authenticates into your org. You create an External Client App with the client-credentials flow enabled and your integration user as its Run As user, then hand its consumer key and secret to TSANet when you register the webhook. Before each delivery TSANet fetches a Salesforce token with them and posts to the package's Apex REST endpoint on your My Domain, where the call runs as the integration user. The public Site and its guest user are no longer used. This is still the part of the setup with the most moving pieces.</p>
     <figure>
       <div class="diagram">
-        <svg viewBox="0 0 1060 300" style="min-width:960px" role="img" aria-label="Inbound flow: TSANet posts a thin event to the Apex REST endpoint on a public Salesforce Site; the handler acknowledges 200 immediately, publishes a platform event for the UI, and enqueues a Queueable which fetches the full case by token and upserts the custom objects, after which a record-triggered flow may auto-accept.">
+        <svg viewBox="0 0 1060 300" style="min-width:960px" role="img" aria-label="Inbound flow: TSANet obtains a token from the External Client App and posts a thin event to the Apex REST endpoint on the org's My Domain; the handler acknowledges 200 immediately, publishes a platform event for the UI, and enqueues a Queueable which fetches the full case by token and upserts the custom objects, after which a record-triggered flow may auto-accept.">
           <defs><marker id="ibA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--slate)"/></marker></defs>
 
           <rect class="bx-ext" x="16" y="110" width="150" height="56" rx="7"/>
           <text class="tt" x="91" y="134" text-anchor="middle">TSANet</text>
-          <text class="tl" x="91" y="152" text-anchor="middle">thin event: tokens</text>
+          <text class="tl" x="91" y="152" text-anchor="middle">OAuth · thin event</text>
 
           <path class="ln" d="M166,138 H222" marker-end="url(#ibA)"/>
 
           <rect class="bx" x="228" y="96" width="200" height="84" rx="7"/>
-          <text class="tt" x="240" y="118">Apex REST · Site guest</text>
+          <text class="tt" x="240" y="118">Apex REST · My Domain</text>
           <text class="ts" x="240" y="137">/apexrest/tsanetconnect</text>
           <text class="ts" x="240" y="153">  /webhook</text>
           <text class="tl" x="240" y="171">always 200, even on error</text>
@@ -360,24 +351,24 @@ TokenManager.commitTokenIfPending();            <span class="c">// DML now safe<
           <text class="ts" x="764" y="246">record-triggered Flow</text>
           <text class="tl" x="764" y="264">create Case · maybe auto-accept</text>
 
-          <text class="tl" x="16" y="212" style="fill:var(--orange);font-weight:600">403 here</text>
-          <text class="tl" x="16" y="228">is almost always</text>
-          <text class="tl" x="16" y="244">a guest user missing</text>
+          <text class="tl" x="16" y="212" style="fill:var(--orange);font-weight:600">401 or 403 here</text>
+          <text class="tl" x="16" y="228">401: key, secret or flow</text>
+          <text class="tl" x="16" y="244">403: Run As user lacks</text>
           <text class="tl" x="16" y="260">the permission set</text>
         </svg>
       </div>
-      <figcaption>The event carries identifiers, not content, so the fetch is what establishes truth — the same shape as the other connectors. Upserting on the token as ExternalID is what makes a redelivered event harmless.</figcaption>
+      <figcaption>The event carries identifiers, not content, so the fetch is what establishes truth — the same shape as the other connectors. Upserting on the token as ExternalID is what makes a redelivered event harmless. The handler also publishes <code>TSANetWebhookEvent__e</code> for your own subscribers, but the package's trigger on that event does nothing. The Queueable does the upsert, whatever the release notes say about the event trigger.</figcaption>
     </figure>
 
     <h3>What the Setup Actually Requires</h3>
     <ul class="tight">
-      <li><strong>A registered Salesforce Sites domain and an active Site.</strong> Both an active site and one showing a maintenance page will serve the endpoint; what breaks it is the site not existing or not being activated.</li>
-      <li><strong>The <code>TSANet Webhook Guest Access</code> permission set assigned to that Site's guest user.</strong> This is the 403 cause. Find the guest user under Setup → Sites → your site → Public Access Settings → View users.</li>
-      <li><strong>Guest permissions kept minimal.</strong> Clone the shipped permission set and grant only Read and/or Create on Case, with record-type access limited to the types TSANet actually uses.</li>
-      <li><strong>A <code>TSANetWebhook__c</code> record</strong> under the credential, Active, with the callback URL set to <code>&lt;Site Base URL&gt;/services/apexrest/tsanetconnect/webhook</code> and <strong>both event types selected</strong> — an empty event-type list delivers nothing, silently.</li>
+      <li><strong>An integration user with the <code>TSANet Integration User Access</code> permission set.</strong> It covers the webhook classes, upserts on the TSANet objects, Case Feed posts and Case read-only access, with no View All.</li>
+      <li><strong>An External Client App</strong>, distribution state Local, OAuth enabled with the <code>api</code> and <code>full</code> scopes and <em>only</em> the client-credentials flow, and the integration user set as <strong>Run As</strong> under its OAuth policies. The callback URL is required by the form but never called.</li>
+      <li><strong>A <code>TSANetWebhook__c</code> record</strong> under the primary credential, with the External Client App's consumer key and secret as Client Id and Client Secret. The callback URL is filled in for you as <code>&lt;My Domain&gt;/services/apexrest/tsanetconnect/webhook</code>. It must use My Domain, not a Site URL. Saving registers the subscription on <code>/v2/webhooks</code> with a V2 payload and OAuth client-credentials <code>callbackAuth</code>. The key and secret are sent to TSANet and not kept in Salesforce.</li>
       <li><strong>Do not change the Apex REST path.</strong> It is part of the package contract.</li>
     </ul>
-    <div class="note"><strong>When inbound is silent, check in this order:</strong> is the Site active; is the guest user assigned the permission set; are event types selected on the webhook record; does <code>TSANetError__c</code> have rows. A trace flag on the integration user with debug level <code>SFDC_DevConsole</code> covers what the error object does not.</div>
+    <div class="note"><strong>Two sources disagree on the integration user's licence — needs probe.</strong> The installation guide says the integration user must hold a full Salesforce licence, because with a Salesforce Integration licence the webhook cannot create Case Feed items. The permission set's own description says it was kept to Case read-only "so it fits the Salesforce Integration license". Follow the guide until one of them is corrected.</div>
+    <div class="note"><strong>When inbound is silent, check in this order:</strong> is the credential both Primary and Connected; does the webhook record exist and show Active; is the External Client App's client-credentials flow on, with the right Run As user; does <code>TSANetError__c</code> have rows. The guide maps a 401 or <code>invalid_client</code> to the External Client App's settings and a 403 to a Run As user missing the permission set. A trace flag on the integration user with debug level <code>SFDC_DevConsole</code> covers what the error object does not. On Production, also read the <a href="#class">callbackAuth note</a>: registration may be what failed.</div>
   </div>
 </section>
 
@@ -385,7 +376,7 @@ TokenManager.commitTokenIfPending();            <span class="c">// DML now safe<
   <div class="wrap">
     <p class="eyebrow">Scheduled sync</p>
     <h2>The 15-Minute Sweep, and Salesforce Cron</h2>
-    <p><code>TSANetScheduledJob</code> reconciles Salesforce against TSANet every 15 minutes by default, catching anything the push path missed. Changing that interval runs into a platform quirk that surprises everyone who has written a crontab.</p>
+    <p><code>TSANetScheduledJob</code> reconciles Salesforce against TSANet every 15 minutes by default, catching anything the push path missed. Push delivers only creations and notes, so the sweep is also how closures and responses arrive. It reads the paged <code>/v2/collaboration-requests</code> list. The package schedules the jobs itself when the primary credential connects, and they run as the user who created the credential record. Changing the interval runs into a platform quirk that surprises everyone who has written a crontab.</p>
     <div class="note" style="border-left-color:var(--red)"><strong>Salesforce cron does not support <code>*/X</code> or <code>0/X</code> increments.</strong> There is no "every 15 minutes" expression. A single schedule fires at most once per hour, at one specific minute — so a 15-minute cadence is <strong>four separate scheduled jobs</strong>, a 10-minute cadence is six, and a 5-minute cadence is twelve.</div>
     <pre><code><span class="c"># Every 15 minutes — four schedules, not one</span>
 0 0  * * * ?
@@ -395,6 +386,7 @@ TokenManager.commitTokenIfPending();            <span class="c">// DML now safe<
 
 <span class="c"># Use ? for Day-of-Month or Day-of-Week when the other is specified</span></code></pre>
     <p>Manage them under Setup → Environments → Jobs → Scheduled Jobs. Before shortening the interval, weigh it against your org's Apex governor limits — every schedule is an independent job making its own callouts.</p>
+    <div class="note"><strong>A custom cadence does not survive a reconnect.</strong> In the 2.14 source the package names its jobs <code>TSANetScheduledJob - &lt;credential Id&gt; - 00</code>, <code>- 15</code>, <code>- 30</code> and <code>- 45</code>. Whenever the credential reconnects, through the reconnect action or by becoming primary again, it counts the jobs carrying that credential's id. If it finds anything other than four, it aborts them and schedules its four again. Jobs under other names are left alone and run alongside the four. The guide's suggested names (<code>TSANetScheduledJob – Every 10 (00)</code> and so on) are of that second kind. After any reconnect, re-check Scheduled Jobs.</div>
   </div>
 </section>
 
@@ -403,6 +395,7 @@ TokenManager.commitTokenIfPending();            <span class="c">// DML now safe<
     <p class="eyebrow">Automation</p>
     <h2>The Flow Library Is the Extension Point</h2>
     <p>This is what makes the Salesforce connector different in kind from the others. The package ships a library of Flows covering every lifecycle action, in both screen and autolaunched form, and <strong>every one of them is clonable</strong>. A member can change routing, approval policy, notification recipients and case-matching logic without writing Apex — the Apex is exposed as invocable actions that Flow calls as building blocks.</p>
+    <p>Since 2.14 the inbound record-triggered flows ship <strong>deactivated, as templates</strong>: Collaboration Request Trigger Handler, its Asset variant, Auto Accept, Note Trigger and Request More Information. You clone and activate the ones you want. The screen flows and the notification, owner-change and case-link flows ship active.</p>
 
     <div class="cols">
       <div>
@@ -412,31 +405,30 @@ TokenManager.commitTokenIfPending();            <span class="c">// DML now safe<
           <li>Approve Request · Reject Case</li>
           <li>Request More Information · Send More Information</li>
           <li>Get Companies · Get Company Form</li>
-          <li>Create Note · Attach File</li>
+          <li>Create Note · Link Case to Collaboration Request</li>
           <li>Refresh Cases · Change Owner · Close Request</li>
+          <li>Process Webhook Event · Mark Notes Notified</li>
         </ul>
       </div>
       <div>
         <h3>Flows Worth Knowing About</h3>
         <ul class="tight">
-          <li><strong>Auto Accept Collaboration Request</strong> — record-triggered on TSANet Case creation, accepts eligible requests with no human step</li>
+          <li><strong>Auto Accept Collaboration Request</strong> — record-triggered on TSANet Case creation, accepts with no human step. Since 2.14 it runs asynchronously, so activating it no longer fails on a callout in the same transaction. If you activated and modified the old one, the release notes say to replace it with this one</li>
           <li><strong>Collaboration Request Trigger Handler</strong> — creates the Salesforce Case and links it back to the TSANet Case</li>
-          <li><strong>Trigger Handler (Asset)</strong> — the entitlement variant: matches on asset, and rejects when there is no match</li>
-          <li><strong>Find Parent Case (Template)</strong> — matching logic for attaching a collaboration to an existing case</li>
+          <li><strong>Trigger Handler (Asset)</strong> — the entitlement variant: matches on an asset, and on no match sends the partner an information request (see below)</li>
+          <li><strong>Find Parent Case (Template)</strong> — matching logic for attaching a collaboration to an existing case, branching on direction across the receiver and submitter case numbers</li>
           <li><strong>Case Owner Change Handler</strong> — propagates a Salesforce owner change to TSANet</li>
         </ul>
       </div>
     </div>
 
-    <h3>Auto-Approval by Asset Serial Number</h3>
-    <p>The most-copied pattern in the library, and a good template for your own policy. The record-triggered flow fires when a TSANet Case is created with no Salesforce Case linked, direction inbound, and a serial number present:</p>
-    <pre><code>Get Asset by Serial Number      <span class="c">→ no match? reject the request</span>
-Get Contact by Customer Email   <span class="c">→ optional enrichment</span>
-Create Salesforce Case          <span class="c">→ Asset, Contact, Subject, Description</span>
-Update TSANet Case              <span class="c">→ attach the new Case Id</span>
-Approve Collaboration Request   <span class="c">→ invocable Apex, with engineer details</span>
-Send Custom Notification        <span class="c">→ to the case owner</span></code></pre>
-    <p>Rejecting on no asset match is the entitlement check: a partner escalating about hardware you have no record of does not become a case your team has to triage. Adapt the matching step — contract, entitlement, account tier — and the rest of the flow is unchanged.</p>
+    <h3>Matching on an Asset</h3>
+    <p>The pattern most worth copying, and a good template for your own policy. Two versions exist, and they differ. The shipped template, <em>Trigger Handler (Asset)</em>, fires when a TSANet Case is created with direction inbound and no Salesforce Case linked:</p>
+    <pre><code>Get Asset                       <span class="c">→ as shipped: Asset Name = the TSANet Case's Email field</span>
+  └─ found      <span class="c">→ create the Salesforce Case, link it, accept, notify the owner</span>
+  └─ not found  <span class="c">→ Request Information (Automation): ask the partner, do not reject</span></code></pre>
+    <p>The installation guide also walks through a custom handler you build yourself, which looks up the Asset by serial number and then a Contact by the customer's email before it creates the Case and approves. That one only runs when a serial number is present, and the guide describes no branch for a missing asset.</p>
+    <div class="note"><strong>The guide and the shipped flow disagree about the no-match branch.</strong> The guide says the Asset template "triggers an automation to reject the collaboration request" when no asset is found. In the package source at both <code>Release-v2.13</code> and 2.14, that branch calls <em>TSANet Request Info (Automation)</em>, which asks the partner for more information. Nothing in the flow rejects. If rejection is the policy you want, change that branch in your clone, and change the lookup too: matching Asset Name against an email field is a placeholder, not an entitlement check.</div>
     <div class="note">Custom flows that send notifications need a Custom Notification Type to exist first; the shipped flows reference one named <code>TSANet_Notification</code>. A flow that silently does nothing at the notification step is usually a missing notification type.</div>
   </div>
 </section>
@@ -445,31 +437,32 @@ Send Custom Notification        <span class="c">→ to the case owner</span></co
   <div class="wrap">
     <p class="eyebrow">Setup</p>
     <h2>Installation Order</h2>
+    <p>The published guide orders configuration in three steps, and the order matters: create the integration user first, then the credential, then the webhook.</p>
     <div class="cols">
       <div>
-        <h3>Package and Access</h3>
+        <h3>Package, User and Credential</h3>
         <ul class="tight">
-          <li>Request credentials from <code>membership@tsanet.org</code></li>
-          <li>Install the latest release package from the <a href="https://github.com/tsanetgit/SFDC_App/releases">GitHub releases page</a> — the release marked Latest, not a beta pre-release — choosing all users or specific profiles</li>
-          <li>Grant third-party website access when prompted</li>
-          <li>Assign <strong>TSANet Connect Permissions (Admin)</strong> and <strong>(Employee)</strong> to the right users</li>
-          <li>Create the credential record, pick the environment, mark it <strong>Primary</strong>, designate the integration user</li>
-          <li>Enable Enhanced Profile User Interface under User Management Settings</li>
+          <li>Request API client credentials from <code>membership@tsanet.org</code></li>
+          <li>Install from the <a href="https://github.com/tsanetgit/SFDC_App/releases">GitHub releases page</a>, using the release marked Latest (2.14 since 2026-10-21) rather than a pre-release. Choose all users or specific profiles, and grant third-party website access when prompted</li>
+          <li>Create the integration user; check its licence (see <a href="#inbound">Inbound</a>)</li>
+          <li>Assign <strong>TSANet Connect Permissions (Admin)</strong> or <strong>(Employee)</strong> to people, and <strong>TSANet Integration User Access</strong> to the integration user only</li>
+          <li>As yourself, enter the TSANet client id and secret on the External Credential's <code>TSANetApp</code> principal until it shows <em>Configured</em></li>
+          <li>Log in as the integration user and create the TSANet Credentials record, naming the Named Credential and the integration user; refresh until <em>Is Primary</em> and <em>Is Connected</em> are both checked</li>
         </ul>
       </div>
       <div>
-        <h3>Surfaces and Automation</h3>
+        <h3>Webhook, Surfaces and Automation</h3>
         <ul class="tight">
+          <li>Create the External Client App and copy its consumer key and secret</li>
+          <li>On the credential's TSANet Webhooks related list, create the webhook with both event types and the key and secret</li>
           <li>Add the <code>TSANetApplication</code> component to the Case record page in Lightning App Builder, then activate and assign</li>
-          <li>Add the TSANet Case related list to the Case page layout</li>
-          <li>Add the <em>Create New TSANet Case</em> dynamic action to the Highlights Panel</li>
-          <li>Add the TSANet Cases list to the Service Console</li>
-          <li>Register the Sites domain, create and activate the Site, assign the guest permission set, create the webhook record</li>
-          <li>Activate the inbound and outbound flows you intend to use, and tune the scheduled job</li>
+          <li>Add the TSANet Case related list to the Case page layout, the <em>Create New TSANet Case</em> dynamic action to the Highlights Panel, and the TSANet Cases list to the Service Console</li>
+          <li>Clone and activate the inbound template flows you intend to use, and tune the scheduled jobs</li>
         </ul>
       </div>
     </div>
     <p>Organizations that would rather not use the LWC can reach the same actions through page layouts instead — override the predefined actions in <em>Salesforce Mobile and Lightning Experience Actions</em> and add the TSANet Case Menu.</p>
+    <div class="note"><strong>Upgrading from 2.13.</strong> Do the credential and webhook steps above before you upgrade. The post-install script does nothing, so disconnect the old Basic Auth credential records and abort their leftover scheduled jobs by hand. Deleting an old webhook record also deletes its subscription on TSANet. The Site and guest user are no longer used. On Production, read the <a href="#class">callbackAuth note</a> before you count on push.</div>
   </div>
 </section>
 
@@ -479,19 +472,19 @@ Send Custom Notification        <span class="c">→ to the case owner</span></co
     <h2>Constraints and Common Failures</h2>
     <div class="cols">
       <ul class="tight">
-        <li><strong>Exactly one primary credential per org.</strong> Marking a second one primary is the usual cause of "it authenticated as the wrong company" after a sandbox refresh.</li>
-        <li><strong>No <code>*/X</code> in Salesforce cron.</strong> Every interval shorter than an hour means multiple schedules. See above.</li>
-        <li><strong>A 403 on the webhook is a guest-user permission problem</strong> nine times out of ten — not a TSANet-side issue and not a Site problem.</li>
-        <li><strong>Delivery signing is not described here.</strong> The API signs every delivery with <code>X-Hub-Signature-256</code>; this page does not describe how the 2.13 package handles it. 2.14 moves the endpoint behind an External Client App with OAuth2 client-credentials callback authentication (see the 2.14 note under <a href="#class">Connector class</a>).</li>
-        <li><strong>Empty event types on the webhook record deliver nothing, silently.</strong> Select both. On v1 those two — <code>collaboration-request.created</code> and <code>note.created</code> — are the whole set the platform delivers; the three v2-only types (closed, response.created, response.updated) never reach a v1 subscription, so closures and responses arrive through the scheduled sync.</li>
-        <li><strong>Remote Site Settings are required per environment.</strong> A callout to an unregistered host never leaves the org.</li>
+        <li><strong>On Production, webhook registration needs a platform feature that is Beta-only today.</strong> 2.14 sends <code>OAUTH2_CLIENT_CREDENTIALS</code> <code>callbackAuth</code> and has no fallback. See the note under <a href="#class">Connector class</a>.</li>
+        <li><strong>Making a credential primary clears the flag on every other record.</strong> It also re-runs the account probe and reschedules the jobs. After a sandbox refresh, check which record is primary and which Named Credential it names — that is the usual cause of "it connected to the wrong environment".</li>
+        <li><strong>No <code>*/X</code> in Salesforce cron.</strong> Every interval shorter than an hour means multiple schedules, and a reconnect resets the package's own four. See <a href="#sync">Scheduled sync</a>.</li>
+        <li><strong>401 versus 403 on the webhook.</strong> A 401 or <code>invalid_client</code> points at the External Client App: the wrong key or secret, or the client-credentials flow not enabled. A 403 means the Run As user lacks <code>TSANet Integration User Access</code>. Neither is a TSANet-side issue.</li>
+        <li><strong>The endpoint does not check <code>X-Hub-Signature-256</code>.</strong> The API signs every delivery, but the 2.14 handler has no signature code. It relies on the OAuth token Salesforce validates before the Apex runs. The handler also answers 200 even when processing fails, so look in <code>TSANetError__c</code> rather than at delivery status.</li>
+        <li><strong>Only two event types are offered.</strong> The webhook form lists <code>collaboration-request.created</code> and <code>note.created</code>, both selected by default, and stores them in prefixed v2 form. Closures and responses are not in the form, so they arrive through the scheduled sync. An empty selection is refused at save.</li>
       </ul>
       <ul class="tight">
-        <li><strong>DML before callout fails.</strong> If you extend the package with your own Apex, defer token persistence until after the callouts, as <code>TokenManager</code> does.</li>
-        <li><strong>The stored token is split across two fields.</strong> Neither half is a valid token on its own.</li>
-        <li><strong>"View Encrypted Data" is a separate permission set</strong> and should be granted narrowly — it exposes encrypted field values wherever they appear.</li>
+        <li><strong>Off the deprecated v1 paths.</strong> Verified against the package source at 2.14: lists read <code>/v2/collaboration-requests</code> and <code>/v2/collaboration-requests/list</code>, and webhooks register and list on <code>/v2/webhooks</code>. Delete stays on <code>/v1/webhooks/{id}</code>, which is not deprecated, and case actions stay on v1, where they have no v2 equivalent. Nothing here is on the 2027-01-01 <a href="../api/index.html#versions">deprecation clock</a>.</li>
+        <li><strong>Note types are a Beta-side feature.</strong> 2.14 sends a <code>type</code> on every note (<code>null</code> when unset) using the v2 note contract. Production's note schema has no <code>type</code> field. What Production does with it has not been probed.</li>
+        <li><strong>DML before callout fails.</strong> If you extend the package with your own Apex, make the callouts before any writes in the same transaction.</li>
+        <li><strong>"View Encrypted Data" is a separate permission set</strong> you create yourself and should grant narrowly — it exposes encrypted field values wherever they appear.</li>
         <li><strong>Cases auto-close after 30 days of inactivity.</strong> Worth knowing before you build reporting that assumes a manual close.</li>
-        <li><strong>Two v1 paths are on a 2027-01-01 sunset.</strong> <code>GET /v1/collaboration-requests</code> and the <code>/v1/webhooks</code> subscription paths. Verified against the package source at <code>Release-v2.13</code>: it registers on <code>/v1/webhooks</code> and lists cases on the deprecated <code>GET /v1/collaboration-requests</code>, which accepts <code>updatedAfter</code> too, so the sync keeps working until the sunset. The 2.14 beta moves both to v2. See <a href="../api/index.html#versions">deprecation clocks</a>.</li>
         <li><strong>Two API rules this page does not repeat.</strong> Rejections arrive as HTTP 500 unless the caller sends <code>Accept: application/problem+json</code>, and there is no idempotency key on create — a retried create is a second case. Both on <a href="../api/index.html">Working with the API</a>.</li>
         <li><strong>Check <code>TSANetError__c</code> first.</strong> It is where <code>ErrorLogger</code> writes, and it is faster than a trace flag for most failures.</li>
       </ul>

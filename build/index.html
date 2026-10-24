@@ -69,7 +69,7 @@
       <p>The answer decides who operates the integration, where credentials live, whether connector faults are isolated to one member or shared across all of them, and whether shipping a fix means asking every member to upgrade. Ask it before scoping anything, because it is what makes route one or route two the natural fit — and the platforms that answer "sort of" are where the design work is.</p>
       <div class="split">
         <div><b>Yes — in-tenant</b> Salesforce and Dynamics say yes and get managed packages the member installs. You build against the API or the SDK, and the member operates it.</div>
-        <div><b>No — gateway</b> Intercom says no, so TSANet hosts and operates the adapter on the Connect Gateway. You write only the half that talks to your platform.</div>
+        <div><b>No — gateway</b> Intercom says no, so the adapter runs as a service on the Connect Gateway, hosted by TSANet or by the member. You write only the half that talks to your platform.</div>
       </div>
       <p style="margin-top:14px;font-size:13.5px">The taxonomy, the consequences of each class, and what to do when a platform answers both ways: <a href="../topics/connector-classes.html">Two Ways to Build a Connector</a>. The worked case of an ambiguous answer is the <a href="../connectors/servicenow.html">ServiceNow assessment</a>.</p>
     </div>
@@ -155,7 +155,7 @@
       <a class="card" href="../connectors/salesforce.html"><span class="chip live">GA · in-tenant</span><h3>Salesforce</h3><p>Managed package; collaboration state in first-class custom objects; a Flow library as the extension point.</p></a>
       <a class="card" href="../connectors/dynamics.html"><span class="chip live">GA · in-tenant</span><h3>Microsoft Dynamics</h3><p>Managed solution; six Dataverse tables; field mapping as a configuration table rather than code.</p></a>
       <a class="card" href="../connectors/zendesk.html"><span class="chip live">GA · partial</span><h3>Zendesk</h3><p>A sandboxed app plus declarative flows; state in ticket fields and tags; the three-audience note model.</p></a>
-      <a class="card" href="../connectors/fin-intercom.html"><span class="chip beta">Early access · gateway</span><h3>Fin / Intercom</h3><p>The first gateway-class adapter: TSANet hosts it, the engine holds the state, the taxonomy parks ambiguity.</p></a>
+      <a class="card" href="../connectors/fin-intercom.html"><span class="chip beta">Early access · gateway</span><h3>Fin / Intercom</h3><p>The first gateway-class adapter: TSANet-hosted or self-hosted, the engine holds the state, the taxonomy parks ambiguity.</p></a>
       <a class="card" href="../connectors/servicenow.html"><span class="chip beta">Not built · assessment</span><h3>ServiceNow</h3><p>What scoping looks like before code exists: every claim tagged, every open question named with what it blocks.</p></a>
     </div>
   </div>

@@ -46,12 +46,12 @@
   <div class="wrap">
     <div class="crumb"><a href="../index.html">Hub</a> / <a href="index.html">Topics</a> / Connector classes</div>
     <h1>Two Ways to Build a Connector</h1>
-    <p class="lede">Every integration decision downstream — who operates it, where credentials live, what happens when it breaks, how members upgrade — is decided by one question about your platform. Ask it first, because the answer is not yours to choose.</p>
+    <p class="lede">Every integration decision downstream — who can operate it, where credentials can live, what happens when it breaks, how members upgrade — is decided by one question about your platform. Ask it first, because the answer is not yours to choose.</p>
     <div class="meta-row">
       <span><b>Topic</b> Integration architecture</span>
       <span><b>Grounded in</b> Five platforms</span>
       <span><b>Audience</b> Anyone scoping an integration</span>
-      <span><b>Updated</b> 2026-09-13</span>
+      <span><b>Updated</b> 2026-10-24</span>
     </div>
     <div class="toc">
       <a href="#question">The question</a>
@@ -105,13 +105,13 @@
       <div class="classcard gateway">
         <h3>Gateway</h3>
         <div class="who">Fin / Intercom</div>
-        <p>The platform hosts no third-party code at all. Panels are pages served from elsewhere and framed in; there is no installed package — the member connects an app in their workspace (for Fin / Intercom, a connected Intercom app) and TSANet hosts the rest. The shared machinery this class runs on is the <a href="../connectors/connect-gateway.html">Connect Gateway</a>.</p>
+        <p>The platform hosts no third-party code at all. Panels are pages served from elsewhere and framed in; there is no installed package — the member connects an app in their workspace (for Fin / Intercom, a connected Intercom app) and the rest runs as a service outside the platform, which TSANet can host or the member can run in its own cloud. The shared machinery this class runs on is the <a href="../connectors/connect-gateway.html">Connect Gateway</a>.</p>
         <ul>
-          <li>TSANet operates it</li>
-          <li>Credentials sit with TSANet, one set per member</li>
+          <li>TSANet operates it, or the member self-hosts it</li>
+          <li>Credentials sit with whoever hosts it, one set per member</li>
           <li>The gateway must hold lifecycle state itself</li>
-          <li>Connector faults are shared — one hosted service for every member on it</li>
-          <li>Fixes ship centrally, with nothing to upgrade</li>
+          <li>Connector faults are shared by the members on a TSANet-hosted service; a self-hosted one is the member's alone</li>
+          <li>Fixes ship centrally when TSANet hosts it; a self-hosting member deploys each release</li>
         </ul>
       </div>
     </div>
@@ -136,17 +136,17 @@
           <text class="tl" x="16" y="140">Operated by</text>
           <text class="ts" x="265" y="140" text-anchor="middle">the member</text>
           <text class="ts" x="570" y="140" text-anchor="middle">the member</text>
-          <text class="ts" x="858" y="140" text-anchor="middle" style="fill:var(--orange)">TSANet</text>
+          <text class="ts" x="858" y="140" text-anchor="middle" style="fill:var(--orange)">TSANet or the member</text>
 
           <text class="tl" x="16" y="168">Credentials</text>
           <text class="ts" x="265" y="168" text-anchor="middle">their tenant</text>
           <text class="ts" x="570" y="168" text-anchor="middle">their tenant</text>
-          <text class="ts" x="858" y="168" text-anchor="middle" style="fill:var(--orange)">with TSANet</text>
+          <text class="ts" x="858" y="168" text-anchor="middle" style="fill:var(--orange)">with whoever hosts it</text>
 
           <text class="tl" x="16" y="196">Connector fault</text>
           <text class="ts" x="265" y="196" text-anchor="middle">one member</text>
           <text class="ts" x="570" y="196" text-anchor="middle">one member</text>
-          <text class="ts" x="858" y="196" text-anchor="middle" style="fill:var(--orange)">shared — one hosted service</text>
+          <text class="ts" x="858" y="196" text-anchor="middle" style="fill:var(--orange)">shared if TSANet-hosted</text>
 
           <text class="tl" x="16" y="224">Platform outage</text>
           <text class="ts" x="265" y="224" text-anchor="middle" style="fill:var(--orange)">everyone</text>
@@ -179,15 +179,15 @@
           <tr><th scope="row">Reconciliation</th><td>Scheduled jobs the platform runs for you</td><td class="next">A poller you build, operate and monitor</td></tr>
           <tr><th scope="row">Durable state</th><td>Platform objects — reportable, governed by their sharing model</td><td class="next">A store you run, back up and keep consistent with the platform</td></tr>
           <tr><th scope="row">Inbound delivery</th><td>An endpoint inside the tenant, or the platform's own event machinery</td><td class="next">Your endpoint, your signature verification, your dedupe</td></tr>
-          <tr><th scope="row">Deployment</th><td>A package a member installs and later upgrades</td><td class="next">A service you deploy; members connect an app and install little else</td></tr>
-          <tr><th scope="row">Data residency</th><td>Case content never leaves the member's tenant</td><td class="next">Case content transits infrastructure TSANet operates</td></tr>
+          <tr><th scope="row">Deployment</th><td>A package a member installs and later upgrades</td><td class="next">A service someone deploys, TSANet or the member; the platform side is a connected app</td></tr>
+          <tr><th scope="row">Data residency</th><td>Case content never leaves the member's tenant</td><td class="next">Case content transits whichever infrastructure hosts the service: TSANet's, or the member's own</td></tr>
           <tr><th scope="row">Connector faults</th><td>Independent — one member's misconfiguration cannot affect another</td><td class="next">Correlated across members on the gateway — one shared service, which is what its durability and rollout design exists to manage</td></tr>
           <tr><th scope="row">Platform outage</th><td colspan="2" style="text-align:center">Affects everyone, in every class — the Connect API is a shared dependency regardless of where connector code runs</td></tr>
           <tr><th scope="row">Release cadence</th><td>Gated by member upgrade appetite and any store review</td><td class="next">As fast as you can deploy safely</td></tr>
         </tbody>
       </table>
     </div>
-    <p>The row that most often gets under-weighted at scoping time is <strong>data residency</strong>, because it is a procurement question rather than an engineering one. A member whose policy says case content stays on their infrastructure has effectively ruled out the gateway class before the first design meeting — and will say so late, after review, unless someone asks early.</p>
+    <p>The row that most often gets under-weighted at scoping time is <strong>data residency</strong>, because it is a procurement question rather than an engineering one. A member whose policy says case content stays on their infrastructure has ruled out a TSANet-hosted gateway before the first design meeting, though not the gateway class: the same adapter can run in the member's own cloud. Either way they will say so late, after review, unless someone asks early.</p>
     <p>The two failure rows are the ones most often reasoned about badly, including by us — an earlier version of this page got them wrong, so it is worth being precise.</p>
     <p><strong>Every class already shares a dependency.</strong> The Connect API is the shared floor: a platform outage stops collaboration for every member regardless of where their connector code runs. An in-tenant Salesforce package does not keep working when the platform is down. So "in-tenant means one member is affected" is only ever true of faults <em>in the connector itself</em>, and stating it without that qualifier flatters the in-tenant column.</p>
     <p><strong>What the gateway changes is correlation, not fragility.</strong> It adds one more component shared by the members on it, so a fault there is correlated rather than independent. That is a design input, not a verdict: correlation is what durability, recovery and staged rollout exist to manage, and a gateway built that way targets availability in the same range members expect from the platform itself. The honest comparison is that in-tenant distributes connector faults across members while a gateway concentrates them into something engineered — and operated — to a higher standard than any individual member's install.</p>
@@ -207,7 +207,7 @@
       <li><strong>Are there native outbound events?</strong> No webhooks means either something installed emits them, or you poll. Both are real answers; polling is not a failure.</li>
       <li><strong>Where can durable state live?</strong> If the platform gives you no first-class object to hold case linkage, something you operate has to hold it — and that thing becomes precious.</li>
     </ol>
-    <div class="note"><strong>Ask a fifth question of the member, not the platform:</strong> does their policy allow case content to transit infrastructure they do not operate? A "no" collapses the choice regardless of what the platform supports, and it is cheaper to hear at scoping than at security review.</div>
+    <div class="note"><strong>Ask a fifth question of the member, not the platform:</strong> does their policy allow case content to transit infrastructure they do not operate? For an in-tenant platform, a "no" is already satisfied. For a gateway-class platform, it decides hosting rather than class: the member runs the adapter in its own environment instead of TSANet hosting it. Either way it is cheaper to hear at scoping than at security review.</div>
     <h3>Where the Shipped Connectors Landed</h3>
     <div class="twrap">
       <table>

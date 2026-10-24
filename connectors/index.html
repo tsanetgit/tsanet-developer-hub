@@ -77,7 +77,7 @@
       <div class="act">A ZAF app plus a ZIS integration, both in your own tenant. <a href="zendesk.html">Architecture &amp; setup →</a></div>
 
       <div class="plat">Fin / Intercom</div>
-      <div class="act">TSANet hosts and operates the adapter; you install almost nothing. <a href="fin-intercom.html">Architecture &amp; platform notes →</a></div>
+      <div class="act">An adapter service outside Intercom, hosted by TSANet or in your own cloud; the choice is yours. <a href="fin-intercom.html">Architecture &amp; platform notes →</a></div>
 
       <div class="plat">ServiceNow</div>
       <div class="act">No connector yet — development committed for 2026. <a href="servicenow.html">Platform assessment →</a></div>
@@ -114,16 +114,16 @@
         <tbody>
           <tr><th scope="row">Class</th><td>In-tenant</td><td>In-tenant</td><td>Partial</td><td>Gateway</td><td class="na">Undecided</td></tr>
           <tr><th scope="row">Status</th><td><span class="pill ok">GA</span></td><td><span class="pill ok">GA</span></td><td><span class="pill ok">GA</span></td><td><span class="pill warn">Early access</span></td><td><span class="pill bad">Not built</span></td></tr>
-          <tr><th scope="row">Operated by</th><td>You</td><td>You</td><td>You</td><td>TSANet</td><td class="na">—</td></tr>
+          <tr><th scope="row">Operated by</th><td>You</td><td>You</td><td>You</td><td>TSANet, or you if self-hosted</td><td class="na">—</td></tr>
           <tr><th scope="row">Agent surface</th><td>LWC on the Case record page</td><td>HTML + JS web resources on the Case form</td><td>ZAF sidebar app + nav-bar screen</td><td>Canvas Kit panel in the Help Desk</td><td class="na">—</td></tr>
           <tr><th scope="row">Where state lives</th><td>Custom objects</td><td>Dataverse tables</td><td>Ticket fields and tags</td><td>The gateway's own durable store</td><td class="na">—</td></tr>
           <tr><th scope="row">Inbound delivery</th><td>Apex REST on My Domain, via an External Client App</td><td>Scheduled poll by default; optional webhook to Power Automate</td><td>ZIS generic inbound webhook</td><td>TSANet push to the adapter</td><td class="na">—</td></tr>
           <tr><th scope="row">Reconciliation</th><td>Scheduled job, 15&nbsp;min default</td><td>Scheduled flow, 15&nbsp;min default</td><td>ZAF background poller, 60&nbsp;s</td><td>Reconciliation poller</td><td class="na">—</td></tr>
           <tr><th scope="row">Extension point</th><td>Clonable Flow library</td><td>Case Mapping configuration table</td><td>Zendesk triggers and ZIS flows</td><td>Server-side, by TSANet</td><td class="na">—</td></tr>
           <tr><th scope="row">Auto-accept</th><td>Asset-match template; asks for information on no match</td><td>Auto-routing by case number, then customer name</td><td>Built-in setting, or a scoped trigger</td><td>Deliberately manual</td><td class="na">—</td></tr>
-          <tr><th scope="row">Distribution</th><td>Managed package</td><td>Managed solution / AppSource</td><td>App upload + ZIS bundle</td><td>A connected Intercom app plus a hosted service</td><td class="na">—</td></tr>
-          <tr><th scope="row">Shipping a fix</th><td>Members upgrade</td><td>Members upgrade</td><td>Members upgrade</td><td>Central, nothing to do</td><td class="na">—</td></tr>
-          <tr><th scope="row">Connector faults</th><td>Isolated</td><td>Isolated</td><td>Isolated</td><td>Shared — one hosted service</td><td class="na">—</td></tr>
+          <tr><th scope="row">Distribution</th><td>Managed package</td><td>Managed solution / AppSource</td><td>App upload + ZIS bundle</td><td>A connected Intercom app plus a service, TSANet-hosted or self-hosted</td><td class="na">—</td></tr>
+          <tr><th scope="row">Shipping a fix</th><td>Members upgrade</td><td>Members upgrade</td><td>Members upgrade</td><td>Central when TSANet-hosted; you deploy each release when self-hosted</td><td class="na">—</td></tr>
+          <tr><th scope="row">Connector faults</th><td>Isolated</td><td>Isolated</td><td>Isolated</td><td>Shared on a TSANet-hosted service; yours alone if self-hosted</td><td class="na">—</td></tr>
           <tr><th scope="row">Platform outage</th><td colspan="5" style="text-align:center;color:var(--orange)">Affects every member in every class — the Connect API is the shared floor</td></tr>
         </tbody>
       </table>

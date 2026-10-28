@@ -47,7 +47,7 @@
       <span><b>Status</b> GA</span>
       <span><b>Surface</b> Ticket sidebar + nav bar</span>
       <span><b>Repo</b> tsanetgit/Zendesk_App</span>
-      <span><b>Updated</b> 2026-10-20</span>
+      <span><b>Updated</b> 2026-10-28</span>
     </div>
     <div class="toc">
       <a href="#class">Connector class</a>
@@ -141,7 +141,7 @@
           <text class="ts" x="624" y="169">connection: tsanet_oauth (Entra)</text>
           <text class="ts" x="624" y="185">connection: zendesk (self, OAuth)</text>
           <text class="tl" x="624" y="205">API-only — invisible in Admin Center</text>
-          <text class="tl" x="624" y="219">bundle upload needs admin session</text>
+          <text class="tl" x="624" y="219">bundle deploy: app nav-bar screen</text>
 
           <rect class="bx" x="348" y="264" width="222" height="106" rx="8"/>
           <text class="tt" x="360" y="286">background.html poller</text>
@@ -534,7 +534,7 @@ PUT  /api/v2/tickets/{id}.json
       <li><strong>Minimal scope is <code>read tickets:write</code>.</strong> <code>tickets:read</code> alone breaks search — <code>/api/v2/search.json</code> returns 403 under it, and there is no <code>search:read</code> scope.</li>
       <li><strong>Migrating an existing install:</strong> connection names are unique across types, so delete the old <code>basic_auth</code> connection named <code>zendesk</code> and create the OAuth one under the same name. Zero bundle changes.</li>
     </ul>
-    <div class="note"><strong>Bundle upload is the one endpoint that rejects OAuth outright.</strong> <code>POST /registry/{integration}/bundles</code> returns 401 for all OAuth bearers. It accepts an API token or an authenticated admin session — and since API tokens are on the clock above, the admin-session path is the documented one. That is exactly what the app's nav-bar deploy screen uses, so no member should be minting a token for this.</div>
+    <div class="note"><strong>Deploy the bundle from the app's nav-bar screen.</strong> Through 2026-10-21, <code>POST /registry/{integration}/bundles</code> returned 401 for every OAuth bearer and accepted only an API token or an authenticated admin session. As of 2026-10-28 it accepts a ZIS OAuth token minted from the integration's own <code>zis_&lt;integration-name&gt;</code> client. Zendesk's developer changelog has no entry for the change, and TSANet has seen it on one instance (<a href="https://github.com/tsanetgit/Zendesk_App/pull/238">Zendesk_App#238</a> has the probe record), so treat it as observed behaviour that could be reversed. The documented path doesn't change: the deploy screen runs on the admin's own session, fills in each instance's values, and installs and checks every job spec, which a bare upload does not. No member needs to mint a token for this.</div>
   </div>
 </section>
 

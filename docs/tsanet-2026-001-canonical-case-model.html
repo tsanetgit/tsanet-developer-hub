@@ -40,10 +40,10 @@
     <h1>The Canonical Case Model, and How Connectors Map onto It</h1>
     <p class="abstract">Every TSANet connector maps the same canonical collaboration case onto a different platform's data model. This document specifies that canonical model, the places where the write schema and the read schema deliberately diverge, and the mapping decisions each connector has to make. It is for anyone building or reviewing an integration against the Connect API.</p>
     <div class="meta-table">
-      <div class="meta-cell"><b>Date</b><span>2026-10-20</span></div>
-      <div class="meta-cell"><b>Version</b><span>0.3</span></div>
+      <div class="meta-cell"><b>Date</b><span>2026-10-28</span></div>
+      <div class="meta-cell"><b>Version</b><span>0.4</span></div>
       <div class="meta-cell"><b>Audience</b><span>Member integrators</span></div>
-      <div class="meta-cell"><b>Verified against</b><span>Connect API OpenAPI spec as served by Production (v3.2.3) and Beta (v3.2.5), 2026-10-20</span></div>
+      <div class="meta-cell"><b>Verified against</b><span>Connect API OpenAPI spec as served by Production and Beta, 2026-10-28: byte-identical, last modified 2026-10-26 (Production) and 2026-10-19 (Beta). Earlier: Production (v3.2.3) and Beta (v3.2.5), 2026-10-20. Spec-read; Production not probed</span></div>
     </div>
   </div>
 </header>
@@ -87,8 +87,8 @@
     </ul>
 
     <div class="callout">
-      <b>Beta only</b>
-      Beta's specification adds two fields to case create and read, and to notes: <code>encrypted</code> (a boolean, default <code>false</code>) and <code>manifest</code> (an opaque value the platform passes through untouched). They belong to a pilot and are not on Production. Don't design around them yet.
+      <b>Pilot fields</b>
+      Both environments' specifications add two fields to case create and read, and to notes: <code>encrypted</code> (a boolean, default <code>false</code>) and <code>manifest</code> (an opaque value the platform passes through untouched). Beta's has carried them since 2026-10-19 and Production's since 2026-10-26. They belong to an end-to-end encryption pilot; see <a href="../topics/end-to-end-encryption.html">End-to-end encryption</a>. Don't design around them yet.
     </div>
 
     <h2><span class="sec-no">3</span>Custom Fields Are Data, Not Schema</h2>
@@ -148,18 +148,18 @@
     </div>
 
     <h2><span class="sec-no">5</span>Known Mapping Gaps</h2>
-    <p>Two mappings are not cleanly expressible on Production today. Both are recorded here so integrators design around them deliberately rather than discovering them mid-build. The second is solved on Beta, and §5.2 and §5.3 say how.</p>
+    <p>Two mappings were not cleanly expressible on the platform until October 2026. Both are recorded here so integrators design around them deliberately rather than discovering them mid-build. The second is solved in the specification both environments now serve, and §5.2 and §5.3 say how. On Production that rests on the specification alone, which it has served since 2026-10-26; nothing there has been probed.</p>
 
     <h3>5.1 Priority Is Three Levels; Most Members Use Four</h3>
     <p>The canonical model has <code>LOW</code>, <code>MEDIUM</code> and <code>HIGH</code>. Members commonly run a four-level severity scale (S1–S4), so a three-to-four mapping is required in both directions, and it has to stay synchronised across the case lifecycle for both sides' service levels to hold. There is no canonical answer; each connector currently decides its own collapse, which means a case can read as a different severity to each party.</p>
 
-    <h3 id="notes">5.2 Note Direction: a Case Property on Production, a Note Property on Beta</h3>
-    <p><strong>On Production</strong>, the note object carries no direction field. Notes are written under a synchronisation identity, so author fields are identical regardless of who sent one. The only available signal is <code>companyName</code>, which is ambiguous when both organisations have similar names. Direction is reliably derivable from the case, not from the note. A connector that labels notes "sent" or "received" should derive that from case direction and its own record of what it posted.</p>
+    <h3 id="notes">5.2 Note Direction: from a Case Property to a Note Property</h3>
+    <p><strong>In the earlier specification</strong>, which Production served until 2026-10-26, the note object carries no direction field. Notes are written under a synchronisation identity, so author fields are identical regardless of who sent one. The only available signal is <code>companyName</code>, which is ambiguous when both organisations have similar names. Direction is reliably derivable from the case, not from the note. A connector that labels notes "sent" or "received" should derive that from case direction and its own record of what it posted. Keep that fallback until direction has been seen on Production notes.</p>
 
-    <p><strong>On Beta</strong>, the gap is closed. The note object there carries:</p>
+    <p><strong>In the current specification</strong>, the gap is closed. Beta served it first. Production has served the same specification since 2026-10-26, spec-read and not probed. The note object there carries:</p>
 
     <table class="doc">
-      <tr><th>Field</th><th>Production (v3.2.3)</th><th>Beta (v3.2.5)</th></tr>
+      <tr><th>Field</th><th>Earlier spec (v3.2.3; Production until 2026-10-26)</th><th>Current spec (v3.2.5; Beta, and Production since 2026-10-26)</th></tr>
       <tr><td><code>companyName</code></td><td>present</td><td>present; absent on system notes</td></tr>
       <tr><td><code>companyId</code></td><td>—</td><td>the authoring company; absent on system notes</td></tr>
       <tr><td><code>direction</code></td><td>—</td><td>relative to <em>the reader</em>, not the author; absent when <code>companyId</code> is</td></tr>
@@ -169,10 +169,10 @@
 
     <p>Because <code>direction</code> is relative to whoever reads the note, the same note reads as one direction to the submitter and the opposite to the receiver. Store it per side; never copy it across.</p>
 
-    <h3>5.3 Note Types Replace a Convention, on Beta</h3>
-    <p>Before note types, the only way to tag a note was a convention both sides had to agree to: a structured event type in the note <code>summary</code> ("status change", "severity change", "new public note") and the human content in <code>description</code>. That convention is still the only option on Production.</p>
+    <h3>5.3 Note Types Replace a Convention</h3>
+    <p>Before note types, the only way to tag a note was a convention both sides had to agree to: a structured event type in the note <code>summary</code> ("status change", "severity change", "new public note") and the human content in <code>description</code>. Until Production's specification changed on 2026-10-26, that convention was the only option there. Keep it readable until note types have been seen working on Production.</p>
 
-    <p>On Beta, the platform carries the tag itself. <code>GET /v1/note-types</code> lists the available types, which today are <code>partner</code>, <code>public</code>, <code>escalation</code> and <code>status</code>. Creating a note takes an optional <code>type: {code}</code>, matched case-insensitively. An unknown code, <code>system</code>, or an empty object is rejected with 400, and leaving the type out creates the note with none.</p>
+    <p>In the current specification, the platform carries the tag itself. <code>GET /v1/note-types</code> lists the available types, which on Beta today are <code>partner</code>, <code>public</code>, <code>escalation</code> and <code>status</code>. Creating a note takes an optional <code>type: {code}</code>, matched case-insensitively. An unknown code, <code>system</code>, or an empty object is rejected with 400, and leaving the type out creates the note with none. Those answers were seen on Beta; Production's list and answers have not been read.</p>
 
     <div class="callout warn">
       <b>Constraint</b>
@@ -182,6 +182,7 @@
     <h2><span class="sec-no">6</span>Revision History</h2>
     <table class="doc">
       <tr><th>Version</th><th>Date</th><th>Change</th></tr>
+      <tr><td>0.4</td><td>2026-10-28</td><td>Production now serves the same specification as Beta (byte-identical on 2026-10-28; Production's last modified 2026-10-26). §2.2 and §5 re-framed from Production-versus-Beta to earlier-versus-current specification, with Production spec-read and unprobed. §2.2 links the end-to-end encryption topic.</td></tr>
       <tr><td>0.3</td><td>2026-10-20</td><td>§5.2 split Production from Beta: the Beta note object carries <code>companyId</code>, reader-relative <code>direction</code> and <code>type</code>, and makes <code>priority</code> optional. New §5.3 on note types. Beta-only <code>encrypted</code> / <code>manifest</code> fields noted in §2.2. Verified-against names both environments.</td></tr>
       <tr><td>0.2</td><td>2026-09-13</td><td>Add the <code>testSubmission</code> / <code>testCase</code> row to the divergence table; cross-reference TSANET-2026-002.</td></tr>
       <tr><td>0.1</td><td>2026-08-15</td><td>Initial draft. Field names verified against the OpenAPI specification rather than taken from connector source.</td></tr>

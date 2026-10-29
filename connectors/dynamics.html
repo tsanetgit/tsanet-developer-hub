@@ -48,7 +48,7 @@
       <span><b>Status</b> GA · managed solution</span>
       <span><b>Surface</b> Case form + TSANET Configuration app</span>
       <span><b>Repo</b> tsanetgit/MS_Power_App</span>
-      <span><b>Updated</b> 2026-10-24</span>
+      <span><b>Updated</b> 2026-10-28</span>
     </div>
     <div class="toc">
       <a href="#class">Connector class</a>
@@ -304,6 +304,7 @@
       <ul class="tight">
         <li><strong>Case response automation</strong> — accepting a TSA case creates the corresponding Dynamics Case using the Case Create mapping, with required fields configurable.</li>
         <li><strong>Ownership and assignment changes</strong> propagate back to the collaborating member, appearing on their timeline.</li>
+        <li><strong>End-to-end encryption (PoC)</strong> — v2.14.0.0 can encrypt and sign a request's summary, description and custom fields for one configured partner, with its keys in Azure Key Vault; note encryption is on <code>main</code> but not yet released. The only implementation on any connector, described on the <a href="../topics/end-to-end-encryption.html">end-to-end encryption topic</a>.</li>
         <li><strong>Automatic closure</strong> after 30 days of inactivity — a platform behaviour the <a href="salesforce.html">Salesforce</a> page also documents; it has not been probed on this hub.</li>
       </ul>
     </div>

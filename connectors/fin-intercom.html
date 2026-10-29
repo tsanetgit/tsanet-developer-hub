@@ -54,7 +54,7 @@
       <span><b>Surface</b> Canvas Kit sidebar, Help Desk</span>
       <span><b>Hosting</b> TSANet-hosted or self-hosted</span>
       <span><b>Last verified</b> 2026-10-20</span>
-      <span><b>Updated</b> 2026-10-24</span>
+      <span><b>Updated</b> 2026-10-28</span>
       <span><b>Repo</b> tsanetgit/Fin-Intercom_App (private during early access)</span>
     </div>
     <div class="toc">
@@ -230,7 +230,7 @@
     <h3>Moving From TSANet-Hosted to Self-Hosted</h3>
     <p>Agree a cutover window with TSANet first. TSANet stops its deployment and hands over the final copies of both stores, taken after the stop rather than from the last periodic backup; you place them where your restore step reads them and only then start yours. Never run the two side by side: the reconciliation poller alone, with no webhook at all, is enough to double-create tickets.</p>
 
-    <div class="note" id="hosting-e2ee"><strong>End-to-end encryption: tracked, not built.</strong> In Connect's end-to-end encryption design, protected case fields are encrypted and signed at the member's own connector, and the platform holds no keys. For a gateway adapter, that puts the keys wherever the adapter runs, which makes self-hosting the mode in which a member holds its own keys. Neither the engine nor this adapter implements it yet: today the adapter sends the encryption fields empty on every create. Do not plan an encrypted deployment on this adapter until it ships; it is listed under <a href="#gaps">known gaps</a>.</div>
+    <div class="note" id="hosting-e2ee"><strong>End-to-end encryption: tracked, not built.</strong> In Connect's end-to-end encryption design, protected case fields are encrypted and signed at the member's own connector, and the platform holds no keys. For a gateway adapter, that puts the keys wherever the adapter runs, which makes self-hosting the mode in which a member holds its own keys. Neither the engine nor this adapter implements it yet: today the adapter sends the encryption fields empty on every create. Do not plan an encrypted deployment on this adapter until it ships; it is listed under <a href="#gaps">known gaps</a>. How the design works, and where the other connectors stand, is on the <a href="../topics/end-to-end-encryption.html">end-to-end encryption topic</a>.</div>
   </div>
 </section>
 

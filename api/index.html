@@ -303,6 +303,11 @@
       <p>Both <code>summary</code> and <code>description</code> return with markup. Strip to plain text before display in a non-HTML surface. The process form's <code>adminNote</code> is the exception — that one renders.</p>
     </div>
     <div class="gotcha">
+      <h4>Encrypted content is supposed to come back byte for byte</h4>
+      <p>Requests and notes carry two optional fields, <code>manifest</code> (an opaque Compact JWS) and <code>encrypted</code> (boolean, default <code>false</code>), stored and returned untouched. The sanitizer behind the HTML above does not check the flag, so on create it rewrites <code>"</code> to <code>&amp;#34;</code> in an encrypted <code>problemDescription</code> and note text, which breaks the manifest's digests. Receivers have to decode before verifying until that changes.</p>
+      <p class="where">Spec-read on Beta and Production; rewrite observed on Development. Details in <a href="../topics/end-to-end-encryption.html#edges">End-to-end encryption</a></p>
+    </div>
+    <div class="gotcha">
       <h4>Note types and direction are Beta-only for now</h4>
       <p>On Beta, <code>GET /v1/note-types</code> lists the types a note can carry (today <code>partner</code>, <code>public</code>, <code>escalation</code> and <code>status</code>), and creating a note takes an optional <code>type: {code}</code>. Read notes carry <code>type</code>, <code>companyId</code> and <code>companyName</code>, plus a <code>direction</code> that is relative to <em>you</em> as the reader. Three rules from the specification: the set can grow without a release, so fetch it rather than hard-coding it; a missing or unknown type does <strong>not</strong> mean public; and the type is not an access-control filter. Beta also stops requiring <code>priority</code> on note create. Production serves none of this yet. Its notes carry only <code>companyName</code>, and its specification still requires <code>priority</code>.</p>
       <p class="where">Spec-read on both environments — full comparison in <a href="../docs/tsanet-2026-001-canonical-case-model.html#notes">TSANET-2026-001</a></p>

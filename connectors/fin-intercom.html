@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fin / Intercom connector — TSANet Connect Developer Hub</title>
+<title>Fin / Intercom Connector — TSANet Connect Developer Hub</title>
 <link rel="icon" href="../assets/tsanet-favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/hub.css?v=20260815">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/hub.css?v=20260914c">
 <style>
   /* page-local: the class-comparison table wants a highlighted column */
   td.next{color:var(--ink);background:rgba(0,91,130,.05)}
@@ -30,12 +30,14 @@
 
 <nav>
   <div class="wrap nav-in">
-    <a class="brand" href="../index.html"><img class="brand-img" src="../assets/tsanet-logo-white.png" alt="TSANet"><small>Developer Hub</small></a>
+    <a class="brand" href="../index.html"><img class="brand-img" src="../assets/tsanet-devhub-horizontal.png" alt="TSANet Developer Hub"></a>
     <div class="nav-links">
-      <a href="../connectors/index.html" aria-current="page">Connectors</a>
+      <a href="../build/index.html">Build</a>
+      <a href="../connectors/index.html" aria-current="page">Existing Solutions</a>
       <a href="../api/index.html">API</a>
       <a href="../docs/index.html">Design Docs</a>
       <a href="../topics/index.html">Topics</a>
+      <a href="../tools/index.html">Tools</a>
       <a href="../community/index.html">Community</a>
     </div>
   </div>
@@ -43,17 +45,21 @@
 
 <header class="pagehead">
   <div class="wrap">
-    <div class="crumb"><a href="../index.html">Hub</a> / <a href="index.html">Connectors</a> / Fin&nbsp;·&nbsp;Intercom</div>
+    <div class="crumb"><a href="../index.html">Hub</a> / <a href="index.html">Existing Solutions</a> / Fin&nbsp;·&nbsp;Intercom</div>
     <h1>Fin / Intercom</h1>
-    <p class="lede">A gateway-class connector: TSANet hosts and operates the integration, because Intercom will not run member code inside the workspace. This page is the architecture as built, and the platform behaviour an implementer needs to know before starting.</p>
+    <p class="lede">A gateway-class connector: the integration runs as a service outside Intercom, because Intercom will not run member code inside the workspace. TSANet can host that service for you, or you can run it in your own cloud environment; the adapter is the same either way. This page is the architecture as built, and the platform behaviour an implementer needs to know before starting.</p>
     <div class="meta-row">
       <span><b>Class</b> Gateway adapter</span>
       <span><b>Status</b> Early access</span>
       <span><b>Surface</b> Canvas Kit sidebar, Help Desk</span>
-      <span><b>Last verified</b> 2026-08-21</span>
+      <span><b>Hosting</b> TSANet-hosted or self-hosted</span>
+      <span><b>Last verified</b> 2026-10-20</span>
+      <span><b>Updated</b> 2026-10-28</span>
+      <span><b>Repo</b> tsanetgit/Fin-Intercom_App (private during early access)</span>
     </div>
     <div class="toc">
       <a href="#class">Why it is shaped differently</a>
+      <a href="#hosting">Hosting options</a>
       <a href="#topology">Topology</a>
       <a href="#outbound">Outbound flow</a>
       <a href="#taxonomy">Submit outcomes</a>
@@ -72,8 +78,8 @@
 <section id="class">
   <div class="wrap">
     <p class="eyebrow">Connector class</p>
-    <h2>Why this connector is shaped differently</h2>
-    <p>Every connector TSANet shipped before this one assumes code can run inside the member's own system. Salesforce, ServiceNow, Dynamics and Oracle all allow it; Zendesk partly. Intercom does not — and neither will most of the platforms behind it. That single constraint makes TSANet the <em>operator</em> of the integration rather than the author of a specification someone else implements.</p>
+    <h2>Why This Connector Is Shaped Differently</h2>
+    <p>Every connector TSANet shipped before this one assumes code can run inside the member's own system. <a href="salesforce.html">Salesforce</a> and <a href="dynamics.html">Dynamics</a> allow it; <a href="zendesk.html">Zendesk</a> partly; <a href="servicenow.html">ServiceNow</a> would, though nothing is built there yet. Intercom does not — and neither will most of the platforms behind it. That single constraint means the integration has to run as a service somewhere outside the platform, and someone has to <em>operate</em> it: TSANet, or the member in its own environment. Which one is the member's choice; <a href="#hosting">hosting options</a> compares the two.</p>
 
     <div class="twrap">
       <table>
@@ -82,27 +88,27 @@
           <tr><th scope="col">&nbsp;</th><th scope="col">In-tenant connector</th><th scope="col" class="next">Gateway adapter</th></tr>
         </thead>
         <tbody>
-          <tr><th scope="row">Platforms</th><td>Salesforce, ServiceNow, Dynamics, Oracle</td><td class="next">Intercom&nbsp;/&nbsp;Fin, Pylon, DevRev, Wolken</td></tr>
-          <tr><th scope="row">Where code runs</th><td>Inside the member's own tenant</td><td class="next">A service TSANet hosts and runs</td></tr>
-          <tr><th scope="row">Who operates it</th><td>The member</td><td class="next">TSANet</td></tr>
-          <tr><th scope="row">Credentials live</th><td>In the member's tenant</td><td class="next">With TSANet, one set per member</td></tr>
+          <tr><th scope="row">Platforms</th><td>Salesforce, Dynamics (ServiceNow would fit here; not built)</td><td class="next">Intercom&nbsp;/&nbsp;Fin, Pylon, DevRev, Wolken</td></tr>
+          <tr><th scope="row">Where code runs</th><td>Inside the member's own tenant</td><td class="next">A service outside the platform, hosted by TSANet or in the member's own cloud</td></tr>
+          <tr><th scope="row">Who operates it</th><td>The member</td><td class="next">Whoever hosts it: TSANet, or the member</td></tr>
+          <tr><th scope="row">Credentials live</th><td>In the member's tenant</td><td class="next">With whoever hosts the service, one set per member</td></tr>
           <tr><th scope="row">Case lifecycle state</th><td>The CRM holds it</td><td class="next">The gateway must hold it</td></tr>
-          <tr><th scope="row">Connector faults</th><td>Isolated to one member</td><td class="next">Correlated across members, so the gateway runs clustered</td></tr>
+          <tr><th scope="row">Connector faults</th><td>Isolated to one member</td><td class="next">Correlated across the members on a TSANet-hosted service; one member's own when self-hosted. A single replica in the reference deployment either way</td></tr>
           <tr><th scope="row">Platform outage</th><td colspan="2" style="text-align:center">Affects everyone either way — the Connect API is a shared dependency</td></tr>
-          <tr><th scope="row">Distribution</th><td>Installed package or app</td><td class="next">Connected app plus a hosted service</td></tr>
+          <tr><th scope="row">Distribution</th><td>Installed package or app</td><td class="next">Connected app plus a service, TSANet-hosted or self-hosted</td></tr>
         </tbody>
       </table>
     </div>
 
-    <p>The two failure rows are worth reading together. Every member already depends on the Connect API, so a platform outage stops collaboration whichever class they are in — an in-tenant package does not keep working when the platform is down. What a gateway changes is that connector faults become correlated rather than independent, which is a design input rather than a drawback: it is why the gateway is built to run clustered and to a higher availability target than any single member's install, and why so much of the design below is durability and recovery rather than features.</p>
+    <p>The two failure rows are worth reading together. Every member already depends on the Connect API, so a platform outage stops collaboration whichever class they are in — an in-tenant package does not keep working when the platform is down. What a gateway changes is that connector faults become correlated rather than independent, which is a design input rather than a drawback: it is why the gateway is designed to a higher availability target than any single member's install — and, with the reference deployment a single replica today, why that target is met through durability and recovery rather than replication, and why so much of the design below is about exactly that rather than features. A member that hosts its own deployment shares a connector fault with no one, and takes on the operating work in exchange.</p>
 
-    <h3>Three differences that force the change</h3>
+    <h3>Three Differences That Force the Change</h3>
     <ol class="drivers">
       <li>
         <span class="n">01</span>
         <div>
           <h4>There is nowhere in the member's system to put connector code</h4>
-          <p>Intercom offers an API, webhooks, sign-in, and panels rendered from your own servers. There is no equivalent of an installed package running inside the customer's instance, so everything runs on infrastructure TSANet operates.</p>
+          <p>Intercom offers an API, webhooks, sign-in, and panels rendered from your own servers. There is no equivalent of an installed package running inside the customer's instance, so everything runs on infrastructure outside the platform: TSANet's, or the member's own.</p>
         </div>
       </li>
       <li>
@@ -121,7 +127,7 @@
       </li>
     </ol>
 
-    <h3>What the lifecycle actually permits</h3>
+    <h3>What the Lifecycle Actually Permits</h3>
     <p>The open design question was whether an incoming partner request could be answered and closed out without ever becoming a ticket — the flow Intercom is built around. Probed against a live environment rather than reasoned from documentation:</p>
 
     <div class="receipts" role="group" aria-label="Live probe results">
@@ -170,11 +176,69 @@
   </div>
 </section>
 
+<section id="hosting">
+  <div class="wrap">
+    <p class="eyebrow">Hosting</p>
+    <h2>Two Ways to Run It: TSANet-Hosted or Self-Hosted</h2>
+    <p>The adapter is one container image with one configuration surface, and it runs the same way wherever it is deployed. A member can have TSANet host and operate it, or run it in the member's own cloud account. TSANet supports both, and the choice is the member's. The deciding questions are usually about policy rather than engineering: where case content and credentials may live, who is on call for the service, and who holds encryption keys once <a href="#hosting-e2ee">end-to-end encryption</a> applies.</p>
+
+    <div class="twrap">
+      <table>
+        <thead>
+          <tr><th scope="col">&nbsp;</th><th scope="col">TSANet-hosted</th><th scope="col">Self-hosted</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Who runs it</th><td>TSANet deploys, monitors and upgrades the service</td><td>You deploy, monitor and upgrade it, in your own cloud account</td></tr>
+          <tr><th scope="row">Credentials</th><td>Your Connect API credential and Intercom app secrets are held by TSANet</td><td>They never leave your environment</td></tr>
+          <tr><th scope="row">Stored case data</th><td>The link store and the SDK cache (which holds case content) sit on TSANet's infrastructure</td><td>Both stay on yours, under your retention and backup policy</td></tr>
+          <tr><th scope="row">Connector faults</th><td>Shared with the other members on the same service</td><td>Yours alone</td></tr>
+          <tr><th scope="row">Upgrades</th><td>TSANet rolls out each adapter release</td><td>You build and deploy each release from its tag, after reading its release notes; you choose the window</td></tr>
+          <tr><th scope="row">Monitoring</th><td>TSANet, including its internal admin console</td><td>You. The admin console is not connected to a self-hosted deployment unless you and TSANet agree to connect it</td></tr>
+          <tr><th scope="row">What you set up</th><td colspan="2" style="text-align:center">The same either way: the Intercom private app, ticket type and ticket-state ids, and a Connect API credential per environment</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>What a Self-Hosted Deployment Needs</h3>
+    <p>These come from how the engine and the adapter work, so they apply on any cloud and any container service.</p>
+    <ul class="tight">
+      <li><strong>Exactly one instance, always running.</strong> Minimum and maximum both one. The stores and the reconciliation cursor assume a single writer, and a cold start breaks the canvas latency budget.</li>
+      <li><strong>One live adapter per member.</strong> Nothing else may poll or receive webhooks as the same member credential. A second deployment, including a TSANet-hosted one you are moving away from, double-creates tickets for inbound cases.</li>
+      <li><strong>The database on local disk, backed up to durable storage.</strong> SQLite in write-ahead-log mode fails on a network filesystem, so keep the files on storage local to the running instance, copy them to durable storage on a loop, and restore the latest copy before the app starts. Treat any network filesystem as a backup target only.</li>
+      <li><strong>The production profile left on.</strong> The image sets it; it arms the guards that refuse fake gateways, an in-memory store and relative store paths.</li>
+      <li><strong>Public HTTPS ingress</strong> to the container's port 8792, reachable by Intercom's canvas calls and TSANet's webhook deliveries; <strong>outbound access</strong> to the Connect API, Microsoft Entra's token endpoint and the Intercom API.</li>
+      <li><strong>Modest sizing.</strong> The reference deployment runs the app at 0.5 vCPU and 1 GiB, with a backup sidecar at 0.25 vCPU and 0.5 GiB.</li>
+      <li><strong>Secrets from your platform's secret store</strong>, injected as environment variables. A credential change is configuration plus a restart.</li>
+    </ul>
+
+    <h3>Where It Has Actually Run</h3>
+    <div class="twrap">
+      <table>
+        <thead><tr><th>Platform</th><th>State</th></tr></thead>
+        <tbody>
+          <tr><td>Azure Container Apps</td><td><span class="pill ok">reference</span> The deployment TSANet runs. A spec template and deploy script ship with the adapter: an app container plus a backup sidecar, the registry pulled by managed identity.</td></tr>
+          <tr><td>AWS</td><td><span class="pill warn">untested</span> No AWS deployment exists and TSANet has not run one. A service shaped like the Azure one (one always-running task, public HTTPS ingress, a sidecar for the backup loop, secrets from AWS Secrets Manager) meets the requirements above. Plan a full Beta validation before treating it as ready.</td></tr>
+          <tr><td>Any other container platform</td><td><span class="pill warn">untested</span> The same container contract applies. Nothing about the adapter is Azure-specific; the backup and restore steps are plain shell over two mounted paths.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Getting the Image, and Upgrading</h3>
+    <p>No image is published for members to pull today. You build it from the adapter's release tag with the repository's Dockerfile, which needs JDK 21, Maven and Docker. The build resolves the engine and <a href="connect-sdk.html">connect-library</a> from TSANet's GitHub package registry, which requires a GitHub token even for reads; the engine package is private, so registry access is granted at onboarding along with the step-by-step self-hosting guide. A ready-to-pull published image is a <a href="#gaps">known gap</a>.</p>
+    <p>Every upgrade repeats the same short loop: read the release notes (they carry an "Upgrading a deployment" section), compare the deploy spec between your tag and the new one, build and push the image, confirm your backups are current, deploy in a quiet window, then verify the running image is the one you built. Rolling back is the same loop with the previous tag.</p>
+
+    <h3>Moving From TSANet-Hosted to Self-Hosted</h3>
+    <p>Agree a cutover window with TSANet first. TSANet stops its deployment and hands over the final copies of both stores, taken after the stop rather than from the last periodic backup; you place them where your restore step reads them and only then start yours. Never run the two side by side: the reconciliation poller alone, with no webhook at all, is enough to double-create tickets.</p>
+
+    <div class="note" id="hosting-e2ee"><strong>End-to-end encryption: tracked, not built.</strong> In Connect's end-to-end encryption design, protected case fields are encrypted and signed at the member's own connector, and the platform holds no keys. For a gateway adapter, that puts the keys wherever the adapter runs, which makes self-hosting the mode in which a member holds its own keys. Neither the engine nor this adapter implements it yet: today the adapter sends the encryption fields empty on every create. Do not plan an encrypted deployment on this adapter until it ships; it is listed under <a href="#gaps">known gaps</a>. How the design works, and where the other connectors stand, is on the <a href="../topics/end-to-end-encryption.html">end-to-end encryption topic</a>.</div>
+  </div>
+</section>
+
 <section id="topology">
   <div class="wrap">
     <p class="eyebrow">Topology</p>
-    <h2>The system at a glance</h2>
-    <p>One headless Spring Boot process sits between the two platforms. Everything TSANet-facing lives in an embedded <code>gateway-engine</code> shared across adapters — the <a href="connect-gateway.html">Connect Gateway</a>, which this connector was the proving ground for and now consumes as a published artifact; everything Intercom-facing goes through a REST gateway. The process border <em>is</em> the trust boundary: signature verification is default-deny, so a route matching no scheme is rejected 401, and a missing secret fails closed. <code>/healthz</code> is the only open route.</p>
+    <h2>The System at a Glance</h2>
+    <p>One headless Spring Boot process sits between the two platforms. Everything TSANet-facing lives in an embedded <code>gateway-engine</code> shared across adapters — the <a href="connect-gateway.html">Connect Gateway</a>, which this connector was the proving ground for and now consumes as a published artifact — <code>gateway-engine</code> 3.0.0 with <code>connect-library</code> 3.0.0 since 2026-10-20, the two pins moved together by the build; everything Intercom-facing goes through a REST gateway. The process border <em>is</em> the trust boundary: signature verification is default-deny, so a route matching no scheme is rejected 401, and a missing secret fails closed. <code>/healthz</code> is the only open route; the TSANet-internal admin plane under <code>/admin/*</code> is a fourth signed edge, under <code>CONNECTOR_ADMIN_API_SECRET</code>.</p>
     <figure>
       <div class="diagram">
         <svg viewBox="0 0 1160 700" style="min-width:1050px" role="img" aria-label="Topology: the Intercom platform and Intercom REST API on the left; the connector process in the centre containing the canvas flow, webhook intake, event queue and handlers, the reconciliation poller, the link table and the embedded gateway engine; the TSANet Connect API, webhook push and partner member on the right. Five numbered edges cross the process boundary.">
@@ -266,7 +330,7 @@
 
           <!-- RIGHT: TSANet world -->
           <rect class="bx-ext" x="916" y="72" width="228" height="170" rx="8"/>
-          <text class="tt" x="930" y="94">TSANet Connect API · /v1</text>
+          <text class="tt" x="930" y="94">TSANet Connect API · v1/v2</text>
           <text class="ts" x="930" y="113">entity search · process form</text>
           <text class="ts" x="930" y="129">createCollaborationRequest</text>
           <text class="ts" x="930" y="145">approve · reject · request-info</text>
@@ -278,7 +342,7 @@
 
           <rect class="bx-ext" x="916" y="286" width="228" height="120" rx="8"/>
           <text class="tt" x="930" y="308">Connect webhook push</text>
-          <text class="ts" x="930" y="327">CloudEvents v2 · v1 gone early 2027</text>
+          <text class="ts" x="930" y="327">CloudEvents v2 · v1 sunset 2027-01</text>
           <text class="ts" x="930" y="343">request.created · request.closed</text>
           <text class="ts" x="930" y="359">note.created · response.created</text>
           <text class="ts" x="930" y="375">response.updated</text>
@@ -325,7 +389,7 @@
           <path class="ln" d="M568,524 H596 V218 H606" marker-end="url(#ahI)"/>
           <text class="tl" x="607" y="374" transform="rotate(-90 607 374)">listInboundUpdatedSince</text>
           <path class="ln" d="M456,496 V478 H700 V466" marker-end="url(#ahI)"/>
-          <text class="tl" x="474" y="474">handle() direct · bypasses the queue</text>
+          <text class="tl" x="474" y="476">handle() direct · bypasses the queue</text>
           <path class="ln" d="M568,560 H606" marker-end="url(#ahI)"/>
           <text class="tl" x="562" y="602" text-anchor="end">cursor →</text>
           <path class="ln" d="M1030,242 V280" marker-end="url(#ahI)"/>
@@ -338,7 +402,7 @@
       <li><span class="n">1</span><span><b>Canvas requests.</b> <code>POST /canvas/initialize</code> and <code>/canvas/submit</code>, signed <code>X-Body-Signature</code>, HMAC-SHA256 over the raw body with the Intercom app client secret.</span></li>
       <li><span class="n">2</span><span><b>Intercom webhooks.</b> <code>POST /webhooks/intercom</code>, signed <code>X-Hub-Signature</code>, HMAC-SHA1 (<code>sha1=&lt;hex&gt;</code>), same client secret. Note the two schemes differ in both algorithm and prefix. <strong>Today this edge carries nothing:</strong> no handler consumes an Intercom event, so the reference deployment subscribes no topics (verified 2026-08-20 — a full inbound E2E ran green with the list empty). The intake stays signature-gated for the day a feature needs a topic.</span></li>
       <li><span class="n">3</span><span><b>TSANet push.</b> <code>POST /webhooks/tsanet</code>, CloudEvents v2, signed <code>x-hub-signature-256</code>, HMAC-SHA256. Non-routable bodies are refused loudly but still answered 200.</span></li>
-      <li><span class="n">4</span><span><b>Connect API calls.</b> REST <code>/v1</code>, bearer injected per request by interceptor; OAuth pre-refreshes on a 30s expiry skew. Hard deadlines: 1500ms reads, 4000ms mutations, on virtual threads.</span></li>
+      <li><span class="n">4</span><span><b>Connect API calls.</b> REST — the v1 case paths and <code>/v2/collaboration-requests/list</code> reads through the embedded engine; the subscription itself is registered at setup on <code>POST /v2/webhooks</code> (and deleted on the v1 path, the only delete there is), and the inbound push it receives is CloudEvents v2 — with the bearer injected per request by interceptor; OAuth pre-refreshes on a 30s expiry skew. Default deadlines, configurable: 1500ms reads, 4000ms mutations, on virtual threads; the reconciliation list read runs under its own fixed 30s budget. The API mints the subscription secret at creation, so a first-ever deploy is two passes: register with the URL, capture the secret into <code>TSANET_WEBHOOK_SECRET</code>, roll the deployment.</span></li>
       <li><span class="n">5</span><span><b>Intercom API calls.</b> Tickets, admin notes, ticket-state writes. Every mutation is read back and asserted: the API 200s while ignoring unknown fields.</span></li>
     </ul>
   </div>
@@ -347,7 +411,7 @@
 <section id="outbound">
   <div class="wrap">
     <p class="eyebrow">Flow 1 · outbound</p>
-    <h2>An agent files a case with a partner</h2>
+    <h2>An Agent Files a Case with a Partner</h2>
     <p>The canvas flow keeps all real state server-side (<code>stored_data</code> carries an opaque <code>{flow_id}</code> only), makes at most one gateway call per canvas response, and never retries in-handler: the canvas latency budget is hard — an 8s response renders, a 10s one fails, and a slow submit strands the agent on a spinner with no error at all. The flow id doubles as the submission's <code>internalCaseNumber</code>, one per flow by construction.</p>
     <figure>
       <div class="diagram">
@@ -395,7 +459,7 @@
 <section id="taxonomy">
   <div class="wrap">
     <p class="eyebrow">Flow 1a · submit outcomes</p>
-    <h2>What a submit can become, and why ambiguity is parked</h2>
+    <h2>What a Submit Can Become, and Why Ambiguity Is Parked</h2>
     <p>Case submission is not idempotent and the Connect API offers no idempotency key: <code>createCollaborationRequest</code> documents 200/400/401/403 and no conflict status, so a second POST with the same <code>internalCaseNumber</code> simply creates a second case. The gateway contract therefore splits failures into exactly two kinds, and treats everything ambiguous as ambiguous.</p>
     <figure>
       <div class="diagram">
@@ -457,7 +521,7 @@
 <section id="inbound">
   <div class="wrap">
     <p class="eyebrow">Flow 2 · inbound</p>
-    <h2>A partner opens a case with us</h2>
+    <h2>A Partner Opens a Case with Us</h2>
     <p>Push is thin and delivered at-least-once, so intake fast-acks and the fetch is the truth: the event contributes only the token. Ticket creation is claim-before-create, arbitrated by the token's UNIQUE constraint in the link table, because check-then-create is a TOCTOU race that has produced duplicate-ticket defects in an earlier connector (<code>note.created</code> overtaking <code>collaboration-request.created</code>).</p>
     <figure>
       <div class="diagram">
@@ -503,8 +567,8 @@
 <section id="recovery">
   <div class="wrap">
     <p class="eyebrow">Flow 3 · recovery</p>
-    <h2>Re-driving what push dropped</h2>
-    <p>Between a single push attempt and a drain that catches internally, anything lost in the middle used to be lost permanently. The reconciliation poller closes that gap: it lists INBOUND cases via <code>listInboundUpdatedSince(cursor − 120s)</code> and drives anything with no link back through the same claim-before-create path.</p>
+    <h2>Re-Driving What Push Dropped</h2>
+    <p>Between an at-least-once push that can still be lost and a drain that catches internally, anything lost in the middle used to be lost permanently. The reconciliation poller closes that gap: it lists INBOUND cases via <code>listInboundUpdatedSince(cursor − 120s)</code> and drives anything with no link back through the same claim-before-create path.</p>
     <div class="cols">
       <ul class="tight">
         <li><strong>Cursoring on <code>updatedAt</code> was verified, not assumed:</strong> a live-created case came back with <code>updatedAt == createdAt</code> to the nanosecond, and a filter set 60s earlier returned it. A naive reading of the data suggested <code>updatedAt</code> only moved on modification, which would have missed new cases for 24h.</li>
@@ -520,7 +584,7 @@
       </ul>
     </div>
 
-    <h3>What survives a restart, and what deliberately does not</h3>
+    <h3>What Survives a Restart, and What Deliberately Does Not</h3>
     <div class="twrap">
       <table>
         <thead><tr><th>Store</th><th>Survives restart</th><th>Notes</th></tr></thead>
@@ -535,14 +599,14 @@
         </tbody>
       </table>
     </div>
-    <div class="note"><strong>Deployment answer, probed rather than assumed.</strong> SQLite write-ahead logging cannot run on a network-filesystem mount — probed live on Azure Files SMB, where it fails loudly at the very first connection. The reference deployment therefore keeps the database on replica-local storage and pairs it with a backup loop to durable storage (copied every few minutes, restored on boot), and the production profile still refuses to start on a memory store or a relative path. A backup loop is not a database: worst case a restart loses the last few minutes of link writes, which is acceptable for a pilot and not for production — production replaces the file with a managed database, by design a configuration swap rather than a rewrite.</div>
+    <div class="note"><strong>Deployment answer, probed rather than assumed.</strong> SQLite write-ahead logging cannot run on a network-filesystem mount — probed live on Azure Files SMB, where it fails loudly at the very first connection. The reference deployment therefore keeps the database on replica-local storage and pairs it with a backup loop to durable storage (copied every few minutes, restored on boot), and the production profile still refuses to start on a memory store, a relative path or a fake gateway — and a deployment missing <code>SPRING_PROFILES_ACTIVE=prod</code> gets none of those refusals and no signal that it is running on sand. A backup loop is not a database: worst case a restart loses the last few minutes of link writes, which is acceptable for a pilot and not for production — production replaces the file with a managed database, by design a configuration swap rather than a rewrite.</div>
   </div>
 </section>
 
 <section id="mapping">
   <div class="wrap">
     <p class="eyebrow">Vocabulary</p>
-    <h2>Connect case status → Intercom ticket state</h2>
+    <h2>Connect Case Status → Intercom Ticket State</h2>
     <div class="twrap">
       <table>
         <thead><tr><th>Connect status</th><th>Intercom ticket state</th><th>Why</th></tr></thead>
@@ -552,7 +616,7 @@
           <tr><td><code>INFORMATION</code></td><td>Waiting on customer</td><td>Blocked on the partner. Intercom's external label reads "Waiting on you" — cosmetic on Back-office tickets today.</td></tr>
           <tr><td><code>REJECTED</code></td><td>Resolved</td><td>Terminal. Ticket state alone cannot distinguish declined from finished; the distinction must live on a custom attribute.</td></tr>
           <tr><td><code>CLOSED</code></td><td>Resolved</td><td>Terminal.</td></tr>
-          <tr><td><code>PENDINGACTION</code></td><td><span class="pill bad">never moved</span></td><td>Undocumented in both contracts — a bare enum member in the spec with no reference documentation. Open question.</td></tr>
+          <tr><td><code>PENDINGACTION</code></td><td><span class="pill bad">never moved</span></td><td>Thinly documented — a bare enum member in the spec; the <a href="../api/index.html#cases">API page</a> reads it as a case awaiting an action from your side. What this adapter should do with it is an open question.</td></tr>
           <tr><td><code>UNKNOWN</code></td><td><span class="pill bad">never moved</span></td><td>An unrecognised wire value by construction. A stale state is visibly wrong; a guessed one is invisibly wrong.</td></tr>
         </tbody>
       </table>
@@ -568,18 +632,18 @@
 <section id="platform">
   <div class="wrap">
     <p class="eyebrow">Platform notes</p>
-    <h2>What an implementer needs to know about Intercom</h2>
+    <h2>What an Implementer Needs to Know About Intercom</h2>
     <p>Measured against a free Intercom development workspace (US region) and the TSANet BETA environment. Development workspaces are free, do not expire, and the Tickets API is available in them — but agents need an Inbox seat before a canvas app renders for them, which is free in a dev workspace and not obvious.</p>
 
-    <h3>Surface and placement</h3>
+    <h3>Surface and Placement</h3>
     <ul class="tight">
       <li><strong>The panel is server-rendered.</strong> Intercom hosts no third-party code, so the server is yours. This is the whole reason a gateway is required.</li>
       <li><strong>One placement option for teammates:</strong> "add to conversation details" in the Help Desk. There is no ticket-specific placement toggle, and the documentation describes placement in terms of conversations — but <strong>it does render on ticket detail panels</strong>. Ticket context is detectable by a top-level <code>ticket</code> key, which rides every canvas request from a ticket surface, initialize and submit alike.</li>
-      <li><strong>Response deadline is roughly 10 seconds.</strong> An 8s response renders; a 10s response fails. The failure UX is asymmetric and the asymmetry is the dangerous part: a slow initialize shows an error card with a working "Try again", while a slow submit strands the agent on a spinner with no error at all.</li>
+      <li><strong>Response deadline is roughly 10 seconds.</strong> An 8s response renders; a 10s response fails (measured 2026-08-04, decision D2). The connector holds itself to a &lt;2s budget on top of that, which is why the replica stays warm; the 10s figure is Intercom's failure point, the 2s figure is the connector's own. The failure UX is asymmetric and the asymmetry is the dangerous part: a slow initialize shows an error card with a working "Try again", while a slow submit strands the agent on a spinner with no error at all.</li>
       <li><strong>A wrong canvas URL fails as a silent infinite spinner</strong> with zero app-side trace — nothing ever reaches your endpoint, so there is nothing to log. When a canvas hangs, verify the pasted initialize and submit URLs before debugging the app.</li>
     </ul>
 
-    <h3>API behaviour traps</h3>
+    <h3>API Behaviour Traps</h3>
     <ul class="tight">
       <li><strong>Unknown fields return 200 and are silently ignored.</strong> <code>PUT /tickets/{id}</code> with <code>admin_assignee_id</code> returns success and does nothing; the working field is <code>assignee_id</code>. This is why read-back-and-assert is a standing rule.</li>
       <li><strong><code>POST /conversations</code> returns a message id, not the conversation id.</strong> Reply calls 404 against it. Use the conversation id from a canvas payload or from search.</li>
@@ -608,7 +672,7 @@
       <li><strong>The hardened profile</strong>, for workspaces whose security review wants the standing surface minimized, stacks three verified reductions on the minimum: no webhook topics (above); <strong>tickets-only mode</strong> (<code>CONNECTOR_TICKETS_ONLY=true</code>, default off) refuses new collaborations from plain conversations with a static canvas so <em>Write conversations</em> can be dropped; and <em>Write users and companies</em> is revoked after the synthetic contact is provisioned at onboarding (if it is ever needed again, the failure is loud and the poller recovers after re-grant). Resulting standing set: Read/Write tickets plus Read and write users, plus the baseline scopes. Two consequences to accept deliberately: agents lose canvas visibility into pre-existing conversation-anchored collaborations, and partner-response notes for those same links fail loudly in the audit log once the grant is gone — drop it only when no conversation-anchored links are active.</li>
     </ul>
 
-    <h3>Object model and tenancy</h3>
+    <h3>Object Model and Tenancy</h3>
     <ul class="tight">
       <li><strong>Cases live on tickets</strong>, under a dedicated collaboration ticket type created with category <code>Back-office</code>.</li>
       <li><strong>Tickets require exactly one contact</strong>, even Back-office ones. There is no natural TSANet counterpart, so inbound cases use a synthetic partner contact.</li>
@@ -625,10 +689,11 @@
 <section id="environments">
   <div class="wrap">
     <p class="eyebrow">Environments</p>
-    <h2>Hosts, events, and versions</h2>
+    <h2>Hosts, Events, and Versions</h2>
     <div class="cols">
       <div>
-        <h3>Connect API environments</h3>
+        <h3>Connect API Environments</h3>
+          <p>Credentials arrive through TSANet staff until a member is on the self-service integration portal, which was announced for the September 2026 release; that has not been re-verified for this page.</p>
         <div class="twrap">
           <table>
             <thead><tr><th>Env</th><th>Host</th></tr></thead>
@@ -641,7 +706,7 @@
         <p style="font-size:13.5px"><code>testSubmission</code> stays a per-deployment config flag, default true: creating real partner cases is a deliberate opt-in at pilot time. Note the flag asymmetry — you write <code>testSubmission</code> and read <code>testCase</code>.</p>
       </div>
       <div>
-        <h3>Webhook event types (v2)</h3>
+        <h3>Webhook Event Types (v2)</h3>
         <ul class="tight" style="font-family:var(--mono);font-size:12.5px">
           <li>collaboration-request.created <span style="color:var(--mute)">→ inbound ticket create (claimed)</span></li>
           <li>collaboration-request.closed <span style="color:var(--mute)">→ mirror partner close</span></li>
@@ -649,7 +714,7 @@
           <li>collaboration-request.response.updated <span style="color:var(--mute)">→ partner verdict</span></li>
           <li>collaboration-request.note.created <span style="color:var(--mute)">→ notes slice</span></li>
         </ul>
-        <p style="font-size:13.5px">All prefixed <code>org.tsanet.connect.</code>. Build against v2 only: v1 is removed in the first part of 2027 — inside this connector's first year — and v1 carries no event-level idempotency key at all.</p>
+        <p style="font-size:13.5px">All prefixed <code>org.tsanet.connect.</code>. Build against v2 only: the v1 subscription and list paths sunset on 2027-01-01 — inside this connector's first year — while the v1 case paths stay with no clock, and v1 carries no event-level idempotency key at all.</p>
       </div>
     </div>
   </div>
@@ -658,24 +723,25 @@
 <section id="changes">
   <div class="wrap">
     <p class="eyebrow">Since the last verification</p>
-    <h2>Recent changes, and what is tracked next</h2>
+    <h2>Recent Changes, and What Is Tracked Next</h2>
     <div class="cols">
       <div>
-        <h3>Landed (August 2026)</h3>
+        <h3>Landed (August–October 2026)</h3>
         <ul class="tight">
           <li><strong>First full design-level security review</strong> against the connector security taxonomy (supply chain, credential lifecycle, authentication boundaries, data flow and retention, audit, untrusted-content rendering), with the authentication boundary live-probed. Findings are filed as <code>security</code>-labelled issues in the repository; several of the items below are its outcomes.</li>
           <li><strong>Hardened deployment profile:</strong> no webhook topics (verified functionally free), tickets-only mode, verified-minimum grants with a documented provision-then-revoke step — all in the deployment skill's <code>intercom-setup.md</code>.</li>
-          <li><strong>SDK-cache retention sweep:</strong> age-based eviction of terminal-case content on a per-deployment window, default off (see the persistence table).</li>
+          <li><strong>SDK-cache retention sweep:</strong> age-based eviction of terminal-case content on a per-deployment window, default off (see the persistence table). The eviction itself now lives in <a href="connect-sdk.html"><code>connect-library</code></a> (since 0.2.0); the connector keeps only the schedule and the window, and its interim hand-rolled sweep is retired.</li>
           <li><strong>Backups gained history:</strong> hourly dated snapshots on a 48-hour window beside the 5-minute latest copy, with a delete-first restore procedure that survives a snapshot lacking a WAL file.</li>
+          <li><strong>Engine and library at 3.0.0</strong> (2026-10-20): the connector moved to <code>gateway-engine</code> 3.0.0 and <code>connect-library</code> 3.0.0. On first start the library adds four columns to the SDK cache's note table automatically; that migration was probed against an existing 2.0.0 cache. The connector's first release to carry them is v0.2.0 (2026-10-21), also its first attested release; its notes include an "Upgrading a deployment" section.</li>
           <li><strong>Build provenance:</strong> the deployable image is built in CI from a repository commit and pushed with a secretless, registry-scoped identity (no admin credential); images are addressed by digest. Dependency updates are automated; workflow actions are SHA-pinned.</li>
+          <li><strong>Registry pull by managed identity</strong> (2026-10-21): the reference deployment pulls its image with a user-assigned identity that can only pull, the registry's admin user is disabled, and deploys take only attested release images. Checked against the live registry and app on 2026-10-24.</li>
+          <li><strong>A self-hosting guide</strong> (2026-10-21): installing, upgrading, rolling back and migrating a deployment in a member's own Azure or AWS account, written for an engineer with no prior knowledge of the code. It is what the <a href="#hosting">hosting options</a> section summarizes, and it is provided at onboarding.</li>
         </ul>
       </div>
       <div>
-        <h3>Tracked next (not promises)</h3>
+        <h3>Tracked Next (Not Promises)</h3>
         <ul class="tight">
-          <li><strong>Registry pull by managed identity</strong> and retirement of the registry admin credential — the live-touching half of the provenance work.</li>
-          <li><strong>Retention upstream:</strong> a first-class eviction API in <code>connect-library</code> so the adapter's sweep collapses into a library call (tracked in the SDK repository).</li>
-          <li><strong>Notes in both directions and status sync</strong> still wait on estate-wide decisions shared with the Zendesk connector: a note summary convention, severity mapping, and a platform direction field on notes.</li>
+          <li><strong>Notes in both directions and status sync</strong> still wait on estate-wide decisions shared with the <a href="zendesk.html">Zendesk connector</a>: a note summary convention, severity mapping, and a platform direction field on notes. That last one now exists on Beta, where notes carry a direction, the author's company and a note type. Production's specification has carried the same fields since 2026-10-26 (spec-read 2026-10-28); Production has not been probed.</li>
           <li><strong>Outbound closure policy</strong> — see Known gaps.</li>
         </ul>
         <p style="font-size:13.5px">Evidence standard: everything under "Landed" is merged and was probed; everything under "Tracked next" has an open issue and no merged code.</p>
@@ -687,18 +753,21 @@
 <section id="gaps">
   <div class="wrap">
     <p class="eyebrow">Honesty section</p>
-    <h2>Deliberately not built, and known gaps</h2>
+    <h2>Deliberately Not Built, and Known Gaps</h2>
     <div class="cols">
       <ul class="tight">
         <li><strong>Outbound closure:</strong> an agent resolving the ticket does not close the partner's case. This needs a policy decision on which Intercom state transitions propagate — <code>/closure</code> documents only 200/400, so a wrong guess is indistinguishable from any bad request.</li>
         <li><strong>Status sync:</strong> the poller recovers missing <em>tickets</em>, not missing <em>state</em>.</li>
         <li><strong>Notes in both directions</strong>, and the <code>information-response</code> reply leg, land with the notes slice; <code>note.created</code> drains unclaimed today.</li>
+        <li><strong>No ready-to-pull image for self-hosting:</strong> a self-hosting member builds the image from the release tag, and the build needs a token for TSANet's private package registry. A published image would make install and upgrade a pull, with nothing else in the procedure changing. AWS and other non-Azure platforms are also unexercised; see <a href="#hosting">hosting options</a>.</li>
+        <li><strong>End-to-end encryption is not implemented:</strong> neither the engine nor this adapter encrypts, signs or verifies protected fields yet; creates carry the encryption fields empty. See the <a href="#hosting-e2ee">note under hosting options</a>.</li>
         <li><strong>Multi-case tickets render no panel:</strong> <code>byTicketId</code> correctly refuses to pick between several cases, but the agent currently sees nothing at all. A "this ticket has N collaboration cases" panel is the follow-up.</li>
       </ul>
       <ul class="tight">
         <li><strong>Inbound ambiguity is transient:</strong> an ambiguous response action tells the acting agent, but the recorded state has moved, so a later render shows a cleanly answered case. Outbound has UNRESOLVED for this; inbound has no equivalent yet.</li>
         <li><strong>Dedupe strategy beyond the CloudEvent id</strong> is a later decision; the reconciliation poller remains the source of truth in both directions.</li>
-        <li><strong><code>PENDINGACTION</code></strong> is undefined in both contracts — an open question for TSANet.</li>
+        <li><strong><code>PENDINGACTION</code></strong> is thinly documented in both contracts; what this adapter should do with it is an open question for TSANet.</li>
+        <li><strong>Attachments</strong> are not covered on this page. This adapter does not implement the contract's <code>forwardAttachments</code> or <code>AttachmentDeliveryHandler</code>: no code in the repository references either (checked at <code>417af2f</code>); see <a href="../topics/file-sharing.html">moving files between members</a>.</li>
         <li><strong>Orphaned claims</strong> hold the poller cursor loudly and indefinitely until a human releases them. Alert on consecutive held cycles, not on consecutive failures.</li>
       </ul>
     </div>
@@ -708,14 +777,14 @@
 <section id="skill">
   <div class="wrap">
     <p class="eyebrow">Build with an assistant</p>
-    <h2>The deployment skill, and how to load it</h2>
-    <p>The connector repository ships an agent skill — <a href="https://github.com/tsanetgit/Fin-Intercom_App/tree/main/skills/fin-intercom-deploy"><code>skills/fin-intercom-deploy</code></a> — that carries this page's operational knowledge in a form an agentic coding assistant can apply while it works on your deployment: the invariants that produce specific defects when violated (one live adapter per member, single replica, a link store that survives restarts), the Intercom workspace setup — the private app's canvas and webhook URLs, the webhook topic list (empty today, and why), the verified-minimum permissions and the hardened profile, the Back-office ticket type with its three exactly-named attributes, the per-workspace ticket-state ids — the TSANet-side provisioning, webhook subscription and go-live flag, and the complete environment table with a verification checklist. It is plain markdown: a <code>SKILL.md</code> that routes, plus three reference files it points into.</p>
-    <h3>Loading it</h3>
+    <h2>The Deployment Skill, and How to Load It</h2>
+    <p>The connector repository — private during early access, with access granted at onboarding — ships an agent skill — <a href="https://github.com/tsanetgit/Fin-Intercom_App/tree/main/skills/fin-intercom-deploy"><code>skills/fin-intercom-deploy</code></a> — that carries this page's operational knowledge in a form an agentic coding assistant can apply while it works on your deployment: the invariants that produce specific defects when violated (one live adapter per member, single replica, a link store that survives restarts), the Intercom workspace setup — the private app's canvas and webhook URLs, the webhook topic list (empty today, and why), the verified-minimum permissions and the hardened profile, the Back-office ticket type with its three exactly-named attributes, the per-workspace ticket-state ids — the TSANet-side provisioning, webhook subscription and go-live flag, and the environment table with a verification checklist — <code>CONNECTOR_SDK_CACHE_RETENTION</code> and <code>CONNECTOR_TICKETS_ONLY</code>, both documented on this page, were added to that table on 2026-09-14 after this page found them missing. It is plain markdown: a <code>SKILL.md</code> that routes, plus three reference files it points into. Every skill TSANet ships, and how to load one into any assistant, is collected on <a href="../topics/agentic-usage.html#skills">Agentic usage with TSANet Connect</a>.</p>
+    <h3>Loading It</h3>
     <p><strong>Claude Code</strong> — copy the whole folder into your deployment project's skills directory; the references must ride along with the <code>SKILL.md</code> that cites them:</p>
     <pre><code>git clone --depth 1 https://github.com/tsanetgit/Fin-Intercom_App.git
 cp -R Fin-Intercom_App/skills/fin-intercom-deploy  your-project/.claude/skills/</code></pre>
     <p><strong>Other assistants</strong> — attach <code>SKILL.md</code> and the <code>references/</code> files as project instructions; nothing in it is Claude-specific. The skill lives in the connector repository and evolves with it, so refresh your copy when you update the connector.</p>
-    <h3>Typical first steps</h3>
+    <h3>Typical First Steps</h3>
     <ul class="tight">
       <li><strong>Start with the invariants.</strong> <em>"Deploy the TSANet connector for our Intercom workspace."</em> The skill's first outputs are the preconditions that hurt most when discovered late: nothing else may run against the same member credentials, and the link store must sit on storage that outlives the container — with the platform trap that SQLite WAL cannot run on a network filesystem.</li>
       <li><strong>Let it drive the workspace setup.</strong> <em>"Set up our Intercom workspace for TSANet."</em> It knows the traps that do not error: granted permissions subscribe no webhook topics by themselves (and none need subscribing today), ticket attributes are name-keyed identity so a rename surfaces as a failed read-back rather than a write error, and ticket-state ids are enumerable only through a one-off out-of-band call that must never end up in anything that runs continuously.</li>
@@ -727,22 +796,47 @@ cp -R Fin-Intercom_App/skills/fin-intercom-deploy  your-project/.claude/skills/<
 </section>
 
 <footer>
-  <div class="wrap foot-in">
-    <div><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
-    <nav class="foot-nav" aria-label="Sections">
-      <a href="../connectors/index.html">Connectors</a>
-      <a href="../api/index.html">Working with the API</a>
-      <a href="../docs/index.html">Design documents</a>
-      <a href="../topics/index.html">Topics</a>
-      <a href="../community/index.html">Community</a>
-    </nav>
-    <div class="foot-links mono">
-      <a href="https://connect2.tsanet.org">connect2.tsanet.org</a>
+  <div class="wrap">
+    <div class="foot-top"><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
+    <div class="foot-cols">
+      <nav class="foot-col" aria-label="Developers">
+        <h4>Developers</h4>
+        <a href="../build/index.html">Build a New Integration</a>
+        <a href="../connectors/index.html">Existing Solutions</a>
+        <a href="../api/index.html">Working with the API</a>
+        <a href="../docs/index.html">Design Documents</a>
+        <a href="../topics/index.html">Topics</a>
+        <a href="../tools/index.html">Tools</a>
+        <a href="../community/index.html">Community</a>
+      </nav>
+      <div class="foot-col">
+        <h4>Members</h4>
+        <a href="https://www.tsanet.org/members/">Member List</a>
+        <a href="https://tsanet.gitbook.io/connect">Platform Documentation</a>
+        <a href="https://tsanet.gitbook.io/connect/help-center">Member Support</a>
+      </div>
+      <div class="foot-col">
+        <h4>About</h4>
+        <a href="https://www.tsanet.org/about-us/">About Us</a>
+        <a href="https://www.tsanet.org/board-of-directors/">Board of Directors</a>
+        <a href="https://www.tsanet.org/news-events/">News and Events</a>
+      </div>
+    </div>
+    <div class="foot-bottom mono">
+      <span>© TSANet Inc. All Rights Reserved</span>
+      <a href="https://www.tsanet.org/legal-policy/">Privacy Policy</a>
       <a href="https://github.com/tsanetgit">github.com/tsanetgit</a>
       <a href="mailto:membership@tsanet.org">membership@tsanet.org</a>
+      <span class="foot-social" aria-label="TSANet on social media">
+        <a href="https://twitter.com/TSANetTweet" aria-label="TSANet on X" title="X"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg></a>
+        <a href="https://www.linkedin.com/company/tsanet" aria-label="TSANet on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+        <a href="https://www.youtube.com/@tsanet8120" aria-label="TSANet on YouTube" title="YouTube"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+        <a href="https://github.com/tsanetgit" aria-label="TSANet on GitHub" title="GitHub"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+      </span>
     </div>
   </div>
 </footer>
 
+<script src="../assets/assistant.js?v=20260913" defer></script>
 </body>
 </html>

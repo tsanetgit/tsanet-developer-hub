@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Moving Files Between Members — TSANet Connect Developer Hub</title>
+<link rel="icon" href="../assets/tsanet-favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/hub.css?v=20260914c">
+<style>
+  pre{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--ink);margin:16px 0}
+  pre code{background:none;padding:0;font-size:inherit}
+  .c{color:var(--mute)}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-in">
+    <a class="brand" href="../index.html"><img class="brand-img" src="../assets/tsanet-devhub-horizontal.png" alt="TSANet Developer Hub"></a>
+    <div class="nav-links">
+      <a href="../build/index.html">Build</a>
+      <a href="../connectors/index.html">Existing Solutions</a>
+      <a href="../api/index.html">API</a>
+      <a href="../docs/index.html">Design Docs</a>
+      <a href="../topics/index.html" aria-current="page">Topics</a>
+      <a href="../tools/index.html">Tools</a>
+      <a href="../community/index.html">Community</a>
+    </div>
+  </div>
+</nav>
+
+<header class="pagehead">
+  <div class="wrap">
+    <div class="crumb"><a href="../index.html">Hub</a> / <a href="index.html">Topics</a> / File sharing</div>
+    <h1>Moving Files Between Members</h1>
+    <p class="lede">A file attached to a collaboration case is delivered into the receiving member's own file store — not parked on a portal for someone to fetch. The sender never learns how the receiver stores files, and that one-way ignorance is what makes the system extensible: each member registers how they receive, once, and every partner can send to them without changing anything.</p>
+    <div class="meta-row">
+      <span><b>Topic</b> Case attachments</span>
+      <span><b>Grounded in</b> The live normalized method + the API</span>
+      <span><b>Audience</b> Members planning file exchange</span>
+      <span><b>Updated</b> 2026-10-20</span>
+    </div>
+    <div class="toc">
+      <a href="#conduit">A conduit, not a drive</a>
+      <a href="#sending">Sending</a>
+      <a href="#receiving">Receiving</a>
+      <a href="#decisions">Five decisions</a>
+      <a href="#edges">Sharp edges</a>
+    </div>
+  </div>
+</header>
+
+<section id="conduit">
+  <div class="wrap">
+    <p class="eyebrow">The reframe</p>
+    <h2>A Conduit, Not a Drive</h2>
+    <p>It is tempting to picture case attachments as uploads to a shared workspace: the file goes <em>up</em>, and the partner comes to get it. The platform does the opposite. Attaching a file to a collaboration case triggers a <strong>delivery</strong> — TSANet takes the file and pushes it into the file store the receiving member registered, using that member's own transfer method and credentials. Partner engineers find the file where they already work, not on a second website.</p>
+    <p>The API is honest about this: there is a call to attach files to a case and calls to manage receiving configuration, and <strong>no download endpoint at all</strong>. A file, once attached, has exactly one direction of travel — outward, into the parties' stores.</p>
+
+    <figure>
+      <div class="diagram">
+        <svg viewBox="0 0 1000 250" style="min-width:880px" role="img" aria-label="A file flows from the sending member through TSANet Connect into the receiving member's registered file store, with a copy also delivered to the sender's own store when one is registered.">
+          <rect x="30" y="70" width="220" height="80" rx="12" fill="var(--panel)" stroke="var(--line)"/>
+          <text class="tt" x="140" y="103" text-anchor="middle">Sending member</text>
+          <text class="ts" x="140" y="126" text-anchor="middle">connector · SDK · REST</text>
+
+          <rect x="390" y="70" width="220" height="80" rx="12" fill="var(--panel)" stroke="var(--blue)"/>
+          <text class="tt" x="500" y="103" text-anchor="middle">TSANet Connect</text>
+          <text class="ts" x="500" y="126" text-anchor="middle">delivers per receiver config</text>
+
+          <rect x="750" y="70" width="220" height="80" rx="12" fill="var(--panel)" stroke="var(--line)"/>
+          <text class="tt" x="860" y="103" text-anchor="middle">Receiving member</text>
+          <text class="ts" x="860" y="126" text-anchor="middle">their own file store</text>
+
+          <line x1="250" y1="110" x2="382" y2="110" stroke="var(--line)" stroke-width="2" marker-end="none"/>
+          <polygon points="382,110 372,105 372,115" fill="var(--line)"/>
+          <text class="ts" x="316" y="96" text-anchor="middle">attach on the case</text>
+
+          <line x1="610" y1="110" x2="742" y2="110" stroke="var(--line)" stroke-width="2"/>
+          <polygon points="742,110 732,105 732,115" fill="var(--line)"/>
+          <text class="ts" x="676" y="96" text-anchor="middle">push, member's method</text>
+
+          <path d="M 500 150 L 500 200 L 140 200 L 140 158" stroke="var(--line)" stroke-width="1.5" fill="none" stroke-dasharray="5 4"/>
+          <polygon points="140,158 135,168 145,168" fill="var(--line)"/>
+          <text class="ts" x="320" y="192" text-anchor="middle">copy to the sender's own store, when one is registered</text>
+        </svg>
+      </div>
+      <figcaption>Delivery fans out to the registered stores of <em>both</em> parties on the case — the sender's own store receives a copy of what it sends. Useful for audit, surprising if you did not plan for it.</figcaption>
+    </figure>
+
+    <div class="twrap">
+      <table>
+        <thead><tr><th>Attaching a file does this</th><th>Which means</th></tr></thead>
+        <tbody>
+          <tr><td>Delivers into the receiver's registered store</td><td>The partner's engineers get the file in their own tooling. There is no portal step and no second login.</td></tr>
+          <tr><td>Reports the delivery outcome to the caller</td><td>The sender learns whether each destination succeeded, in the response <em>body</em>. The HTTP status is 200 whatever happened, so read <code>completeSuccess</code> and the per-side statuses. Nobody else is told automatically.</td></tr>
+          <tr><td>Creates no case note by itself</td><td>Announcing the file on the case is the connector's job — see <a href="#edges">sharp edges</a>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="sending">
+  <div class="wrap">
+    <p class="eyebrow">The sending side</p>
+    <h2>One Call, Three Ways to Make It</h2>
+    <p>Sending is a single API call on the collaboration case: attach one or more files (multipart, with a required <code>description</code> of up to 500 characters in the form body) to the case token you already hold. The platform resolves the receiving side's configuration and does the rest. The official reference is the <a href="https://tsanet.gitbook.io/connect/api-reference/case-attachments">case attachments documentation</a>.</p>
+    <ul class="tight">
+      <li><strong>Your connector does it.</strong> On platforms with a shipped <a href="../connectors/index.html">connector</a>, attachment support arrives as connector functionality — no member code involved.</li>
+      <li><strong>The Connect SDK.</strong> The <a href="../connectors/connect-sdk.html">Java SDK</a> carries attachment forwarding as a library call, for members building their own integration — and the <a href="../connectors/connect-gateway.html">Connect Gateway</a> sends through the same library, so <a href="connector-classes.html">gateway-class</a> connectors inherit attachment sending rather than reimplementing it.</li>
+      <li><strong>Direct REST.</strong> The endpoint is the contract; any stack that can make an authenticated multipart request can send. Nothing requires the SDK.</li>
+    </ul>
+    <p>Delivery is per destination: with two configured stores on a case, each gets its own attempt and the response distinguishes complete from partial success. There is <strong>one attempt per destination — no automatic retries</strong> (source-read, not probed on this hub) — so a failure is loud for the caller and invisible to everyone else until someone acts on it. "Loud" means the response body: the call answers 200 either way, so a caller that checks only the status code hears nothing.</p>
+    <div class="note"><strong>In development: direct-to-storage delivery (alpha).</strong> Both environments' specifications also carry Attachment V2: Beta's first, Production's since 2026-10-26 (spec-read 2026-10-28). The receiver registers its own storage (S3, Azure Blob, or Google Cloud Storage per the specification), and the sender gets a short-lived grant to upload straight into it, so the bytes never pass through TSANet. The conduit model above still holds: nothing comes to rest on the platform. Every V2 operation is still marked alpha, and it has been exercised on Beta only, never on Production. A receiver that has registered V2 storage can refuse the relay call with <code>409 attachment-direct-path-required</code>. The <a href="../connectors/connect-sdk.html#direct">Connect SDK</a> already carries a V2 client, and <a href="../docs/tsanet-2026-002-case-attachments.html">TSANET-2026-002</a> §5.1 has the specification-level summary. Don't build production flows on it yet.</div>
+  </div>
+</section>
+
+<section id="receiving">
+  <div class="wrap">
+    <p class="eyebrow">The receiving side</p>
+    <h2>Register How You Receive</h2>
+    <p>Each member registers a receiving configuration with TSANet — per company, set up during onboarding, with per-case overrides possible. The baseline method, live in production today, is the <strong>normalized HTTPS push</strong>: five fields of configuration, and one request shape your endpoint must answer.</p>
+<pre><code>{
+  "domain":    "files.example-member.com",
+  "httpsPort": 443,
+  "httpsPath": "/tsanet/uploads",
+  "password":  "&lt;pre-shared secret&gt;",
+  "expiration": "2027-01-01T00:00:00Z"
+}</code></pre>
+    <p>With that registered, every case file arrives at your endpoint as:</p>
+<pre><code>PUT https://files.example-member.com:443/tsanet/uploads/&lt;fileName&gt;
+Authorization: Basic base64(&lt;caseNumber&gt;:&lt;password&gt;)   <span class="c">← case correlation rides here</span>
+Content-Type: &lt;the file's own media type&gt;
+
+&lt;raw file bytes&gt;                                      <span class="c">← not multipart</span></code></pre>
+    <p>Anything that answers this request qualifies as a receiver — it is an afternoon of work in any stack, and a small ingest service in front of object storage (S3, Azure Files, or similar) is the common pattern. Any 2xx you return counts as delivered, which is a sharper contract than it looks: see <a href="#edges">sharp edges</a>.</p>
+    <div class="note"><strong>When your store cannot answer a PUT.</strong> Members with an established file repository that has its own upload protocol do not have to bolt an endpoint onto it — TSANet can implement a member-specific delivery method against the repository's existing interface, configured platform-side. The normalized method is the default; member-specific methods are how established repositories join without changing. They are arranged with TSANet rather than exposed on the API — outside the alpha V2 operations, the published surface registers only the normalized HTTPS configuration. Member-registered storage is coming through Attachment V2, which is alpha in both environments' specifications and exercised on Beta only (see <a href="#sending">Sending</a>). If yours is in that camp, <a href="../community/index.html">start the conversation</a> with what your store's upload interface looks like.</div>
+  </div>
+</section>
+
+<section id="decisions">
+  <div class="wrap">
+    <p class="eyebrow">Designing yours</p>
+    <h2>The Five Decisions Every Receiving Member Makes</h2>
+    <p>Whichever method you land on, the same five questions decide whether file exchange works quietly for years or generates a support thread a month. They are worth answering in writing before the first test file moves.</p>
+    <div class="twrap">
+      <table>
+        <thead><tr><th>Decision</th><th>The question</th><th>Why it bites</th></tr></thead>
+        <tbody>
+          <tr><td>Authentication &amp; rotation</td><td>What credential does TSANet hold to reach your store, who rotates it, and how is rotation communicated ahead of time?</td><td>The configuration declares an expiration. A credential that silently dies makes its first appearance as a failed delivery on a live case.</td></tr>
+          <tr><td>Case correlation</td><td>Which case identifier links an arriving file to the right case, and where does it travel — auth username, upload parameter, filename, path?</td><td>On the normalized method the case number is the Basic-auth username and <em>nothing else identifies the case</em>. If your ingest drops it, you own a pile of orphaned files.</td></tr>
+          <tr><td>Filenames &amp; collisions</td><td>What characters do you accept, and what happens when the same name arrives twice — overwrite, version, or reject?</td><td>Receivers differ on this today, and silent overwrite is a common object-storage default. Whatever you choose, engineers on both sides should not have to guess.</td></tr>
+          <tr><td>Size &amp; limits</td><td>What is your maximum file size and write timeout?</td><td>Support archives are large. A limit nobody wrote down becomes a mid-transfer failure on the day it matters.</td></tr>
+          <tr><td>Arrival notification</td><td>Does your system tell the case owner a file landed, or is the case note the only announcement?</td><td>The platform does not create the note. If neither your store nor your connector announces arrivals, files land in silence.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="edges">
+  <div class="wrap">
+    <p class="eyebrow">Sharp edges</p>
+    <h2>What Goes Wrong, in the Order You Will Meet It</h2>
+    <ul class="tight">
+      <li><strong>2xx is a promise.</strong> One attempt, no retries (source-read) — so return success only after the file is durably committed. A receiver that answers 200 from a buffer and fails afterwards has converted a recoverable error into silent loss, and nobody upstream will retry on your behalf.</li>
+      <li><strong>The note is not automatic.</strong> The platform delivers the file and stops; announcing it on the case is the sending connector's job. If you build a sender, create the note. If you build a receiver, do not treat the note as the signal that a file exists — it may arrive before, after, or not at all.</li>
+      <li><strong>Same-name uploads.</strong> The live receivers do not agree on collision behavior, and some ignore duplicates silently. Pick a policy, implement it, and write it down where partners can see it.</li>
+      <li><strong>Filenames travel in URLs.</strong> On the normalized method the filename becomes a path segment. Conservative ASCII names survive everywhere; spaces and non-ASCII characters are where interoperability goes to die.</li>
+      <li><strong>Your own store gets a copy.</strong> Delivery fans out to both parties' configurations. That is useful for audit and surprising for capacity planning — size your store for what you send as well as what you receive.</li>
+      <li><strong>Expiry is declared, not managed for you.</strong> The config's expiration is a statement about your credential, and rotation is an operational duty on your side. Put it on a calendar, not in a memory.</li>
+    </ul>
+    <div class="note">Questions about a store or method not covered here — or a repository with an upload interface you think should be supported — belong in <a href="../community/index.html">Community</a>. The <a href="https://tsanet.gitbook.io/connect/api-reference/case-attachments">case attachments reference</a> is the authoritative contract, and design doc <a href="../docs/tsanet-2026-002-case-attachments.html">TSANET-2026-002</a> specifies the direct-push model, the config endpoints and the per-file delivery statuses in full; this page is the design guidance around both.</div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-top"><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
+    <div class="foot-cols">
+      <nav class="foot-col" aria-label="Developers">
+        <h4>Developers</h4>
+        <a href="../build/index.html">Build a New Integration</a>
+        <a href="../connectors/index.html">Existing Solutions</a>
+        <a href="../api/index.html">Working with the API</a>
+        <a href="../docs/index.html">Design Documents</a>
+        <a href="../topics/index.html">Topics</a>
+        <a href="../tools/index.html">Tools</a>
+        <a href="../community/index.html">Community</a>
+      </nav>
+      <div class="foot-col">
+        <h4>Members</h4>
+        <a href="https://www.tsanet.org/members/">Member List</a>
+        <a href="https://tsanet.gitbook.io/connect">Platform Documentation</a>
+        <a href="https://tsanet.gitbook.io/connect/help-center">Member Support</a>
+      </div>
+      <div class="foot-col">
+        <h4>About</h4>
+        <a href="https://www.tsanet.org/about-us/">About Us</a>
+        <a href="https://www.tsanet.org/board-of-directors/">Board of Directors</a>
+        <a href="https://www.tsanet.org/news-events/">News and Events</a>
+      </div>
+    </div>
+    <div class="foot-bottom mono">
+      <span>© TSANet Inc. All Rights Reserved</span>
+      <a href="https://www.tsanet.org/legal-policy/">Privacy Policy</a>
+      <a href="https://github.com/tsanetgit">github.com/tsanetgit</a>
+      <a href="mailto:membership@tsanet.org">membership@tsanet.org</a>
+      <span class="foot-social" aria-label="TSANet on social media">
+        <a href="https://twitter.com/TSANetTweet" aria-label="TSANet on X" title="X"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg></a>
+        <a href="https://www.linkedin.com/company/tsanet" aria-label="TSANet on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+        <a href="https://www.youtube.com/@tsanet8120" aria-label="TSANet on YouTube" title="YouTube"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+        <a href="https://github.com/tsanetgit" aria-label="TSANet on GitHub" title="GitHub"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+      </span>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/assistant.js?v=20260913" defer></script>
+</body>
+</html>

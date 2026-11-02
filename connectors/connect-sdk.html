@@ -7,8 +7,8 @@
 <link rel="icon" href="../assets/tsanet-favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/hub.css?v=20260815">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/hub.css?v=20260914c">
 <style>
   pre{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--ink);margin:16px 0}
   pre code{background:none;padding:0;font-size:inherit}
@@ -27,12 +27,14 @@
 
 <nav>
   <div class="wrap nav-in">
-    <a class="brand" href="../index.html"><img class="brand-img" src="../assets/tsanet-logo-white.png" alt="TSANet"><small>Developer Hub</small></a>
+    <a class="brand" href="../index.html"><img class="brand-img" src="../assets/tsanet-devhub-horizontal.png" alt="TSANet Developer Hub"></a>
     <div class="nav-links">
-      <a href="../connectors/index.html" aria-current="page">Connectors</a>
+      <a href="../build/index.html">Build</a>
+      <a href="../connectors/index.html" aria-current="page">Existing Solutions</a>
       <a href="../api/index.html">API</a>
       <a href="../docs/index.html">Design Docs</a>
       <a href="../topics/index.html">Topics</a>
+      <a href="../tools/index.html">Tools</a>
       <a href="../community/index.html">Community</a>
     </div>
   </div>
@@ -40,18 +42,19 @@
 
 <header class="pagehead">
   <div class="wrap">
-    <div class="crumb"><a href="../index.html">Hub</a> / <a href="index.html">Connectors</a> / Connect SDK</div>
+    <div class="crumb"><a href="../index.html">Hub</a> / <a href="index.html">Existing Solutions</a> / Connect SDK</div>
     <h1>Connect SDK</h1>
-    <p class="lede">A Java client for the TSANet Connect API, generated from the API's own OpenAPI specification and wrapped in eight typed facades — plus a console app, an attachment receiver and a web demo that show it working end to end. If you are building a custom integration on the JVM, this is the shortest path that is not hand-rolled HTTP.</p>
+    <p class="lede">A Java client for the TSANet Connect API, generated from the API's own OpenAPI specification and wrapped in ten typed facades — plus a console app, an attachment receiver and a web demo that show it working end to end. If you are building a custom integration on the JVM, this is the shortest path that is not hand-rolled HTTP.</p>
     <div class="meta-row">
-      <span><b>Version</b> v0.1.0</span>
-      <span><b>Released</b> 2026-08-11</span>
-      <span><b>Language</b> Java 21</span>
+      <span><b>Version</b> v3.0.0 · <a href="https://github.com/tsanetgit/Connect_SDK/releases/latest">latest release</a></span>
+      <span><b>Released</b> 2026-10-20</span>
+      <span><b>Runtime</b> Java 21 · Spring Boot 4.1 · Jackson 3</span>
       <span><b>Repo</b> tsanetgit/Connect_SDK</span>
     </div>
     <div class="toc">
       <a href="#what">What it is</a>
-      <a href="#surface">The eight facades</a>
+      <a href="#surface">The ten facades</a>
+      <a href="#direct">Direct delivery (V2)</a>
       <a href="#layers">How it fits together</a>
       <a href="#modules">Modules</a>
       <a href="#getting">Getting it</a>
@@ -67,11 +70,11 @@
 <section id="what">
   <div class="wrap">
     <p class="eyebrow">Status</p>
-    <h2>What it is, and what it is not yet</h2>
+    <h2>What It Is, and What It Is Not Yet</h2>
     <div class="status-band">
-      <h3>Read the version number before you plan around it</h3>
-      <p>This is <strong>v0.1.0</strong>, released 2026-08-11, and the repository describes itself as a demonstration of integration with the TSANet API in Java. That is not a disclaimer to skim past: it is a real, working, tested client — the TSANet-built gateway consumes it in production paths — but it is early, the surface can still move, and there is one release to date.</p>
-      <p style="margin-top:12px">Treat it as the reference implementation of how to talk to the Connect API correctly, and as a dependency you pin rather than float.</p>
+      <h3>Read the Version Number Before You Plan Around It</h3>
+      <p>This is <strong>v3.0.0</strong>, released 2026-10-20 — the fifth release, after v0.1.0 (2026-08-11), v0.2.0 (2026-08-27), v1.0.0 (2026-08-28) and v2.0.0 (2026-09-08). The 1.0.0 major marked a runtime change (Spring Boot 3.3, past its supported life, to <strong>Spring Boot 4.1 and Jackson 3</strong>) and 2.0.0 a contract change on that runtime: every failure the API answers arrives as one typed, value-free exception instead of Spring's. 3.0.0 keeps the runtime and is a major for five reasons: the <a href="#direct">V2 direct-delivery client</a> is rebuilt from the Connect API's own specification and its public types change; <code>/v1/</code> failures now arrive as problem details with their documented status; API calls run on the JDK's <code>HttpClient</code>; interfaces and records grew (a tenth facade, note types, a receiver allowlist); and a V2 upload link missing its expiry or size is refused rather than quietly tolerated. Of the two TSANet-built consumers, the <a href="connect-gateway.html">Connect Gateway</a> moved its pin to 3.0.0 and released its own v3.0.0 the same day, and the <a href="fin-intercom.html">Fin / Intercom</a> connector, which consumes the gateway engine, moved with it. The release notes' list of known consumers predates both moves and still shows the gateway on 2.0.0. The repository still describes itself as a demonstration.</p>
+      <p style="margin-top:12px">Treat it as the reference implementation of how to talk to the Connect API correctly, and as a dependency you pin rather than float. Only the current release is supported, so Jackson 3 on the Spring Boot 4.1 line is a prerequisite, not a choice. Before bumping to 3.0.0, read its upgrade entry in the repository's consumption reference: code that branches on <code>kind() == LEGACY</code>, on <code>status()</code> or on message text now sees different values, and a wrong password is a problem detail like any other failure.</p>
     </div>
     <p style="margin-top:22px">The value is not that it saves you HTTP calls — it is that the Connect API has a number of behaviours that are easy to get wrong on a first integration, and the client encodes the right answers. Request shapes are validated before they go out, the process-form field types are modelled rather than guessed at, both authentication modes are handled behind one session object, and webhook payloads and attachment configuration have types instead of being maps of strings.</p>
   </div>
@@ -80,29 +83,50 @@
 <section id="surface">
   <div class="wrap">
     <p class="eyebrow">API surface</p>
-    <h2>Eight facades over one session</h2>
+    <h2>Ten Facades over One Session</h2>
     <p>Everything hangs off <code>TsaNetApi</code> and <code>TsaNetApiSession</code>. The facades divide the API the way the API actually divides, which makes them easy to hold in your head:</p>
     <div class="obj-grid">
-      <div class="obj"><h4>AuthFacade</h4><p>Login and session establishment across both supported credential modes.</p></div>
-      <div class="obj"><h4>PartnersFacade</h4><p>Partner search and selection, plus the process-form template for a chosen partner.</p></div>
-      <div class="obj"><h4>CollaborationRequestsFacade</h4><p>The core lifecycle: create, fetch, list, approve, reject, request and send information, close.</p></div>
-      <div class="obj"><h4>CaseNotesFacade</h4><p>Notes on a case, in both directions.</p></div>
-      <div class="obj"><h4>CaseResponsesFacade</h4><p>The formal response records — approvals, rejections, information exchanges.</p></div>
-      <div class="obj"><h4>WebhooksFacade</h4><p>Subscription management plus inbound event and delivery types.</p></div>
-      <div class="obj"><h4>AttachmentsFacade</h4><p>Attachment configuration, forwarding, and the HTTPS push arrangement.</p></div>
+      <div class="obj"><h4>AuthFacade</h4><p>Login across both credential modes, with the token renewed before expiry in both when the credentials are configured; the company and user behind the session, fetched from <code>/v1/me</code> at login; logout. A 401 mid-session re-mints the token and retries once, and concurrent callers share one renewal. A token call that cannot reach the identity provider fails as a connectivity error that names neither the URL nor the tenant.</p></div>
+      <div class="obj"><h4>PartnersFacade</h4><p>Partner search by name, with the last results kept locally. The semantic search method is still there but marked <em>do not use</em>: the endpoint behind it answers 500 on Beta and Development (see <a href="../api/index.html">Working with the API</a>).</p></div>
+      <div class="obj"><h4>CollaborationRequestsFacade</h4><p>List, create and fetch cases; the partner's process-form template by company, department or document; a sync of everything the account can see.</p></div>
+      <div class="obj"><h4>CaseNotesFacade</h4><p>The notes timeline per case or across all cases, and note creation with a priority. From 3.0.0, <code>listNoteTypes()</code> returns the note types the server offers, from <code>GET /v1/note-types</code>, and <code>createNote</code> takes one of those codes. There is no default: leave it out and the note has no type; send one the server does not offer and the answer is a 400 <code>invalid-note-type</code>. Notes read back carry their type, its display name, the authoring company and the direction.</p></div>
+      <div class="obj"><h4>CaseResponsesFacade</h4><p>The lifecycle actions: approve, reject, request and send information, close — plus the response history they produce.</p></div>
+      <div class="obj"><h4>WebhooksFacade</h4><p>Subscriptions and their delivery logs, and an inbound receiver that verifies the signature and refreshes the affected case.</p></div>
+      <div class="obj"><h4>AttachmentsFacade</h4><p>V1 attachments: configuration, forwarding local files to a case, and the HTTPS push arrangement. Unchanged by 3.0.0.</p></div>
+      <div class="obj"><h4>AttachmentsV2Facade</h4><p>Direct delivery: one method per grant call in the specification, plus a <code>send</code> that grants, uploads in whichever mode the grant names, and completes. Generated from operations the specification marks <strong>alpha</strong>; see <a href="#direct">Direct delivery (V2)</a>.</p></div>
+      <div class="obj"><h4>AttachmentStorageFacade</h4><p>New in 3.0.0, for the receiving side of V2: get, register and test the company's own S3 or Azure Blob storage, the place partners' files will land. Alpha, like the operations it calls.</p></div>
       <div class="obj"><h4>UserFacade</h4><p>Identity and company context for the authenticated account.</p></div>
     </div>
-    <p style="margin-top:18px">Alongside the facades sit typed DTOs for every payload — form templates and field types, case status, notes, responses, webhook deliveries, attachment configuration — and a validation layer that checks a request before it is sent rather than letting the API reject it. On an API where a validation failure may arrive as an HTTP 500 unless you opt into <a href="zendesk.html#auth">problem+json</a>, catching the problem client-side is worth more than it sounds.</p>
+    <p style="margin-top:18px">Alongside the facades sit typed DTOs for every payload — form templates and field types, case status, notes, responses, webhook deliveries, attachment configuration — and a validation layer that checks a request before it is sent rather than letting the API reject it. On an API where a validation failure may arrive as an HTTP 500 unless you opt into <a href="zendesk.html#auth">problem+json</a>, catching the problem client-side is worth more than it sounds. From 3.0.0 the library opts in on every call, <code>/v1/</code> included (2.0.0 did not, and saw 500s where the API documents a 4xx), and surfaces whatever the API answers as one typed exception carrying the API's own title and detail, never the URL or a token.</p>
+  </div>
+</section>
+
+<section id="direct">
+  <div class="wrap">
+    <p class="eyebrow">Attachments, V2</p>
+    <h2>Direct Delivery, and Why It Is Alpha</h2>
+    <p>The V1 attachment path relays a file through TSANet, which then pushes it to the receiving member. V2 skips the relay: the sender asks the platform for a <strong>grant</strong>, the grant comes back with short-lived upload links into the <em>receiver's own</em> storage, the sender uploads straight to it, and a <strong>complete</strong> call has the platform check the stored upload and record the outcome. The file never passes through the Connect API. The details are on <a href="../topics/file-sharing.html">File sharing</a>.</p>
+    <div class="twrap">
+      <table>
+        <thead><tr><th>Side</th><th>What 3.0.0 gives you</th></tr></thead>
+        <tbody>
+          <tr><td>Sending</td><td><code>attachmentsV2().send(...)</code> grants, uploads and completes in one call, in whichever mode the grant names — <code>single</code>, <code>s3Multipart</code> or <code>azureBlock</code>. Upload links are requested just before use, in batches, and refreshed shortly before they expire; each part is retried a bounded number of times and honours <code>Retry-After</code>; links never appear in logs or messages. Only the company that submitted the case can create a grant for it. The individual grant, link, complete and abandon calls are there too, one method per specification operation.</td></tr>
+          <tr><td>Receiver allowlist</td><td>An optional list of company IDs a sender is willing to deliver to — <code>ApplicationUserAccount.withAllowedReceiverCompanyIds</code>, or <code>allowed-receiver-company-ids</code> in the console's account configuration. With a list set, a case whose receiving company is not on it is refused with <code>attachment/receiver-not-allowed</code> <em>before</em> any grant is requested; the platform's own allowlist refusal is reported under the same code. Empty means unrestricted.</td></tr>
+          <tr><td>Receiving</td><td><code>attachmentStorage()</code> gets, registers and tests the company's own storage: an S3 bucket, reached through a role TSANet assumes, or an Azure Blob container. No secret is sent to TSANet or stored by the library.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note" style="border-left-color:var(--orange)"><strong>Alpha means alpha.</strong> Every grant and storage-configuration operation is marked <code>x-stability-level: alpha</code> in the Connect API specification, so its shape may still change without a deprecation clock. The operations were in Beta's specification first; since 2026-10-26 Production's specification carries them too, still marked alpha (spec-read 2026-10-28). The release was verified live on <strong>Beta</strong> only, with an S3 receiver: a single-mode send and a three-part S3 multipart send, both completed. Azure Blob and the Development environment were not live-verified. A few of the platform's answers are still settling — a missing storage configuration and one the endpoint does not show are not yet told apart — and the library marks those spots as provisional in its source.</div>
   </div>
 </section>
 
 <section id="layers">
   <div class="wrap">
     <p class="eyebrow">Construction</p>
-    <h2>Generated from the spec, wrapped by hand</h2>
+    <h2>Generated from the Spec, Wrapped by Hand</h2>
     <figure>
       <div class="diagram">
-        <svg viewBox="0 0 1020 330" style="min-width:900px" role="img" aria-label="Layering: your integration calls the eight facades, which call a generated OpenAPI client, which calls the TSANet Connect API. The OpenAPI specification is a build-time input to code generation, not a runtime dependency.">
+        <svg viewBox="0 0 1020 330" style="min-width:900px" role="img" aria-label="Layering: your integration calls the ten facades, which call a generated OpenAPI client, which calls the TSANet Connect API. The OpenAPI specification is a build-time input to code generation, not a runtime dependency.">
           <defs><marker id="sdA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--slate)"/></marker></defs>
 
           <rect class="bx-ext" x="20" y="126" width="180" height="70" rx="8"/>
@@ -114,7 +138,7 @@
           <rect class="bx-acc" x="262" y="96" width="230" height="130" rx="8"/>
           <text class="tt" x="276" y="120">connect-library</text>
           <text class="ts" x="276" y="140">TsaNetApi · TsaNetApiSession</text>
-          <text class="ts" x="276" y="158">eight typed facades</text>
+          <text class="ts" x="276" y="158">ten typed facades</text>
           <text class="ts" x="276" y="176">DTOs + request validation</text>
           <text class="ts" x="276" y="194">auth modes · account registry</text>
           <text class="tl" x="276" y="214">hand-written — the stable surface</text>
@@ -148,64 +172,67 @@
       </div>
       <figcaption>The generated layer is regenerated from the API's own specification at build time, so the wire types cannot drift from the contract. The facades are hand-written on top, which is what gives the library a surface that stays stable while the generated code underneath changes with the spec.</figcaption>
     </figure>
-    <div class="note">One consequence of wrapping the generated client by hand: the library currently spans both API versions. List reads call <code>/v2/collaboration-requests/list</code>, but webhook subscribe and list go through <code>/v1/webhooks</code> — deprecated, sunset 2027-01-01 — and the generated v2 webhook client is present with nothing calling it. Where every shipped integration stands is tracked in <a href="../api/index.html#versions">Deprecation clocks</a>.</div>
+    <div class="note">One consequence of wrapping the generated client by hand: the library currently spans both API versions. List reads call <code>/v2/collaboration-requests/list</code>, but <em>every</em> webhook call still goes to v1 — subscribe and list on <code>/v1/webhooks</code>, delete and delivery history on <code>/v1/webhooks/{id}</code> — while the generated v2 webhook client sits unused; the webhook code is unchanged from 2.0.0 to 3.0.0. The facade has no secret-rotation method at all. The inbound receiver reads the v1 payload shape too: a flat <code>eventType</code> and request token, not a CloudEvent. Worth knowing before you plan the migration: only subscribe and list are deprecated (sunset 2027-01-01), and only those two have v2 equivalents. Delete and deliveries exist on v1 alone, unmarked, with nothing to move to — so this is not a split the library can close on its own. One more consequence of the sibling build: the generated client comes from a pinned commit on the specification's <em>beta</em> branch, and the commit 3.0.0 is built from (2026-10-20) carries the <code>caseDirections</code> and <code>partnerCompanyIds</code> subscription filters. They are live on Beta. When 3.0.0 shipped, the specification Production served lacked them. Its <code>openapi.yaml</code> at that commit is byte-identical to what both Beta and Production serve as of 2026-10-28, so Production's specification has had them since 2026-10-26 (spec-read; not probed). So the generated request type carries both fields, but <code>createSubscription(callbackUrl, eventTypes)</code> does not pass them. Re-verified against the 3.0.0 source, its generated client, and the beta specification it was built from. Where every shipped integration stands is tracked in <a href="../api/index.html#versions">Deprecation clocks</a>.</div>
+    <div class="note">The library does not yet carry the two end-to-end encryption fields, <code>manifest</code> and <code>encrypted</code>, so an SDK-based integration cannot send or read an encrypted case. Tracked in <a href="https://github.com/tsanetgit/Connect_SDK/issues/137">Connect_SDK#137</a>; the contract is on the <a href="../topics/end-to-end-encryption.html#contract">end-to-end encryption topic</a>.</div>
   </div>
 </section>
 
 <section id="modules">
   <div class="wrap">
     <p class="eyebrow">Modules</p>
-    <h2>Five modules, one of which you actually depend on</h2>
+    <h2>Five Modules, One of Which You Actually Depend On</h2>
     <div class="twrap">
       <table>
         <thead><tr><th>Module</th><th>What it is</th></tr></thead>
         <tbody>
           <tr><td><code>connect-library</code></td><td><strong>The client.</strong> This is the one you take as a dependency; everything else is demonstration and tooling around it.</td></tr>
-          <tr><td><code>TSANet-integration-app</code></td><td>A console application with an executor per operation — create, approve, reject, information request and response, notes, close, attachments. Useful as a worked example and as a way to exercise the API by hand.</td></tr>
-          <tr><td><code>TSANet-integration-demo</code></td><td>Scripted demo scenarios over the same facades.</td></tr>
-          <tr><td><code>attachment-receiver</code></td><td>The receiving endpoint for the HTTPS attachment push arrangement — the piece both sides need before file transfer works.</td></tr>
-          <tr><td><code>demo-ui</code></td><td>A branded web demo over the SDK facades, with its own runbook and hosting notes.</td></tr>
+          <tr><td><code>TSANet-integration-app</code></td><td>A console shell with a command per operation — create, approve, reject, information request and response, notes, close, attachments, webhooks — and an optional endpoint that receives webhooks into the local store, on port 8090 by default (<code>tsanet.webhook.port</code>). Useful as a worked example and as a way to exercise the API by hand.</td></tr>
+          <tr><td><code>TSANet-integration-demo</code></td><td>Scripted two-party scenarios over the same facades, plus a scheduled poll for accounts that cannot receive webhooks.</td></tr>
+          <tr><td><code>attachment-receiver</code></td><td>The storage half of receiving files: a streaming storage interface with AWS S3, Azure Files, Azure Blob Storage and Google Cloud Storage adapters, an encrypted per-member configuration store, and a go-live check that proves the storage and CRM credentials before anything is registered. It serves the V1 relay path, where TSANet pushes the file to you; a V2 receiver registers its storage through <code>attachmentStorage()</code> instead. Its source is unchanged since 2.0.0. <strong>The HTTPS endpoint that accepts the V1 push is still not built</strong>; it is planned for the Connect Gateway's attachments-only profile, not here.</td></tr>
+          <tr><td><code>demo-ui</code></td><td>A branded web demo over the SDK facades — dashboard, partner search, the partner's form rendered live, every lifecycle action, webhook management, a <em>Deliver directly (V2)</em> action on a case, and a Settings page that shows and tests the company's V2 receiver storage — with its own runbook and hosting notes, listening on port 8090 — change one port before running it alongside the console app. It is not published as an artifact: building it needs access to the private repository the specification lives in, or a jar or image handed over. The create → approve → close round trip has been run end to end against a TSANet test environment.</td></tr>
         </tbody>
       </table>
     </div>
-    <div class="note"><strong>If you host the demo UI, set its auth password.</strong> The demo runs with no authentication gate unless <code>TSANET_DEMO_AUTH_PASSWORD</code> is set. That is fine on a laptop and not fine on anything reachable from the internet.</div>
+    <div class="note"><strong>If you host the demo UI, set its auth password.</strong> The demo runs with no authentication gate unless <code>TSANET_DEMO_AUTH_PASSWORD</code> is set. That is fine on a laptop and not fine on anything reachable from the internet. Registering storage from its Settings page is off by default — the page is read-only unless <code>TSANET_DEMO_RECEIVER_STORAGE_EDITABLE=true</code> — and should stay off on a shared instance.</div>
   </div>
 </section>
 
 <section id="getting">
   <div class="wrap">
     <p class="eyebrow">Getting it</p>
-    <h2>Take the artifact, not the source tree</h2>
+    <h2>Take the Artifact, Not the Source Tree</h2>
     <p>This is the most important practical thing on the page, because the obvious approach does not work for most people.</p>
 
-    <h3>The path that works: consume the published library</h3>
-    <p><code>connect-library</code> is published to GitHub Packages as a <strong>public</strong> package, so you can depend on it without building anything:</p>
-    <pre><code><span class="c">&lt;!-- com.tsanet:connect-library:0.1.0 --&gt;</span>
+    <h3>The Path That Works: Consume the Published Library</h3>
+    <p><code>connect-library</code> is published to GitHub Packages as a <strong>public</strong> package, so you can depend on it without building anything. Since 2.0.0 the <code>attachment-receiver</code> module (the storage SPI and its four cloud adapters, a plain library with no main class) is published alongside it at the same version. It does not depend on <code>connect-library</code>, and taking it means taking all four cloud SDKs at once — about 170 runtime artifacts, because the storage factory links every adapter; a per-provider split is a follow-up:</p>
+    <pre><code><span class="c">&lt;!-- com.tsanet:connect-library — check the latest release for the current version --&gt;</span>
 &lt;<span class="k">dependency</span>&gt;
   &lt;<span class="k">groupId</span>&gt;com.tsanet&lt;/<span class="k">groupId</span>&gt;
   &lt;<span class="k">artifactId</span>&gt;connect-library&lt;/<span class="k">artifactId</span>&gt;
-  &lt;<span class="k">version</span>&gt;0.1.0&lt;/<span class="k">version</span>&gt;
+  &lt;<span class="k">version</span>&gt;3.0.0&lt;/<span class="k">version</span>&gt;
 &lt;/<span class="k">dependency</span>&gt;</code></pre>
+    <p><strong>Only the current release is supported</strong> — v3.0.0 today. Earlier versions are still in the registry, but they are obsolete and not offered, and there are no external deployments to keep them for. It <strong>requires Jackson 3</strong> (<code>tools.jackson.core</code>) and the Spring Boot 4.1 line; a service still on Jackson 2 or Spring Boot 3 has to move before it can take the library. <strong>3.0.0 changes what a failure looks like again</strong>, this time on the wire: <code>/v1/</code> failures carry their documented status and problem type, and because calls now run on the JDK's <code>HttpClient</code>, a default <code>Authenticator</code> for an authenticating proxy is no longer honoured, a redirect is not followed, and an interrupted call stops with the thread left interrupted. Implementers and decorators of the facade interfaces must add the new methods, and a record pattern over a grown record stops compiling. The 3.0.0 entry in the repository's consumption reference lists every removed type, method and error code. Two Jackson 3 traps from the 1.0.0 move still apply: Jackson 3's parse exceptions are unchecked, so a <code>catch (IOException)</code> around a mapper call compiles and silently stops catching malformed JSON; and Jackson 3 rejects a missing primitive by default where Jackson 2 zero-filled it. The library's own cache reader keeps the old behaviour; your mappers inherit the new one unless you say otherwise.</p>
     <p>One wrinkle that catches everyone: <strong>GitHub Packages requires authentication for Maven even on public packages.</strong> You need a token with <code>read:packages</code> in your <code>settings.xml</code> against the <code>github</code> server, or the resolve fails in a way that looks like the artifact does not exist.</p>
 
-    <h3>The path that does not work from outside TSANet: build from source</h3>
-    <p>The client is generated from the Connect API's OpenAPI specification, and the build reads that specification from a <strong>sibling clone of a private repository</strong>. A clone of the SDK alone does not build. For TSANet engineers this is a one-line setup; for a member or vendor without access to that repository, building from source is simply not available.</p>
-    <p>There is a documented way around it if you need a hermetic build and have the spec by other means — vendor the specification into your own repository and point the codegen property at the vendored copy. That is the pattern the Fin/Intercom adapter uses, and it also removes the cross-repository CI credential that the sibling-clone approach needs.</p>
-    <div class="note" style="border-left-color:var(--red)"><strong>The practical consequence.</strong> If you are an external integrator, plan on consuming the published artifact and treating the source as reference reading. If you need to build it yourself — to patch it, or to run it in an air-gapped pipeline — that is a conversation with TSANet about spec access, not something you can resolve on your own.</div>
+    <h3>The Path That Does Not Work from Outside TSANet: Build from Source</h3>
+    <p>The client is generated from the Connect API's OpenAPI specification, and the build reads that specification from a <strong>sibling clone of a private repository</strong>. A clone of the SDK alone does not build, and from 3.0.0 the sibling has to be on a specification branch that carries the Attachment Grants and Attachment Storage Config operations — <code>beta</code> does; the repository's CI also builds against the specification's <code>develop</code> branch daily, to see changes coming. For TSANet engineers this is a one-line setup; for a member or vendor without access to that repository, building from source is simply not available.</p>
+    <p>There is a documented way around it if you need a hermetic build and have the spec by other means — vendor the specification into your own repository and point the codegen property at the vendored copy. That was the pattern the Fin / Intercom adapter used before it moved to the published engine artifact, and it also removes the cross-repository CI credential that the sibling-clone approach needs.</p>
+    <p>One runtime rule the apps enforce and the library does not: plain <code>http</code> to the API is refused at startup. The opt-outs are <code>tsanet.api.allow-insecure-http=true</code> for the console and scripted demo and <code>tsanet.demo.allow-insecure-http=true</code> for the web demo.</p>
+      <div class="note" style="border-left-color:var(--red)"><strong>The practical consequence.</strong> If you are an external integrator, plan on consuming the published artifact and treating the source as reference reading. If you need to build it yourself — to patch it, or to run it in an air-gapped pipeline — that is a conversation with TSANet about spec access, not something you can resolve on your own.</div>
   </div>
 </section>
 
 <section id="auth">
   <div class="wrap">
     <p class="eyebrow">Authentication</p>
-    <h2>Both credential modes, behind one session</h2>
+    <h2>Both Credential Modes, Behind One Session</h2>
     <p>The library models authentication as a mode rather than branching call sites, so the same facade calls work whichever credentials you were issued.</p>
     <div class="twrap">
       <table>
         <thead><tr><th>Mode</th><th>Use</th></tr></thead>
         <tbody>
           <tr><td>Client credentials</td><td>The OAuth 2.0 server-to-server path. Tokens are re-minted from a long-lived credential, so there is no static token to refresh — the arrangement described on the <a href="zendesk.html#auth">Zendesk</a> and <a href="salesforce.html#auth">Salesforce</a> pages.</td></tr>
-          <tr><td>Password</td><td>The legacy login that exchanges a username and password for a JWT lasting about an hour.</td></tr>
+          <tr><td>Password</td><td>The legacy login that exchanges a username and password for a JWT lasting about an hour. The library tracks the lifetime the login states and, for configured credentials, logs in again before it runs out.</td></tr>
         </tbody>
       </table>
     </div>
@@ -216,8 +243,8 @@
 <section id="storage">
   <div class="wrap">
     <p class="eyebrow">Local state</p>
-    <h2>A storage layer for what you fetched</h2>
-    <p>The library ships storage services paralleling the facades — collaboration requests and their form templates, notes, responses, partner selections, user context, webhook subscriptions and inbound events, attachment configuration and forward results. Backed by SQLite in the demo, they give an integration somewhere to keep what it has already retrieved.</p>
+    <h2>A Storage Layer for What You Fetched</h2>
+    <p>The library ships storage services paralleling the facades — collaboration requests and their form templates, notes, responses, partner selections, user context, webhook subscriptions and inbound events, attachment configuration and forward results. Backed by SQLite, they give an integration somewhere to keep what it has already retrieved. Since 0.2.0 the store can also forget: an age-based sweep evicts closed and rejected cases older than a window you choose, never touches an open case, and leaves attachment forward results alone because nothing upstream can re-supply them. Nothing runs the sweep for you: it is a call, <code>CacheRetention.sweep</code>, that your own schedule makes.</p>
     <p>This matters more than it first appears on an API where inbound events are thin. When a webhook tells you only that <em>something</em> changed on a token, the fetch is what establishes truth — and having a local record of what you last saw is how you work out what actually changed, and how you avoid re-notifying on every redelivery. Every connector on this hub ends up building some version of this; here it comes with the client.</p>
   </div>
 </section>
@@ -225,8 +252,8 @@
 <section id="languages">
   <div class="wrap">
     <p class="eyebrow">Other languages</p>
-    <h2>Java today; Python and TypeScript scoped, not started</h2>
-    <p>There is no Python, JavaScript or TypeScript client. A scoping note exists and is honest that the work has not begun. What it establishes is that the shape is well understood: each target needs a generated client from the same specification, a thin facade layer reproducing the same eight-facade surface so parity is auditable, and a local cache equivalent to the SQLite store.</p>
+    <h2>Java Today; Python and TypeScript Scoped, Not Started</h2>
+    <p>There is no Python, JavaScript or TypeScript client. A scoping note exists and is honest that the work has not begun. What it establishes is that the shape is well understood: each target needs a generated client from the same specification, a thin facade layer reproducing the same ten-facade surface so parity is auditable, and a local cache equivalent to the SQLite store.</p>
     <p>No new code-generation infrastructure is required — the same generator already supports Python and TypeScript targets — so the cost is the facade layer and the tests, not the plumbing. Python is the stated first choice, driven by a real integration need rather than by demo convenience.</p>
     <div class="note">If you are building on a non-JVM stack today, you are writing against the REST API directly. The <a href="fin-intercom.html#taxonomy">submit-outcome taxonomy</a> and the polling-cursor guidance elsewhere on this hub are the parts worth copying, because they are the parts that are easy to get subtly wrong.</div>
   </div>
@@ -235,23 +262,23 @@
 <section id="when">
   <div class="wrap">
     <p class="eyebrow">Fit</p>
-    <h2>When to reach for it</h2>
+    <h2>When to Reach for It</h2>
     <div class="cols">
       <div>
-        <h3>Good fit</h3>
+        <h3>Good Fit</h3>
         <ul class="tight">
           <li>A custom JVM integration against a platform with no TSANet connector</li>
           <li>A middleware or translation service between the Connect API and an in-house system</li>
           <li>Learning the API's real shape before committing to a design — the console app exercises every operation</li>
-          <li>Anything needing attachments, where the receiver module saves building the endpoint yourself</li>
+          <li>Anything sending attachments, where forwarding a file to a case is a library call — and, once you accept alpha, direct delivery too</li>
         </ul>
       </div>
       <div>
-        <h3>Look elsewhere</h3>
+        <h3>Look Elsewhere</h3>
         <ul class="tight">
           <li>Your platform already has a connector — use <a href="salesforce.html">Salesforce</a>, <a href="zendesk.html">Zendesk</a> or <a href="dynamics.html">Dynamics</a> rather than rebuilding</li>
           <li>You are not on the JVM — there is no port yet</li>
-          <li>You need a frozen, long-supported API surface; this is v0.1.0 and will move</li>
+          <li>You need a frozen, long-supported API surface: the library has had three majors in two months, and 3.0.0 removed V2 attachment methods and types, added methods to two interfaces and grew three records</li>
           <li>You cannot pin dependencies and need something that floats safely</li>
         </ul>
       </div>
@@ -262,41 +289,66 @@
 <section id="skill">
   <div class="wrap">
     <p class="eyebrow">Build with an assistant</p>
-    <h2>The deployment skill, and how to load it</h2>
-    <p>The SDK repository ships an agent skill — <a href="https://github.com/tsanetgit/Connect_SDK/tree/main/skills/connect-sdk-deploy"><code>skills/connect-sdk-deploy</code></a> — that carries this page's practical knowledge in a form an agentic coding assistant can apply while it works in your project: the artifact-versus-source decision above, the GitHub Packages token requirement, both credential modes with working configuration, the demo's build-run-host runbook, and a symptom-first troubleshooting file for the traps that recur. It is plain markdown: a <code>SKILL.md</code> that routes, plus three reference files it points into.</p>
-    <h3>Loading it</h3>
+    <h2>The Deployment Skill, and How to Load It</h2>
+    <p>The SDK repository ships an agent skill — <a href="https://github.com/tsanetgit/Connect_SDK/tree/main/skills/connect-sdk-deploy"><code>skills/connect-sdk-deploy</code></a> — that carries this page's practical knowledge in a form an agentic coding assistant can apply while it works in your project: the artifact-versus-source decision above, the GitHub Packages token requirement, both credential modes with working configuration, the demo's build-run-host runbook, and a symptom-first troubleshooting file for the traps that recur. It is plain markdown: a <code>SKILL.md</code> that routes, three reference files it points into, and an <code>evals</code> folder that rides along when you copy it. Every skill TSANet ships, and how to load one into any assistant, is collected on <a href="../topics/agentic-usage.html#skills">Agentic usage with TSANet Connect</a>.</p>
+    <h3>Loading It</h3>
     <p><strong>Claude Code</strong> — copy the whole folder into your integration project's skills directory; the references must ride along with the <code>SKILL.md</code> that cites them:</p>
     <pre><code>git clone --depth 1 https://github.com/tsanetgit/Connect_SDK.git
 cp -R Connect_SDK/skills/connect-sdk-deploy  your-project/.claude/skills/</code></pre>
-    <p><strong>Other assistants</strong> — attach <code>SKILL.md</code> and the <code>references/</code> files as project instructions; nothing in it is Claude-specific. The skill lives in the SDK repository and evolves with it, so refresh your copy when you move to a new SDK release.</p>
-    <h3>Typical first steps</h3>
+    <p><strong>Other assistants</strong> — attach <code>SKILL.md</code> and the <code>references/</code> files as project instructions; nothing in it is Claude-specific. The skill lives in the SDK repository and evolves with it, so refresh your copy when you move to a new SDK release. At 3.0.0 it is part-way there: its consumption reference carries the 3.0.0 upgrade guide, but <code>SKILL.md</code> still says it was checked at v2.0.0 and the reference still names 2.0.0 as current in one place.</p>
+    <h3>Typical First Steps</h3>
     <ul class="tight">
       <li><strong>Start with the path decision.</strong> <em>"We want to call the Connect API from our Java service — set up the dependency and authentication."</em> The skill routes you to the published artifact and surfaces the <code>read:packages</code> requirement before it bites, rather than after a 401 that looks like a missing artifact.</li>
       <li><strong>Let it plan the demo.</strong> <em>"Get the SDK demo running locally"</em> or <em>"plan a hosted demo my colleagues can reach for a week."</em> Its first move is the one that matters here: checking whether you can build from source at all, and giving you the ask-TSANet fallback when you cannot — the same constraint under <a href="#getting">Getting it</a> above.</li>
       <li><strong>Paste build errors verbatim.</strong> <code>cannot find symbol ... WebhooksApi</code> means one specific thing (the spec sibling is on the wrong branch), and the skill knows it; a paraphrase throws that away.</li>
-      <li><strong>Have it review your error handling.</strong> <em>"Check my integration against the API's error modes"</em> catches the behaviours from <a href="../api/index.html">Working with the API</a> — the 500-on-bad-login legacy mode, the test-flag read/write asymmetry, the registered-domain email rule — before your first live case does.</li>
+      <li><strong>Have it review your error handling.</strong> <em>"Check my integration against the API's error modes"</em> catches the behaviours from <a href="../api/index.html">Working with the API</a> — the HTTP-500-by-default error mode, the test-flag read/write asymmetry, the registered-domain email rule — before your first live case does.</li>
     </ul>
     <div class="note"><strong>Boundaries worth keeping.</strong> Member credentials, client secrets and tenant IDs never go into an assistant session — the skill is written against placeholders and never needs a real value. And it is distilled guidance, not the source of truth: it instructs the assistant to read the repository's own documentation from your checkout, and where they seem to disagree, the repository is newer.</div>
   </div>
 </section>
 
 <footer>
-  <div class="wrap foot-in">
-    <div><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
-    <nav class="foot-nav" aria-label="Sections">
-      <a href="../connectors/index.html">Connectors</a>
-      <a href="../api/index.html">Working with the API</a>
-      <a href="../docs/index.html">Design documents</a>
-      <a href="../topics/index.html">Topics</a>
-      <a href="../community/index.html">Community</a>
-    </nav>
-    <div class="foot-links mono">
-      <a href="https://connect2.tsanet.org">connect2.tsanet.org</a>
+  <div class="wrap">
+    <div class="foot-top"><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
+    <div class="foot-cols">
+      <nav class="foot-col" aria-label="Developers">
+        <h4>Developers</h4>
+        <a href="../build/index.html">Build a New Integration</a>
+        <a href="../connectors/index.html">Existing Solutions</a>
+        <a href="../api/index.html">Working with the API</a>
+        <a href="../docs/index.html">Design Documents</a>
+        <a href="../topics/index.html">Topics</a>
+        <a href="../tools/index.html">Tools</a>
+        <a href="../community/index.html">Community</a>
+      </nav>
+      <div class="foot-col">
+        <h4>Members</h4>
+        <a href="https://www.tsanet.org/members/">Member List</a>
+        <a href="https://tsanet.gitbook.io/connect">Platform Documentation</a>
+        <a href="https://tsanet.gitbook.io/connect/help-center">Member Support</a>
+      </div>
+      <div class="foot-col">
+        <h4>About</h4>
+        <a href="https://www.tsanet.org/about-us/">About Us</a>
+        <a href="https://www.tsanet.org/board-of-directors/">Board of Directors</a>
+        <a href="https://www.tsanet.org/news-events/">News and Events</a>
+      </div>
+    </div>
+    <div class="foot-bottom mono">
+      <span>© TSANet Inc. All Rights Reserved</span>
+      <a href="https://www.tsanet.org/legal-policy/">Privacy Policy</a>
       <a href="https://github.com/tsanetgit">github.com/tsanetgit</a>
       <a href="mailto:membership@tsanet.org">membership@tsanet.org</a>
+      <span class="foot-social" aria-label="TSANet on social media">
+        <a href="https://twitter.com/TSANetTweet" aria-label="TSANet on X" title="X"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg></a>
+        <a href="https://www.linkedin.com/company/tsanet" aria-label="TSANet on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+        <a href="https://www.youtube.com/@tsanet8120" aria-label="TSANet on YouTube" title="YouTube"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+        <a href="https://github.com/tsanetgit" aria-label="TSANet on GitHub" title="GitHub"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+      </span>
     </div>
   </div>
 </footer>
 
+<script src="../assets/assistant.js?v=20260913" defer></script>
 </body>
 </html>

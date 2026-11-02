@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Deciding what to accept automatically — TSANet Connect Developer Hub</title>
+<title>Deciding What to Accept Automatically — TSANet Connect Developer Hub</title>
 <link rel="icon" href="../assets/tsanet-favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/hub.css?v=20260815">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/hub.css?v=20260914c">
 <style>
   pre{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--ink);margin:16px 0}
   pre code{background:none;padding:0;font-size:inherit}
@@ -29,12 +29,14 @@
 
 <nav>
   <div class="wrap nav-in">
-    <a class="brand" href="../index.html"><img class="brand-img" src="../assets/tsanet-logo-white.png" alt="TSANet"><small>Developer Hub</small></a>
+    <a class="brand" href="../index.html"><img class="brand-img" src="../assets/tsanet-devhub-horizontal.png" alt="TSANet Developer Hub"></a>
     <div class="nav-links">
-      <a href="../connectors/index.html">Connectors</a>
+      <a href="../build/index.html">Build</a>
+      <a href="../connectors/index.html">Existing Solutions</a>
       <a href="../api/index.html">API</a>
       <a href="../docs/index.html">Design Docs</a>
       <a href="../topics/index.html" aria-current="page">Topics</a>
+      <a href="../tools/index.html">Tools</a>
       <a href="../community/index.html">Community</a>
     </div>
   </div>
@@ -43,12 +45,13 @@
 <header class="pagehead">
   <div class="wrap">
     <div class="crumb"><a href="../index.html">Hub</a> / <a href="index.html">Topics</a> / Entitlement automation</div>
-    <h1>Deciding what to accept automatically</h1>
-    <p class="lede">Every shipped connector offers some way to accept inbound collaboration requests without an agent. They disagree completely about when that is a good idea — and the disagreement is worth understanding, because accepting a case is not a routing step. It is a promise to another company.</p>
+    <h1>Deciding What to Accept Automatically</h1>
+    <p class="lede">Three of the four shipped connectors offer some way to accept inbound collaboration requests without an agent, and the fourth deliberately does not. They disagree completely about when that is a good idea — and the disagreement is worth understanding, because accepting a case is not a routing step. It is a promise to another company.</p>
     <div class="meta-row">
       <span><b>Topic</b> Inbound automation</span>
       <span><b>Grounded in</b> Four connectors</span>
       <span><b>Audience</b> Anyone configuring inbound</span>
+      <span><b>Updated</b> 2026-10-24</span>
     </div>
     <div class="toc">
       <a href="#commitment">What acceptance commits you to</a>
@@ -63,7 +66,7 @@
 <section id="commitment">
   <div class="wrap">
     <p class="eyebrow">The reframe</p>
-    <h2>Acceptance is a commitment, not a triage step</h2>
+    <h2>Acceptance Is a Commitment, Not a Triage Step</h2>
     <p>It is tempting to read <code>/approval</code> as "route this to my team". It is not. Accepting a collaboration request tells the partner that <strong>an engineer is engaged on their problem</strong>, and it satisfies the response SLA at the same moment. Those two effects pull in opposite directions, and that tension is the whole subject of this page.</p>
     <div class="twrap">
       <table>
@@ -71,7 +74,7 @@
         <tbody>
           <tr><td>Sets <code>responded</code> to true</td><td>The platform stops tracking <code>respondBy</code>. Your SLA obligation is met — the clock is off.</td></tr>
           <tr><td>Records an engineer against the case</td><td>The partner sees a named contact and a case number, and reasonably expects work to be happening.</td></tr>
-          <tr><td>Moves the case out of OPEN</td><td>Reject and Request-information are no longer available. The triage decision has been made.</td></tr>
+          <tr><td>Moves the case out of OPEN</td><td>Reject and Request-information are no longer offered by the shipped connectors once a case is accepted. The triage decision has been made. (Connector behaviour — the API page does not state this rule itself.)</td></tr>
         </tbody>
       </table>
     </div>
@@ -83,28 +86,28 @@
 <section id="postures">
   <div class="wrap">
     <p class="eyebrow">The spectrum</p>
-    <h2>Four postures, all shipping today</h2>
+    <h2>Four Postures, All Shipping Today</h2>
     <div class="grid g2" style="margin-bottom:24px">
       <div class="posture p1">
-        <h3>Accept everything</h3>
+        <h3>Accept Everything</h3>
         <div class="who">Zendesk — app setting</div>
         <p>Every inbound case is accepted the moment it arrives. No condition, no lookup, no check that the request is one you can act on. Ships as a built-in setting, off by default.</p>
         <p class="trade">Buys: the SLA can never be breached. Spends: every case is a promise, including the ones that turn out not to be yours.</p>
       </div>
       <div class="posture p2">
-        <h3>Accept what matches existing work</h3>
+        <h3>Accept What Matches Existing Work</h3>
         <div class="who">Dynamics — auto-routing</div>
         <p>Look for a case that already exists for the partner's case number; fall back to the customer name. On a match, create and relate the local case and accept.</p>
         <p class="trade">Buys: re-collaboration on a known issue attaches to the right place instead of opening a duplicate. Spends: says nothing about entitlement.</p>
       </div>
       <div class="posture p3">
-        <h3>Accept what you can verify</h3>
+        <h3>Accept What You Can Verify</h3>
         <div class="who">Salesforce — asset match</div>
-        <p>Resolve the serial number to an asset you actually have a record of. On a match, create the case and accept. <strong>On no match, reject.</strong></p>
-        <p class="trade">Buys: acceptance means something checkable. Spends: needs clean asset data, and rejects legitimate requests when that data is stale.</p>
+        <p>Resolve the request to an asset you actually have a record of. On a match, create the case and accept. <strong>On no match, ask the partner for more information</strong> instead of accepting.</p>
+        <p class="trade">Buys: acceptance means something checkable. Spends: needs clean asset data, and an unmatched request waits on the partner's answer while the clock runs.</p>
       </div>
       <div class="posture p4">
-        <h3>Never accept automatically</h3>
+        <h3>Never Accept Automatically</h3>
         <div class="who">Fin / Intercom — guardrail</div>
         <p>Automation drafts and proposes; a person accepts, declines or asks for more information. The commitment stays with a human even when the answer is machine-generated.</p>
         <p class="trade">Buys: no promise is made that nobody chose to make. Spends: the SLA clock runs until someone acts.</p>
@@ -157,31 +160,31 @@
 <section id="howthey">
   <div class="wrap">
     <p class="eyebrow">Implementations</p>
-    <h2>How each connector actually does it</h2>
+    <h2>How Each Connector Actually Does It</h2>
 
-    <h3>Zendesk: a setting for everything, a trigger for conditions</h3>
+    <h3>Zendesk: A Setting for Everything, a Trigger for Conditions</h3>
     <p>Since app v1.0.69 there are two paths, split by policy. Accepting <em>everything</em> is a built-in app setting — <em>Auto-accept inbound requests</em>, off by default — that accepts each inbound case the moment its ticket is created, with your ticket number as the case reference. It is deliberately unconditional, and toggling it takes effect only after a bundle redeploy. Accepting <em>conditionally</em> stays with a Zendesk trigger on the TSANet Action field, which rides the optional field-actions feature: fire on ticket creation, condition on the inbound tag, action sets TSANet Action to Accept. Both run server-side, so no agent needs to be logged in, and both are verified end to end — the partner sees the case accepted roughly fifteen seconds after submitting it.</p>
     <p>Crucially, <strong>trigger conditions are the scoping mechanism</strong>. A condition on the partner field turns "accept everything" into "accept everything from this partner" — which moves you along the spectrum without writing anything. Cases that do not match simply stay open for normal triage.</p>
     <div class="note">The published guide is honest about the cost: auto-accept commits you instantly, and the triage options are skipped for auto-accepted cases. If some cases should still be looked at first, use the trigger path and put those conditions in the trigger. <a href="https://tsanet.gitbook.io/connect/documentation/zendesk-app/auto-accepting-inbound-cases">Setup guide →</a></div>
 
-    <h3>Salesforce: verify, then accept — or reject</h3>
-    <p>The shipped flow is the most opinionated of the four, and the only one that will say no. It fires on TSANet Case creation where no local case is linked, direction is inbound, and a serial number is present:</p>
-    <pre><code>Get Asset by serial number
-  └─ no match  <span class="c">→ reject the collaboration request</span>
+    <h3>Salesforce: Verify, Then Accept — Or Ask</h3>
+    <p>The shipped template, <em>Trigger Handler (Asset)</em>, is the most opinionated of the four. It ships deactivated, for you to clone and activate. It fires on TSANet Case creation where direction is inbound and no local case is linked:</p>
+    <pre><code>Get Asset                            <span class="c">as shipped, Asset Name = the case's email field</span>
+  └─ no match  <span class="c">→ send the partner an information request</span>
   └─ match     <span class="c">→ continue</span>
-Get Contact by customer email        <span class="c">(enrichment, optional)</span>
-Create the Salesforce Case           <span class="c">asset, contact, subject, description</span>
-Update the TSANet Case               <span class="c">attach the new Case Id</span>
-Approve the collaboration request    <span class="c">with engineer details</span>
+Create the Salesforce Case
+Link it to the TSANet Case
+Approve the collaboration request
 Notify the case owner</code></pre>
-    <p>Rejecting on no asset match <em>is</em> the entitlement check. A partner escalating about hardware you have no record of does not become a case your team has to triage — and the partner finds out immediately rather than after a silent wait.</p>
+    <p>Asking on no match is the entitlement check in its softer form. A partner escalating about something you have no record of does not become a case your team owns. It gets a question back straight away instead of a silent wait.</p>
+    <div class="note"><strong>The published guide says this branch rejects. The shipped flow does not.</strong> Verified against the package source at <code>Release-v2.13</code> and 2.14: the no-match branch calls the Request Information automation. If rejection is your policy, it is a one-element change in your clone. Replace the lookup while you are there, because matching an Asset Name against an email field is a placeholder. Details on the <a href="../connectors/salesforce.html#flows">Salesforce page</a>.</div>
 
-    <h3>Dynamics: attach to work that already exists</h3>
+    <h3>Dynamics: Attach to Work That Already Exists</h3>
     <p>Auto-routing is a feature toggle rather than a flow to activate, and it solves a different problem: not "should we take this" but "where does this belong". It searches for an existing case by the partner's case number, falls back to a customer-name lookup, and on a match creates and relates the local case before approving.</p>
     <p>Matching on the partner's own case number first is what makes re-collaboration on a continuing issue attach to the same case rather than opening a duplicate. That is worth having even if you never intend to auto-accept.</p>
 
-    <h3>Fin / Intercom: draft automatically, commit deliberately</h3>
-    <p>The gateway connector takes the opposite position and states the reasoning explicitly: accepting, declining and requesting information are <strong>contractual commitments to another vendor, made under a service-level clock</strong>. Automation composes the answer; a person makes the commitment.</p>
+    <h3>Fin / Intercom: Draft Automatically, Commit Deliberately</h3>
+    <p>The <a href="connector-classes.html">gateway-class</a> connector takes the opposite position and states the reasoning explicitly: accepting, declining and requesting information are <strong>contractual commitments to another vendor, made under a service-level clock</strong>. Automation composes the answer; a person makes the commitment.</p>
     <p>There is a second reason specific to AI-assisted flows. Partner escalations carry end-customer logs and text pasted in verbatim — untrusted content arriving at a system that would then reply under your company's name. Keeping a human on the commitment is also a containment boundary.</p>
   </div>
 </section>
@@ -189,8 +192,8 @@ Notify the case owner</code></pre>
 <section id="designing">
   <div class="wrap">
     <p class="eyebrow">Designing yours</p>
-    <h2>Building a rule that asserts something true</h2>
-    <p>The Salesforce flow is the useful template even on other platforms, because its shape generalises: <em>resolve an identifier, branch on whether you found it, and be willing to say no.</em> What varies is the identifier.</p>
+    <h2>Building a Rule That Asserts Something True</h2>
+    <p>The Salesforce flow is the useful template even on other platforms, because its shape generalises: <em>resolve an identifier, branch on whether you found it, and decide what no match means.</em> What varies is the identifier.</p>
     <div class="twrap">
       <table>
         <thead><tr><th>Match on</th><th>Asserts</th><th>Fails when</th></tr></thead>
@@ -205,8 +208,8 @@ Notify the case owner</code></pre>
     </div>
     <p>Two design rules worth adopting whichever identifier you pick:</p>
     <ul class="tight">
-      <li><strong>Decide what "no match" means before you build.</strong> Rejecting is a real answer and it is kinder than silence — but only if your matching is good enough that a rejection is usually correct. If it is not, leave unmatched cases open for a human instead. Rejecting wrongly is worse than not automating.</li>
-      <li><strong>Start scoped, then widen.</strong> One partner, or one product line, with everything else falling through to normal triage. Every connector here supports a conditional form, and it converts a policy question into an observation: run it narrow for a month and count how often the rule was right.</li>
+      <li><strong>Decide what "no match" means before you build.</strong> There are three answers. Rejecting is a real answer, and kinder than silence, but only if your matching is good enough that a rejection is usually correct. Asking for information, which is what the Salesforce template does, is safer when the partner may just have quoted a different identifier. Leaving the case open for a human is the fallback when you are unsure. Rejecting wrongly is worse than not automating.</li>
+      <li><strong>Start scoped, then widen.</strong> One partner, or one product line, with everything else falling through to normal triage. Every connector that automates acceptance supports a conditional form, and it converts a policy question into an observation: run it narrow for a month and count how often the rule was right.</li>
     </ul>
   </div>
 </section>
@@ -214,7 +217,7 @@ Notify the case owner</code></pre>
 <section id="failures">
   <div class="wrap">
     <p class="eyebrow">Failure modes</p>
-    <h2>What goes wrong, in the order you will meet it</h2>
+    <h2>What Goes Wrong, in the Order You Will Meet It</h2>
     <ul class="tight">
       <li><strong>The silent accept.</strong> A rule accepts a case that lands in a queue nobody watches. The clock is off, so nothing escalates, and the partner waits on an engineer who was never assigned. This is the failure that auto-accept exists to prevent and the one it most often causes.</li>
       <li><strong>The confident reject.</strong> Matching runs against stale reference data and declines a request that was perfectly valid. The partner has to re-submit, and now believes your integration is unreliable. Audit your rejections before you trust them — they are the ones nobody complains about internally.</li>
@@ -227,22 +230,47 @@ Notify the case owner</code></pre>
 </section>
 
 <footer>
-  <div class="wrap foot-in">
-    <div><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
-    <nav class="foot-nav" aria-label="Sections">
-      <a href="../connectors/index.html">Connectors</a>
-      <a href="../api/index.html">Working with the API</a>
-      <a href="../docs/index.html">Design documents</a>
-      <a href="../topics/index.html">Topics</a>
-      <a href="../community/index.html">Community</a>
-    </nav>
-    <div class="foot-links mono">
-      <a href="https://connect2.tsanet.org">connect2.tsanet.org</a>
+  <div class="wrap">
+    <div class="foot-top"><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
+    <div class="foot-cols">
+      <nav class="foot-col" aria-label="Developers">
+        <h4>Developers</h4>
+        <a href="../build/index.html">Build a New Integration</a>
+        <a href="../connectors/index.html">Existing Solutions</a>
+        <a href="../api/index.html">Working with the API</a>
+        <a href="../docs/index.html">Design Documents</a>
+        <a href="../topics/index.html">Topics</a>
+        <a href="../tools/index.html">Tools</a>
+        <a href="../community/index.html">Community</a>
+      </nav>
+      <div class="foot-col">
+        <h4>Members</h4>
+        <a href="https://www.tsanet.org/members/">Member List</a>
+        <a href="https://tsanet.gitbook.io/connect">Platform Documentation</a>
+        <a href="https://tsanet.gitbook.io/connect/help-center">Member Support</a>
+      </div>
+      <div class="foot-col">
+        <h4>About</h4>
+        <a href="https://www.tsanet.org/about-us/">About Us</a>
+        <a href="https://www.tsanet.org/board-of-directors/">Board of Directors</a>
+        <a href="https://www.tsanet.org/news-events/">News and Events</a>
+      </div>
+    </div>
+    <div class="foot-bottom mono">
+      <span>© TSANet Inc. All Rights Reserved</span>
+      <a href="https://www.tsanet.org/legal-policy/">Privacy Policy</a>
       <a href="https://github.com/tsanetgit">github.com/tsanetgit</a>
       <a href="mailto:membership@tsanet.org">membership@tsanet.org</a>
+      <span class="foot-social" aria-label="TSANet on social media">
+        <a href="https://twitter.com/TSANetTweet" aria-label="TSANet on X" title="X"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg></a>
+        <a href="https://www.linkedin.com/company/tsanet" aria-label="TSANet on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+        <a href="https://www.youtube.com/@tsanet8120" aria-label="TSANet on YouTube" title="YouTube"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+        <a href="https://github.com/tsanetgit" aria-label="TSANet on GitHub" title="GitHub"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+      </span>
     </div>
   </div>
 </footer>
 
+<script src="../assets/assistant.js?v=20260913" defer></script>
 </body>
 </html>

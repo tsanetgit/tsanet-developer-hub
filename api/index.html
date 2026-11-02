@@ -7,8 +7,8 @@
 <link rel="icon" href="../assets/tsanet-favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/hub.css?v=20260815">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/hub.css?v=20260914c">
 <style>
   pre{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--ink);margin:16px 0}
   pre code{background:none;padding:0;font-size:inherit}
@@ -34,12 +34,14 @@
 
 <nav>
   <div class="wrap nav-in">
-    <a class="brand" href="../index.html"><img class="brand-img" src="../assets/tsanet-logo-white.png" alt="TSANet"><small>Developer Hub</small></a>
+    <a class="brand" href="../index.html"><img class="brand-img" src="../assets/tsanet-devhub-horizontal.png" alt="TSANet Developer Hub"></a>
     <div class="nav-links">
-      <a href="../connectors/index.html">Connectors</a>
+      <a href="../build/index.html">Build</a>
+      <a href="../connectors/index.html">Existing Solutions</a>
       <a href="index.html" aria-current="page">API</a>
       <a href="../docs/index.html">Design Docs</a>
       <a href="../topics/index.html">Topics</a>
+      <a href="../tools/index.html">Tools</a>
       <a href="../community/index.html">Community</a>
     </div>
   </div>
@@ -57,14 +59,14 @@
       <span><b>Beta</b> connect2.tsanet.net</span>
     </div>
     <div class="toc">
-      <a href="#reference">Endpoint reference</a>
-      <a href="#errors">Error modes</a>
+      <a href="#reference">Endpoint Reference</a>
+      <a href="#errors">Error Modes</a>
       <a href="#auth">Authentication</a>
-      <a href="#partners">Partners &amp; forms</a>
-      <a href="#cases">Collaboration requests</a>
-      <a href="#content">Notes &amp; attachments</a>
+      <a href="#partners">Partners &amp; Forms</a>
+      <a href="#cases">Collaboration Requests</a>
+      <a href="#content">Notes &amp; Attachments</a>
       <a href="#webhooks">Webhooks</a>
-      <a href="#versions">Deprecation clocks</a>
+      <a href="#versions">Deprecation Clocks</a>
     </div>
   </div>
 </header>
@@ -72,8 +74,9 @@
 <section id="reference">
   <div class="wrap">
     <div class="status-band">
-      <h3>Looking for the endpoint reference?</h3>
-      <p>Full request and response schemas, parameters and status codes for all 27 paths are published in the GitBook API Reference and generated from the specification, which keeps it broadly in step with the API — broadly, not perfectly: <a href="#ref-drift">one known drift</a> is flagged on this page. It deliberately does not duplicate the reference — two copies of a reference is one copy that goes stale.</p>
+      <h3>Looking for the Endpoint Reference?</h3>
+      <p>Full request and response schemas, parameters and status codes are published in the GitBook API Reference and generated from the specification, which keeps it broadly in step with the API — broadly, not perfectly: <a href="#ref-drift">the known drifts</a> are flagged on this page. It deliberately does not duplicate the reference — two copies of a reference is one copy that goes stale.</p>
+      <p><strong>Production and Beta now serve the same specification.</strong> Until late October they did not: Production served 27 paths (spec v3.2.3, last changed 2026-07-30) and Beta 42. On 2026-10-28 the <code>openapi.yaml</code> each environment serves was byte-identical, last modified on Production 2026-10-26 and on Beta 2026-10-19. Both serve 42 paths: the original 27, plus <code>GET /v1/note-types</code>, plus 14 Attachment V2 paths whose 17 operations are all still marked <code>x-stability-level: alpha</code>. So note types and note direction, webhook filters and OAuth callback auth are in Production's specification too. That is spec-read only: the hub has not probed Production, and a field being in the served spec is not proof the deployed code honours it. Where a claim on this page rests on a probe, it names the environment probed. The path counts, the sunset table, the enums, the note caps, the event types and the OpenAPI retry policy were re-checked against both served specs on 2026-10-28; the AsyncAPI retry policy was last checked 2026-10-20.</p>
       <div class="out">
         <a href="https://tsanet.gitbook.io/connect/api-reference">API Reference →</a>
         <a href="https://tsanet.gitbook.io/connect/api-reference/integration-guide">Integration guide →</a>
@@ -88,7 +91,7 @@
 <section id="errors">
   <div class="wrap">
     <p class="eyebrow">Error modes</p>
-    <h2>The one header that changes how every failure reaches you</h2>
+    <h2>The One Header That Changes How Every Failure Reaches You</h2>
     <p>If you read nothing else here, read this. By default, most business-rule, validation and authorization rejections come back as <strong>HTTP 500</strong> with a <code>{"message": "..."}</code> body. Not 400, not 422 — 500. An integration written against the defaults cannot distinguish "you sent a bad email domain" from "the platform is broken", and will retry things it should not.</p>
     <p>This is deliberate and permanent, locked in for backward compatibility with clients built before the alternative existed. The fix is one header:</p>
     <pre><code>Accept: application/json, application/problem+json</code></pre>
@@ -133,13 +136,18 @@
       <figcaption>Same request, same rejection, two different worlds. With the header you get the documented status code (400 / 401 / 403 / 404 / 409 / 422) and an RFC 7807 body — read the message from <code>detail</code>, falling back to <code>title</code>.</figcaption>
     </figure>
     <div class="note"><strong>List <code>application/json</code> first.</strong> With <code>application/problem+json</code> alone, successful 200 responses also come back labelled <code>Content-Type: application/problem+json</code>, which breaks consumers that switch on content type.</div>
+    <div class="gotcha">
+      <h4>A missing required field is still a 500, even with the header</h4>
+      <p>The header covers rejections the platform raises itself. A request that leaves out a field the specification marks <em>required</em> is not validated against the specification at all, so it fails further in and comes back as <strong>500</strong> <code>server-error</code> in problem form. Examples: <code>POST /v2/webhooks</code> without <code>callbackUrl</code>, or <code>POST /v1/collaboration-requests</code> with an empty body. Validate required fields on your side before sending, and treat a 500 on a write you just built as "check your payload" before "the platform is down".</p>
+      <p class="where">Source-read on both the Production and Beta branches; probed on Development</p>
+    </div>
   </div>
 </section>
 
 <section id="auth">
   <div class="wrap">
     <p class="eyebrow">Authentication</p>
-    <h2>Two schemes, one of them legacy</h2>
+    <h2>Two Schemes, One of Them Legacy</h2>
     <div class="twrap">
       <table>
         <thead><tr><th>Scheme</th><th>Lifetime</th><th>Notes</th></tr></thead>
@@ -149,6 +157,44 @@
         </tbody>
       </table>
     </div>
+
+    <h3 id="self-issue">Issuing Your Own Client Secret</h3>
+    <p>Members now create the client secrets for their OAuth client themselves, in the TSANet webapp, instead of asking TSANet for one. TSANet still creates the client, meaning the app registration and its client ID, and still maps it to your member company. What moves to you is the secret, and with it the rotation.</p>
+    <p><span class="pill ok">Beta</span> <span class="pill ok">Development</span> live now. <span class="pill warn">Production</span> scheduled for the week of 26 October 2026, not yet confirmed by the hub. Production's API specification changed on 2026-10-26, the start of that week, but the specification does not describe the webapp's Integration page, so it says nothing about this feature.</p>
+    <p>The page is open to users with the <strong>Program Manager</strong> or <strong>Business Manager</strong> role on the member company. Standard users and the API user can't reach it.</p>
+    <ul class="legend">
+      <li><span class="n">1</span><span><b>Open the Integration page.</b> In the webapp, go to <em>Admin → Company</em> and choose <em>Integration</em>.</span></li>
+      <li><span class="n">2</span><span><b>Find your client.</b> Under <em>API Authentication</em>, the <em>Oauth2 M2M</em> block shows your client ID. If the block isn't there, TSANet hasn't set up an OAuth client for your company yet, so ask TSANet support for one first.</span></li>
+      <li><span class="n">3</span><span><b>Create the secret.</b> Choose <em>Manage Secret Keys</em>, enter a description, and choose <em>Create Client Secret</em>. The description is required and is the only label the secret will ever have, so name the system that will hold it, for example <code>Zendesk ZIS production, 2026-10</code>.</span></li>
+      <li><span class="n">4</span><span><b>Copy the value before you close the dialog.</b> The dialog shows the secret once, with its Secret ID, description and expiry date. TSANet doesn't keep the value and can't show it again. If you lose it, create another one.</span></li>
+      <li><span class="n">5</span><span><b>Use it.</b> Mint tokens exactly as before, with your client ID and the new secret. The token URL, tenant and scope don't change. Call <code>GET /v1/me</code> to confirm the new secret resolves to your company.</span></li>
+    </ul>
+    <div class="twrap">
+      <table>
+        <thead><tr><th>Behaviour</th><th>What to expect</th></tr></thead>
+        <tbody>
+          <tr><td>Lifetime</td><td>One year from creation. The period is fixed, and you can't choose it.</td></tr>
+          <tr><td>Several secrets</td><td>Each create adds a secret alongside the ones you already have. Existing secrets keep working until they expire, which is what lets you rotate without downtime.</td></tr>
+          <tr><td><em>Registered Keys</em> list</td><td>Shows each secret created on this page, by Secret ID, description and expiry date. It never shows a value.</td></tr>
+          <tr><td>Revoking</td><td>The page can't delete or revoke a secret. A secret you create stays valid until its expiry date. To end one early, for example after a leak, ask TSANet.</td></tr>
+          <tr><td>Secrets TSANet issued earlier</td><td>They keep working until their own expiry date, but they don't appear in <em>Registered Keys</em>. Ask TSANet for the date if you don't have it.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="gotcha">
+      <h4>Rotate by overlapping, because you can't delete</h4>
+      <p>Create the new secret, deploy it to every system that holds the old one, and confirm each with <code>GET /v1/me</code>. Then let the old secret lapse on its date. Start well ahead of the expiry: a month leaves room for a change freeze. A rotation done because a secret leaked isn't finished until TSANet has revoked the old one, since it otherwise stays valid for the rest of its year.</p>
+    </div>
+    <div class="gotcha">
+      <h4>Production's page changes under you at the rollout</h4>
+      <p>Until the rollout, Production's Integration page displays the secret TSANet issued you. After it, the page displays no secret values at all, only the <em>Manage Secret Keys</em> flow. If that page is the only place your current Production secret lives, put it in your secret store now: the rollout was scheduled for the week of 26 October.</p>
+    </div>
+    <div class="gotcha">
+      <h4>Only for a client TSANet created</h4>
+      <p>The webapp issues secrets on the app registration TSANet created for your company. If your company authenticates with an app registration in its own Entra tenant instead, you keep managing that registration's secrets in your own tenant, and the Integration page doesn't apply.</p>
+      <p class="where">Read from the webapp's Beta branch source on 2026-10-24; working on Beta and Development per TSANet; not yet probed by the hub</p>
+    </div>
+
     <div class="gotcha">
       <h4>The scope that looks right and isn't</h4>
       <p>Use the <strong>bare audience GUID</strong> plus <code>/.default</code>. The <code>api://</code> prefix fails with <code>AADSTS500011</code> because the app registration publishes no Application ID URI. This reads like a typo in the working version, and it is not.</p>
@@ -156,7 +202,7 @@
     </div>
     <div class="gotcha">
       <h4>Provisioning is a prerequisite, not a formality</h4>
-      <p>An app-only token is accepted only once TSANet has provisioned your service principal's object ID — that provisioning is also what maps your tokens to your member company. Ask before you start building, not when auth fails.</p>
+      <p>An app-only token is accepted only once TSANet has provisioned your service principal's object ID — that provisioning is also what maps your tokens to your member company. Ask before you start building, not when auth fails. <a href="#self-issue">Self-issued secrets</a> don't change this: TSANet still sets up the client, and you issue its secrets.</p>
     </div>
     <div class="gotcha">
       <h4>Store secrets verbatim</h4>
@@ -164,8 +210,8 @@
     </div>
     <div class="gotcha">
       <h4>Tokens renew themselves; the credential behind them does not</h4>
-      <p>It is easy to read "no static token to refresh" as "nothing to maintain". The <em>token</em> re-mints automatically — the <strong>client secret it re-mints from has its own expiry</strong>, and rotating it before that date is the member's responsibility. When it lapses, every call stops at once, and it presents as a sudden total auth failure rather than a gradual degradation.</p>
-      <p>Confirm the expiry date and the rotation process with TSANet at onboarding, put the date somewhere that will actually alert you, and rehearse the rotation before you need it. This is the single most predictable outage available to an otherwise healthy integration.</p>
+      <p>It is easy to read "no static token to refresh" as "nothing to maintain". The <em>token</em> re-mints automatically — the <strong>client secret it re-mints from has its own expiry</strong>, and rotating it before that date is the member's responsibility. Rotation is now <a href="#self-issue">self-service</a>, but nothing rotates for you. When it lapses, every call stops at once, and it presents as a sudden total auth failure rather than a gradual degradation.</p>
+      <p>Every secret you issue shows its expiry date in <em>Registered Keys</em>; for a secret TSANet issued before self-issue, ask TSANet for the date. Put the date somewhere that will actually alert you, and rehearse the rotation before you need it. This is the single most predictable outage available to an otherwise healthy integration.</p>
     </div>
     <p>Always call <code>GET /v1/me</code> during development to confirm which company your credentials actually resolve to. On a platform where every call is scoped to your member identity, that is the cheapest sanity check available.</p>
   </div>
@@ -174,7 +220,7 @@
 <section id="partners">
   <div class="wrap">
     <p class="eyebrow">Partners &amp; forms</p>
-    <h2>The process form is not static, and neither are its field types</h2>
+    <h2>The Process Form Is Not Static, and Neither Are Its Field Types</h2>
     <div class="gotcha">
       <h4>Fetch the form fresh, every time</h4>
       <p>Partners change their own forms. The <code>documentId</code> you must submit with a case comes from that fetch, so a cached form means a stale <code>documentId</code> and a rejected submission. Cache it for the duration of one submission flow, never longer.</p>
@@ -188,14 +234,14 @@
       <h4><code>adminNote</code> is HTML to render, not to strip</h4>
       <p>The form's "Partner instructions" field is authored HTML with links. Escaping shows raw tags; stripping loses the links. Sanitize against a tag allowlist and render it. This is the one field that is the exception to stripping HTML.</p>
     </div>
-    <p>Search returns an array: a company with several departments returns several results. Use <code>departmentId</code> for precise routing when it is available, and remember that <code>/v1/partners/search</code> takes a natural-language <code>query</code> if plain matching is not enough.</p>
+    <p>Search returns an array: a company with several departments returns several results. Use <code>departmentId</code> for precise routing when it is available, and use <code>/v1/partners/{searchTerm}</code> for lookup. Do not use <code>/v1/partners/search</code>: it does not currently work, returning 500 (probed on Beta; Production untested). Neither specification marks it deprecated yet; a deprecation is pending.</p>
   </div>
 </section>
 
 <section id="cases">
   <div class="wrap">
     <p class="eyebrow">Collaboration requests</p>
-    <h2>The lifecycle, and the four rules that catch people</h2>
+    <h2>The Lifecycle, and the Four Rules That Catch People</h2>
     <div class="gotcha">
       <h4>What you send is not what you read back</h4>
       <p>The write model and the read model use <strong>different names for the same fields</strong>. You POST <code>problemSummary</code> and <code>problemDescription</code>; you GET <code>summary</code> and <code>description</code>. Your own case number goes out as <code>internalCaseNumber</code> and comes back as <code>submitterCaseNumber</code> or <code>receiverCaseNumber</code> depending on which side you are. Contact details go out under <code>submitterContactDetails</code> and come back flattened onto the case.</p>
@@ -220,6 +266,11 @@
       <p>Calling <code>/closure</code> as the receiver returns an error. Show the action only on outbound cases. And note the asymmetry with acceptance: a case cannot be closed while still OPEN by <em>either</em> party, so every case that ends cleanly must pass through acceptance first.</p>
       <p class="where">Probed and diagrammed on <a href="../connectors/fin-intercom.html#class">Fin / Intercom → lifecycle</a></p>
     </div>
+      <div class="gotcha">
+        <h4>Cases auto-close after 30 days of inactivity</h4>
+        <p>The one closure that does not come from the submitter. Reporting that assumes a manual close is wrong on every connector, and an integration that mirrors status should expect a CLOSED it never sent. It sits in tension with the probed rule that an OPEN case cannot be closed by either party; whether the inactivity close applies to cases still OPEN is unverified.</p>
+        <p class="where">Documented on the <a href="../connectors/salesforce.html">Salesforce</a> and <a href="../connectors/dynamics.html">Dynamics</a> connector pages — not probed here</p>
+      </div>
     <h3>Statuses</h3>
     <p>The enum is <code>OPEN</code>, <code>INFORMATION</code>, <code>ACCEPTED</code>, <code>REJECTED</code>, <code>CLOSED</code>, <code>PENDINGACTION</code> — plus <code>ALL</code> as a list filter. <code>PENDINGACTION</code> surfaces cases awaiting an action from your side; it is thinly documented, so treat an unrecognised value as unknown rather than guessing. A stale status is visibly wrong; a guessed one is invisibly wrong.</p>
     <div class="gotcha">
@@ -227,11 +278,11 @@
       <p>Accepting tells the partner an engineer is engaged, and it satisfies the SLA at the same moment. Those pull in opposite directions, which is why automating acceptance is a real decision rather than a convenience: a rule that accepts something nobody will work stops the clock and leaves the partner waiting — worse for them than an honest breach, because a breach is visible.</p>
       <p class="where">Four shipping postures compared in <a href="../topics/entitlement-automation.html">Deciding what to accept automatically</a></p>
     </div>
-    <h3>Approval's email carries an undocumented constraint</h3>
+    <h3>Approval's Email Carries an Undocumented Constraint</h3>
     <p><code>engineerEmail</code> is required on <code>/approval</code> — the specification marks it required, though omitting it still returns an unhelpful error. What the specification does not say: the address must be on your company's TSANet-registered domain. An individual agent's own address fails domain validation, so use the dedicated API user's address.</p>
-    <h3>Listing and polling</h3>
+    <h3>Listing and Polling</h3>
     <ul class="tight">
-      <li><code>/v2/collaboration-requests</code> is paginated and returns <code>{content:[...]}</code>; <code>/v2/collaboration-requests/list</code> returns a plain array and supports <code>updatedAfter</code> and <code>createdAfter</code>.</li>
+      <li><code>/v2/collaboration-requests</code> is paginated and returns <code>{content:[...]}</code>; <code>/v2/collaboration-requests/list</code> returns a plain array and supports <code>updatedAfter</code> and <code>createdAfter</code>. The deprecated <code>GET /v1/collaboration-requests</code> accepts both filters as well (ignored when its <code>paginated</code> flag is true), so the reason to move is the sunset, not a missing parameter.</li>
       <li>Store the <code>updatedAt</code> of the last synced record and pass it as <code>updatedAfter</code> on the next poll. Overlap the window slightly rather than trusting exact boundaries.</li>
       <li><strong>There is no <code>/v1/cases</code> endpoint.</strong> It is a common wrong guess that 404s.</li>
       <li><code>testSubmission: true</code> submits without creating real SLA timers or partner notifications. Note the asymmetry: you <em>write</em> <code>testSubmission</code> and <em>read</em> <code>testCase</code>.</li>
@@ -242,7 +293,7 @@
 <section id="content">
   <div class="wrap">
     <p class="eyebrow">Notes &amp; attachments</p>
-    <h2>Two fields, rendered twice</h2>
+    <h2>Two Fields, Rendered Twice</h2>
     <div class="gotcha">
       <h4>Never copy <code>summary</code> into <code>description</code></h4>
       <p><code>summary</code> is required and capped at 500 characters; <code>description</code> is optional and capped at 5,000. The web UI renders both as separate labelled sections, so posting identical values displays the text twice. It looks like a duplication bug and it is intentional rendering. Present two fields — Subject and Details — and send <code>description</code> only when it has content.</p>
@@ -252,15 +303,40 @@
       <p>Both <code>summary</code> and <code>description</code> return with markup. Strip to plain text before display in a non-HTML surface. The process form's <code>adminNote</code> is the exception — that one renders.</p>
     </div>
     <div class="gotcha">
+      <h4>Encrypted content is supposed to come back byte for byte</h4>
+      <p>Requests and notes carry two optional fields, <code>manifest</code> (an opaque Compact JWS) and <code>encrypted</code> (boolean, default <code>false</code>), stored and returned untouched. The sanitizer behind the HTML above does not check the flag, so on create it rewrites <code>"</code> to <code>&amp;#34;</code> in an encrypted <code>problemDescription</code> and note text, which breaks the manifest's digests. Receivers have to decode before verifying until that changes.</p>
+      <p class="where">Spec-read on Beta and Production; rewrite observed on Development. Details in <a href="../topics/end-to-end-encryption.html#edges">End-to-end encryption</a></p>
+    </div>
+    <div class="gotcha">
+      <h4>Note types and direction: in both specifications, probed on Beta only</h4>
+      <p><code>GET /v1/note-types</code> lists the types a note can carry (on Beta today <code>partner</code>, <code>public</code>, <code>escalation</code> and <code>status</code>; the specification lists none, and Production's set has not been read), and creating a note takes an optional <code>type: {code}</code>. Read notes carry <code>type</code>, <code>companyId</code> and <code>companyName</code>, plus a <code>direction</code> that is relative to <em>you</em> as the reader. Three rules from the specification: the set can grow without a release, so fetch it rather than hard-coding it; a missing or unknown type does <strong>not</strong> mean public; and the type is not an access-control filter. The specification also stops requiring <code>priority</code> on note create. Until 2026-10-26 this was Beta-only: Production's specification gave notes only <code>companyName</code> and required <code>priority</code>. Since then Production serves the same specification as Beta, so all of it is in Production's too. Until a Production call confirms it, treat a Production note without <code>direction</code> as possible and keep the fallback in TSANET-2026-001.</p>
+      <p class="where">Spec-read on both environments, 2026-10-28 (Production's spec last modified 2026-10-26); not probed on Production. Full comparison in <a href="../docs/tsanet-2026-001-canonical-case-model.html#notes">TSANET-2026-001</a></p>
+    </div>
+    <div class="gotcha">
       <h4>Attachments are a two-party setup, and the platform stores nothing</h4>
       <p>A forward is delivered straight to the other party's registered endpoint — there is no attachment store, and no endpoint that lists files on a case. Delivery also fans out to <em>your own</em> registered endpoint, so an integration that only ever sends still wants one: without it every forward reports <code>submitterStatus: CONFIG_MISSING</code> and you keep no copy of what you sent.</p>
-      <p>Two things the platform will not do for you: it creates <strong>no case note</strong> announcing the file, and it keeps <strong>no history</strong>. Both are yours to build.</p>
+      <p>Configuration is per case and readable before you act: <code>GET …/attachments/config</code> returns the <code>submitter</code> and <code>receiver</code> configurations, <code>POST …/attachments/config/https/analyze</code> proposes a normalized configuration without saving it, and <code>PUT …/attachments/config/https</code> registers one. Check it before offering an attachment action rather than discovering <code>CONFIG_MISSING</code> afterwards. Each destination gets one delivery attempt with no automatic retry (source-read; the <a href="../topics/file-sharing.html">file-sharing topic</a> has the detail), so build the receiver so that a 2xx means durably stored.</p>
+        <p>Two things the platform will not do for you: it creates <strong>no case note</strong> announcing the file, and it keeps <strong>no history</strong>. Both are yours to build.</p>
       <p class="where">Full model in <a href="../docs/tsanet-2026-002-case-attachments.html">TSANET-2026-002</a></p>
     </div>
+    <div class="gotcha">
+      <h4>HTTP 200 on a forward does not mean delivered</h4>
+      <p>The forward call answers 200 whatever happened to the file. A forward that reached neither side still returns 200, with the failure in the body. Read <code>completeSuccess</code> and the per-side <code>submitterStatus</code> and <code>receiverStatus</code>, and never treat the status code as the outcome.</p>
+      <p class="where">Source-read on both environments</p>
+    </div>
+    <div class="gotcha">
+      <h4>Alpha: a direct-storage receiver refuses the relay</h4>
+      <p>The receiver can register its own storage for Attachment V2. The file then goes straight from sender to storage under a short-lived grant and never passes through TSANet. When the receiver has done that, the v1 forward above can return <strong>409</strong> <code>attachment-direct-path-required</code>, and the sender has to use the V2 grant flow instead. V2 also adds an alpha listing of a case's grants, the first time the platform can enumerate attachment activity on a case. Until 2026-10-26 all of this was in Beta's specification only. Production's specification now carries it too, with every V2 operation still marked alpha, so its shape can change without a deprecation clock. Don't build a production flow on it yet, and handle the 409 wherever you forward attachments.</p>
+      <p class="where">Spec-read on both environments, 2026-10-28; V2 exercised on Beta only (see Connect SDK), not probed on Production. The Java client's V2 support is described on <a href="../connectors/connect-sdk.html">Connect SDK</a></p>
+    </div>
     <div class="gotcha" id="ref-drift">
-      <h4>The reference shows <code>description</code> in the wrong place</h4>
-      <p>On the forward call, the GitBook reference currently shows <code>description</code> as a query parameter. The specification puts it in the <code>multipart/form-data</code> body — a <strong>required</strong> field, capped at 500 characters, alongside <code>files</code>. A request built from the reference omits a required form field. Send it in the form.</p>
-      <p class="where">Verified against <code>openapi.yaml</code> — <code>POST /v1/collaboration-requests/{token}/attachments</code>, requestBody</p>
+      <h4>Where the reference and the platform disagree</h4>
+      <p>The earlier drift is fixed: the GitBook reference now shows the forward call's <code>description</code> in the <code>multipart/form-data</code> body, required and capped at 500 characters, as the specification does. Two newer drifts ran the other way, with the reference <em>ahead</em> of what was deployed. The first still holds; the second has closed in the specification but is unprobed on Production.</p>
+      <ul class="tight">
+        <li><strong>Secret rotation.</strong> The reference documents <code>POST /v1/webhooks/{id}/secret</code> as a working rotation call, and the v3.2.1 changelog lists it as new. No implementation is behind it. Beta answers <strong>501 with an empty body</strong> (probed). See <a href="#webhooks">Webhooks</a> for what to do instead.</li>
+        <li><strong>v2 webhook options.</strong> The reference's webhooks-v2 page shows <code>caseDirections</code> and <code>OAUTH2_CLIENT_CREDENTIALS</code>. On 2026-10-20 both were on Beta only. Since 2026-10-26 Production's specification carries both too (spec-read 2026-10-28), so this drift has closed at the specification level. Production has not been probed.</li>
+      </ul>
+      <p class="where">GitBook pages fetched 2026-10-20; compared with <code>openapi.yaml</code> as Production and Beta serve it, re-read 2026-10-28</p>
     </div>
     <p class="where" style="font-family:var(--mono);font-size:11.5px;color:var(--mute)">Note-visibility modelling across three audiences: <a href="../connectors/zendesk.html#notes" style="color:var(--blue)">Zendesk → Note visibility</a></p>
   </div>
@@ -269,7 +345,7 @@
 <section id="webhooks">
   <div class="wrap">
     <p class="eyebrow">Webhooks</p>
-    <h2>Two versions that both accept your subscription</h2>
+    <h2>Two Versions That Both Accept Your Subscription</h2>
     <div class="note" style="border-left-color:var(--red)"><strong>This is the trap that fails silently.</strong> Both <code>/v1/webhooks</code> and <code>/v2/webhooks</code> accept a subscription. They deliver different event type strings — v1 sends bare names like <code>collaboration-request.created</code>, v2 sends CloudEvents with <code>org.tsanet.connect.</code> prefixes. A consumer written for one and subscribed to the other returns 200 to every delivery and does nothing at all, with no error anywhere to find.</div>
     <div class="twrap">
       <table>
@@ -280,7 +356,8 @@
         </tbody>
       </table>
     </div>
-    <h3>The five event types</h3>
+    <h3>The Five Event Types</h3>
+      <p>These are the v2 set. A v1 subscription delivers only two of them — <code>collaboration-request.created</code> and <code>note.created</code> — so closures and responses reach a v1 consumer through the poll, never the push.</p>
     <pre><code>org.tsanet.connect.collaboration-request.created
 org.tsanet.connect.collaboration-request.closed
 org.tsanet.connect.collaboration-request.response.created
@@ -303,14 +380,16 @@ org.tsanet.connect.collaboration-request.note.created</code></pre>
       <h4>You have 30 seconds to respond</h4>
       <p>Past that the delivery is treated as failed. Acknowledge immediately and do the real work asynchronously — every connector on this hub fast-acks and hands off to a queue for exactly this reason.</p>
     </div>
-    <div class="note" style="border-left-color:var(--orange)"><strong>The published retry policy is currently inconsistent.</strong> The OpenAPI specification states 5 total attempts with exponential backoff from 10s capped at 300s; the AsyncAPI specification states 2 retries an hour apart. Both are published, and they disagree. Until it is reconciled, do not design around a specific cadence — assume retries happen, make handlers idempotent, and treat the reconciliation poll as the real guarantee. Exhausted deliveries are dead-lettered either way and flagged in the delivery log.</div>
-    <h3>Managing a subscription</h3>
+    <div class="note" style="border-left-color:var(--orange)"><strong>The published retry policy is currently inconsistent.</strong> The OpenAPI specification states 5 total attempts with exponential backoff from 10s capped at 300s; the AsyncAPI specification states 2 retries an hour apart. Both are published, and they disagree. The evidence now leans one way: the deployed delivery configuration (the same on Production and Beta) is 3 attempts an hour apart, and a Beta probe on 2026-10-19 saw 1-hour spacing, with a 4xx not retried. Both match AsyncAPI. Production has not been probed, and a correction to the OpenAPI text is pending but not merged. Until it lands, still don't design around a specific cadence: assume retries happen, make handlers idempotent, and treat the reconciliation poll as the real guarantee. An exhausted delivery carries no marker. Its final failed attempt is an ordinary <code>success: false</code> row in the delivery log.</div>
+    <h3>Managing a Subscription</h3>
     <ul class="tight">
-      <li>Subscribe with <code>POST /v2/webhooks</code> carrying a <code>callbackUrl</code> and <code>callbackAuth</code> (<code>BASIC</code>, <code>BEARER</code> or <code>HEADER</code>). If <code>callbackAuth</code> is set, the URL must be HTTPS.</li>
-      <li><strong>Save the <code>secret</code> at creation.</strong> The HMAC signing key is returned once and cannot be read back. Rotate it later with <code>POST /v1/webhooks/{id}/secret</code>.</li>
-      <li><strong>There is no update verb.</strong> No PATCH, no PUT — changing a callback URL or its credentials means delete and re-create the subscription.</li>
+      <li>Subscribe with <code>POST /v2/webhooks</code> carrying a <code>callbackUrl</code> and <code>callbackAuth</code>. The auth types are <code>NONE</code>, <code>BASIC</code>, <code>BEARER</code>, <code>HEADER</code> and <code>OAUTH2_CLIENT_CREDENTIALS</code>, where the platform fetches a token from your token URL with a client id, a write-only secret and a scope. If <code>callbackAuth</code> is set, the URL must be HTTPS. <code>OAUTH2_CLIENT_CREDENTIALS</code> was Beta-only until 2026-10-26 and is in Production's specification since (spec-read 2026-10-28; not probed on Production).</li>
+      <li><strong>Save the <code>secret</code> at creation.</strong> The HMAC signing key is returned once and cannot be read back. <strong>It cannot be rotated in place.</strong> <code>POST /v1/webhooks/{id}/secret</code> is in the specification and the reference, and the changelog lists it as new, but nothing implements it. Beta answers 501 with an empty body (probed). To change a secret, delete the subscription and create it again. The specification and the deployed platform disagree here, and the hub reports both.</li>
+      <li>Filter what you receive with <code>eventTypes</code>. On Beta you can also filter with <code>caseDirections</code> (<code>INBOUND</code> means your company receives the case, <code>OUTBOUND</code> that it submitted it) and <code>partnerCompanyIds</code>; omit a filter and it is not applied. Those two filters are live on Beta. On 2026-10-20 they were on neither Production's specification nor its code; since 2026-10-26 Production's specification has them (spec-read 2026-10-28). Whether Production's code applies them has not been probed.</li>
+        <li><strong>There is no update verb.</strong> No PATCH, no PUT — changing a callback URL or its credentials means delete and re-create the subscription.</li>
       <li>Every delivery is signed <code>X-Hub-Signature-256: sha256=&lt;hex&gt;</code>. Verify before processing, not after.</li>
-      <li>Per-delivery status, including dead-lettered events, is queryable at <code>GET /v1/webhooks/{id}/deliveries</code>. That is the first place to look when a member says "we never got it".</li>
+      <li>Per-delivery status is queryable at <code>GET /v1/webhooks/{id}/deliveries</code>. That is the first place to look when a member says "we never got it". Two cautions when reading it. <code>attemptNumber</code> reads 1 on every attempt (observed on Beta), so count rows instead. And an exhausted delivery looks like any other failed attempt.</li>
+      <li><strong>Compare the v2 <code>subscriptionid</code> as a string.</strong> The AsyncAPI specification types it as an int64, but it arrives as a JSON string (observed on Development). A strict numeric comparison never matches.</li>
     </ul>
   </div>
 </section>
@@ -318,8 +397,8 @@ org.tsanet.connect.collaboration-request.note.created</code></pre>
 <section id="versions">
   <div class="wrap">
     <p class="eyebrow">Deprecation clocks</p>
-    <h2>What is on a timer</h2>
-    <p>Three paths carry <code>deprecated: true</code> and an explicit <code>x-sunset</code> in the specification. If you are starting now, start on the successors.</p>
+    <h2>What Is on a Timer</h2>
+    <p>Three paths carry <code>deprecated: true</code> and an explicit <code>x-sunset</code> in the specification, identically on Production and Beta. If you are starting now, start on the successors. Further clocks are under discussion but not decided, and the hub does not publish dates until they are in a served specification.</p>
     <div class="twrap">
       <table>
         <thead><tr><th>Path</th><th>Sunset</th><th>Use instead</th></tr></thead>
@@ -330,18 +409,18 @@ org.tsanet.connect.collaboration-request.note.created</code></pre>
         </tbody>
       </table>
     </div>
-    <h3>The migration is smaller than "v1 → v2" sounds</h3>
-    <p>The v2 surface is exactly three paths: the two list endpoints and the webhook subscription. Creating a case and every <code>{token}</code> sub-resource — approval, rejection, closure, notes, attachments, the information exchange — exist only on v1 and carry no deprecation. Migrating means moving your list polling and your webhook subscription; nothing else moves. And the webhook half is a <a href="#webhooks">two-sided change</a>: the subscription and the consumer's event-type matching have to move together, or every delivery returns 200 into a no-op.</p>
-    <h3>Where the shipped integrations stand</h3>
+    <h3>The Migration Is Smaller than "v1 → v2" Sounds</h3>
+    <p>Outside alpha, the v2 surface is exactly three paths, the same in both environments' specifications: the two list endpoints and the webhook subscription. The rest of v2 is the alpha Attachment V2 paths (on Beta, and in Production's specification since 2026-10-26), which are new capability, not successors to anything on a clock. Creating a case and every <code>{token}</code> sub-resource — approval, rejection, closure, notes, attachments, the information exchange — exist only on v1 and carry no deprecation. Migrating means moving your list polling and your webhook subscription; nothing else moves. And the webhook half is a <a href="#webhooks">two-sided change</a>: the subscription and the consumer's event-type matching have to move together, or every delivery returns 200 into a no-op.</p>
+    <h3>Where the Shipped Integrations Stand</h3>
     <div class="twrap">
       <table>
         <thead><tr><th>Integration</th><th>Posture</th><th>Where it stands</th><th>Evidence</th></tr></thead>
         <tbody>
-          <tr><td><a href="../connectors/fin-intercom.html">Fin / Intercom</a></td><td><span class="pill ok">v2</span></td><td>Consumes CloudEvents with prefixed type strings end to end.</td><td>Gateway source</td></tr>
+          <tr><td><a href="../connectors/fin-intercom.html">Fin / Intercom</a></td><td><span class="pill ok">v2</span></td><td>Consumes CloudEvents with prefixed type strings end to end.</td><td>Connector source — <code>TsanetWebhookController</code>, v2 only</td></tr>
           <tr><td><a href="../connectors/zendesk.html">Zendesk</a></td><td><span class="pill warn">v1 · deliberate</span></td><td>The ZIS flow matches bare type strings, so a v2 subscription would deliver into a no-op. The CloudEvents migration is tracked and ships with a future app release; until then v1 is the correct choice for this connector.</td><td>Connector source and setup guide</td></tr>
-          <tr><td><a href="../connectors/salesforce.html">Salesforce</a></td><td><span class="pill warn">v1</span></td><td>The Apex REST endpoint receives the v1 flat payload.</td><td>Documented — not re-probed</td></tr>
-          <tr><td><a href="../connectors/connect-sdk.html">Connect SDK</a> v0.1.0</td><td><span class="pill warn">split</span></td><td>List reads already call <code>/v2/collaboration-requests/list</code>, but webhook subscribe and list go through the generated v1 client. A v2 webhook client is generated and nothing calls it.</td><td>SDK source and generated client</td></tr>
-          <tr><td><a href="../connectors/dynamics.html">Dynamics</a></td><td><span class="pill ok">v2</span></td><td>Registers on <code>/v2/webhooks</code> with prefixed types, for creation and note events only — responses and closures ride the poll. The endpoint flow never matches type strings (it reads the token and fetches), so it cannot hit the no-op trap. An orphaned v1 registration flow still ships.</td><td>Solution source, release v2.13.0.1</td></tr>
+          <tr><td><a href="../connectors/salesforce.html">Salesforce</a></td><td><span class="pill ok">v2</span></td><td>Since 2.14 (released 2026-10-21) it registers on <code>/v2/webhooks</code> with prefixed types and a V2 payload, and reads the v2 list and paged list. Its handler accepts both payload shapes and matches on substrings, so it cannot hit the no-op trap. It calls no deprecated path. Registration always sends <code>OAUTH2_CLIENT_CREDENTIALS</code> <code>callbackAuth</code>. Production's specification lacked it on 2026-10-24 and has carried it since 2026-10-26 (spec-read 2026-10-28), so Production registration should now be possible; it has not been probed. Until it is, the 15-minute sweep is what carries inbound on Production.</td><td>Package source, <code>TSANetConnect-2.14-Release</code></td></tr>
+          <tr><td><a href="../connectors/connect-sdk.html">Connect SDK</a> v3.0.0</td><td><span class="pill warn">split</span></td><td>List reads already call <code>/v2/collaboration-requests/list</code>, but the whole webhook surface is still v1 — subscribe and list through the generated v1 client, and delete and deliveries through v1 paths that are not deprecated and have no v2 equivalent. Secret rotation is not a capability, because the platform answers that call with 501. The generated v2 webhook client is unused. Only the deprecated half of this split can actually move.</td><td>SDK source at v3.0.0, generated client and <code>openapi.yaml</code></td></tr>
+          <tr><td><a href="../connectors/dynamics.html">Dynamics</a></td><td><span class="pill ok">v2</span></td><td>Registers on <code>/v2/webhooks</code> with prefixed types, for creation and note events only — responses and closures ride the poll. The endpoint flow never matches type strings (it reads the token and fetches), so it cannot hit the no-op trap. An orphaned v1 registration flow still ships. Since v2.14.0.0, registration can ask the platform to authenticate deliveries with OAuth client credentials. The platform side of that is live on Beta and in Production's specification since 2026-10-26 (spec-read; not probed on Production).</td><td>Solution source, release v2.14.0.0</td></tr>
         </tbody>
       </table>
     </div>
@@ -350,22 +429,47 @@ org.tsanet.connect.collaboration-request.note.created</code></pre>
 </section>
 
 <footer>
-  <div class="wrap foot-in">
-    <div><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
-    <nav class="foot-nav" aria-label="Sections">
-      <a href="../connectors/index.html">Connectors</a>
-      <a href="index.html">Working with the API</a>
-      <a href="../docs/index.html">Design documents</a>
-      <a href="../topics/index.html">Topics</a>
-      <a href="../community/index.html">Community</a>
-    </nav>
-    <div class="foot-links mono">
-      <a href="https://connect2.tsanet.org">connect2.tsanet.org</a>
+  <div class="wrap">
+    <div class="foot-top"><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
+    <div class="foot-cols">
+      <nav class="foot-col" aria-label="Developers">
+        <h4>Developers</h4>
+        <a href="../build/index.html">Build a New Integration</a>
+        <a href="../connectors/index.html">Existing Solutions</a>
+        <a href="../api/index.html">Working with the API</a>
+        <a href="../docs/index.html">Design Documents</a>
+        <a href="../topics/index.html">Topics</a>
+        <a href="../tools/index.html">Tools</a>
+        <a href="../community/index.html">Community</a>
+      </nav>
+      <div class="foot-col">
+        <h4>Members</h4>
+        <a href="https://www.tsanet.org/members/">Member List</a>
+        <a href="https://tsanet.gitbook.io/connect">Platform Documentation</a>
+        <a href="https://tsanet.gitbook.io/connect/help-center">Member Support</a>
+      </div>
+      <div class="foot-col">
+        <h4>About</h4>
+        <a href="https://www.tsanet.org/about-us/">About Us</a>
+        <a href="https://www.tsanet.org/board-of-directors/">Board of Directors</a>
+        <a href="https://www.tsanet.org/news-events/">News and Events</a>
+      </div>
+    </div>
+    <div class="foot-bottom mono">
+      <span>© TSANet Inc. All Rights Reserved</span>
+      <a href="https://www.tsanet.org/legal-policy/">Privacy Policy</a>
       <a href="https://github.com/tsanetgit">github.com/tsanetgit</a>
       <a href="mailto:membership@tsanet.org">membership@tsanet.org</a>
+      <span class="foot-social" aria-label="TSANet on social media">
+        <a href="https://twitter.com/TSANetTweet" aria-label="TSANet on X" title="X"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg></a>
+        <a href="https://www.linkedin.com/company/tsanet" aria-label="TSANet on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+        <a href="https://www.youtube.com/@tsanet8120" aria-label="TSANet on YouTube" title="YouTube"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+        <a href="https://github.com/tsanetgit" aria-label="TSANet on GitHub" title="GitHub"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+      </span>
     </div>
   </div>
 </footer>
 
+<script src="../assets/assistant.js?v=20260913" defer></script>
 </body>
 </html>

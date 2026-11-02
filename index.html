@@ -7,8 +7,8 @@
 <link rel="icon" href="assets/tsanet-favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/hub.css?v=20260815">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/hub.css?v=20260914c">
 <style>
   /* Page-local styles. Shared tokens, nav, cards, sections and footer live in assets/hub.css */
 
@@ -16,9 +16,8 @@
   header{padding:72px 0 56px;border-bottom:1px solid var(--line);background:
     radial-gradient(900px 340px at 85% -60px, rgba(51,124,155,.16), transparent 65%),
     radial-gradient(700px 300px at 10% -80px, rgba(0,91,130,.10), transparent 60%)}
-  h1{font-family:var(--disp);font-weight:800;font-size:clamp(34px,5.2vw,58px);line-height:1.06;letter-spacing:-.025em;margin:18px 0 20px;max-width:15ch}
-  h1 em{font-style:normal;position:relative;color:var(--orange)}
-  h1 em::after{content:"";position:absolute;left:0;right:0;bottom:4px;height:10px;background:rgba(204,78,11,.12);z-index:-1;border-radius:2px}
+  h1{font-family:var(--disp);font-weight:700;font-size:clamp(32px,4.6vw,50px);line-height:1.1;letter-spacing:-.02em;margin:18px 0 20px;max-width:15ch}
+  h1 em{font-style:normal;color:var(--orange)}
   header .lede{font-size:18px;color:var(--slate);max-width:56ch;margin-bottom:30px}
   .cta-row{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:56px}
 
@@ -97,12 +96,14 @@
 
 <nav>
   <div class="wrap nav-in">
-    <a class="brand" href="#top"><img class="brand-img" src="assets/tsanet-logo-white.png" alt="TSANet"><small>Developer Hub</small></a>
+    <a class="brand" href="#top"><img class="brand-img" src="assets/tsanet-devhub-horizontal.png" alt="TSANet Developer Hub"></a>
     <div class="nav-links">
-      <a href="connectors/index.html">Connectors</a>
+      <a href="build/index.html">Build</a>
+      <a href="connectors/index.html">Existing Solutions</a>
       <a href="api/index.html">API</a>
       <a href="docs/index.html">Design Docs</a>
       <a href="topics/index.html">Topics</a>
+      <a href="tools/index.html">Tools</a>
       <a href="community/index.html">Community</a>
     </div>
   </div>
@@ -112,14 +113,14 @@
   <div class="wrap hero-flex">
    <div class="hero-copy">
     <div class="eyebrow">The Technology Support Alliance Network · 900+ member companies</div>
-    <h1>Connect to one.<br>Build for <em>anyone</em>.</h1>
+    <h1>Connect to One.<br>Build for <em>Anyone</em>.</h1>
     <p class="lede">The engineering home for TSANet Connect: connectors, gateways, the REST API, and the design documents behind the platform. Built and maintained by TSANet, for the members who automate multi-vendor support.</p>
     <div class="cta-row">
-      <a class="btn btn-primary" href="api/index.html">Working with the API</a>
-      <a class="btn btn-ghost" href="connectors/index.html">Compare the connectors</a>
+      <a class="btn btn-primary" href="build/index.html">Build a new integration</a>
+      <a class="btn btn-ghost" href="api/index.html">Working with the API</a>
     </div>
    </div>
-   <img class="hero-mark" src="assets/tsanet-logo-3c-vertical.png" alt="TSANet">
+   <img class="hero-mark" src="assets/tsanet-devhub-vertical.png" alt="TSANet Developer Hub">
   </div>
   <div class="wrap">
     <div class="rail-card" aria-label="TSANet case lifecycle demonstration">
@@ -156,12 +157,58 @@
   </div>
 </header>
 
+
+
+
+
+
+
+<section id="build">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <h2>Build a New Integration</h2>
+        <p>Your platform has no connector, or you are wiring Connect into something of your own. One question about the platform decides which of four routes fits; they are ordered by how much you have to build.</p>
+      </div>
+      <a class="sec-link" href="build/index.html">Start here →</a>
+    </div>
+    <div class="grid g2">
+      <a class="card" href="connectors/connect-gateway.html"><span class="chip beta">Work in progress · v3.0.0</span><h3>Build on the Connect Gateway</h3><p>TSANet supplies the engine, the contract and a conformance harness; you write only the half that talks to your platform. The route when the platform will not run your code in the member's tenant.</p><span class="card-foot">Design &amp; adapter guide →</span></a>
+      <a class="card" href="connectors/connect-sdk.html"><span class="chip live">v3.0.0 · Java</span><h3>Use the SDK</h3><p>A Java client with typed facades, validation and both auth modes, as a public package. The shortest JVM path that is not hand-rolled HTTP.</p><span class="card-foot">Library reference →</span></a>
+      <a class="card" href="api/index.html"><span class="chip">Pattern</span><h3>Build Against the API</h3><p>Your platform's events in, Connect API calls out, <code>updatedAfter</code> polling back. For any stack; read the behaviour guide before you design.</p><span class="card-foot">Working with the API →</span></a>
+      <a class="card" href="community/index.html"><span class="chip">Wish list</span><h3>Tell Us the Platform</h3><p>Which platform your team runs on decides which connector gets built next. If yours is common, waiting may be the right route.</p><span class="card-foot">Community →</span></a>
+    </div>
+    <p style="margin-top:18px;font-size:14.5px;color:var(--slate)">Whichever route: settle first whether the platform runs your code inside the member's tenant, then build on Beta with test-flagged submissions. The <a href="build/index.html#first-week">first week</a> is the same on every route, and the <a href="tools/index.html">tools</a> are collected in one place.</p>
+  </div>
+</section>
+
+<section id="api">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <h2>Build Against the API</h2>
+        <p>The behaviours that cost integrators time, gathered from building four connectors and a Java client against it. The endpoint reference lives in GitBook and is generated from the spec — this is the layer underneath it.</p>
+      </div>
+      <a class="sec-link" href="api/index.html">Working with the API →</a>
+    </div>
+    <div class="grid g3">
+      <a class="card" href="api/index.html#reference"><span class="chip">Reference</span><h3>The Endpoint Reference</h3><p>Schemas, parameters and status codes for every path outside the alpha Attachment V2 set live in the GitBook reference, generated from the spec. Not duplicated here — where GitBook and the spec disagree, the hub says so.</p></a>
+      <a class="card" href="api/index.html#errors"><span class="chip">Errors</span><h3>Two Response Modes</h3><p>By default most rejections return HTTP 500 — indistinguishable from an outage. One <code>Accept</code> header gets you documented status codes and RFC 7807 bodies.</p></a>
+      <a class="card" href="api/index.html#auth"><span class="chip">Auth</span><h3>Login &amp; Identity</h3><p>OAuth 2.0 client credentials is the current server-to-server path; <code>POST /v1/login</code> is legacy. Members now issue their own client secrets in the webapp. Watch the scope format — the obvious one fails.</p></a>
+      <a class="card" href="api/index.html#partners"><span class="chip">Partners</span><h3>Discovery &amp; Forms</h3><p>Fetch the process form fresh every time, and parse its SELECT options on newlines rather than commas.</p></a>
+      <a class="card" href="api/index.html#cases"><span class="chip">Cases</span><h3>Collaboration Requests</h3><p>Save the token immediately. There is no idempotency key on create, and <code>responded</code> — not the status name — is what gates the SLA.</p></a>
+      <a class="card" href="api/index.html#content"><span class="chip">Content</span><h3>Notes &amp; Attachments</h3><p>Two note fields rendered as two sections, so never copy one into the other. Attachments need both sides configured.</p></a>
+      <a class="card" href="api/index.html#webhooks"><span class="chip">Webhooks</span><h3>Event Delivery</h3><p>v1 and v2 both accept your subscription and deliver different type strings. Payloads are thin; delivery is at-least-once, so build for duplicates.</p></a>
+      <a class="card" href="api/index.html#versions"><span class="chip">Sunset</span><h3>Deprecation Clocks</h3><p>Three v1 paths sunset on 2027-01-01: the case list and both webhook paths. Everything else has no v2 and no clock, so the migration is smaller than it sounds.</p></a>
+    </div>
+  </div>
+</section>
 <section id="connectors">
   <div class="wrap">
     <div class="sec-head">
       <div>
-        <h2>Connectors &amp; gateways</h2>
-        <p>Production integrations maintained in the tsanetgit organization. One connection reaches every partner member.</p>
+        <h2>Existing Solutions</h2>
+        <p>The shipped integrations, maintained in the tsanetgit organization — and, if you are building your own, the worked examples of the routes above. One connection reaches every partner member.</p>
       </div>
       <a class="sec-link" href="connectors/index.html">Compare all connectors →</a>
     </div>
@@ -169,7 +216,7 @@
       <a class="card" href="connectors/salesforce.html">
         <span class="chip live">GA · managed package</span>
         <h3>Salesforce</h3>
-        <p>LWC on the Case record page, TSANet Cases as a related list, 15-minute scheduled sync, auto-approval flows by asset serial.</p>
+        <p>LWC on the Case record page, TSANet Cases as a related list, Named Credential auth, 15-minute scheduled sync, an asset-match auto-accept template.</p>
         <span class="card-foot">Architecture &amp; setup →</span>
       </a>
       <a class="card" href="connectors/dynamics.html">
@@ -179,7 +226,7 @@
         <span class="card-foot">Architecture &amp; setup →</span>
       </a>
       <a class="card" href="connectors/servicenow.html">
-        <span class="chip beta">Planned · 2026</span>
+        <span class="chip beta">Not built · committed 2026</span>
         <h3>ServiceNow</h3>
         <p>Not built yet. A platform assessment of the surfaces, Table API traps and distribution choices an eBonding integration has to design around.</p>
         <span class="card-foot">Platform assessment →</span>
@@ -193,112 +240,91 @@
       <a class="card" href="connectors/fin-intercom.html">
         <span class="chip beta">Early access · gateway</span>
         <h3>Fin / Intercom</h3>
-        <p>The first gateway-class connector: TSANet hosts and operates the adapter, because Intercom runs no member code in-workspace. Canvas Kit panel in the Help Desk.</p>
+        <p>The first gateway-class connector: the adapter runs outside Intercom, because Intercom runs no member code in-workspace. TSANet-hosted or self-hosted in your own cloud. Canvas Kit panel in the Help Desk.</p>
         <span class="card-foot">Architecture &amp; platform notes →</span>
       </a>
-      <a class="card" href="connectors/connect-sdk.html">
-        <span class="chip">Pattern</span>
-        <h3>Custom API integration</h3>
-        <p>The translation microservice pattern: your platform's events in, Connect API calls out, and <code>updatedAfter</code> polling back. For any platform without a connector.</p>
-        <span class="card-foot">Start with the SDK →</span>
-      </a>
-      <a class="card" href="connectors/connect-sdk.html">
-        <span class="chip beta">v0.1.0 · Java</span>
-        <h3>TSANet Connect SDK</h3>
-        <p>A Java client generated from the Connect API spec, wrapped in eight typed facades — plus a console app, attachment receiver and web demo. Python and TypeScript not started.</p>
-        <span class="card-foot">Library reference →</span>
-      </a>
       <a class="card" href="connectors/connect-gateway.html">
-        <span class="chip beta">Work in progress · v0.1.2</span>
+        <span class="chip beta">Work in progress · v3.0.0</span>
         <h3>Connect Gateway</h3>
-        <p>One shared TSANet-facing engine, thin per-platform adapters: the machinery behind Fin / Intercom, and the contract a member or vendor builds their own adapter against.</p>
+        <p>One shared TSANet-facing engine, thin per-platform adapters: the machinery behind Fin / Intercom, and the contract a member or vendor builds their own adapter against. The least effort when your platform has no connector.</p>
         <span class="card-foot">Design &amp; adapter guide →</span>
       </a>
+      <a class="card" href="connectors/connect-sdk.html">
+        <span class="chip live">v3.0.0 · Java</span>
+        <h3>TSANet Connect SDK</h3>
+        <p>A Java client generated from the Connect API spec, wrapped in ten typed facades — plus a console app, attachment receiver and web demo. Python and TypeScript not started.</p>
+        <span class="card-foot">Library reference →</span>
+      </a>
+      <a class="card" href="api/index.html">
+        <span class="chip">Pattern</span>
+        <h3>Build Against the API</h3>
+        <p>The translation-service pattern: your platform's events in, Connect API calls out, <code>updatedAfter</code> polling back. Read the behaviour guide before you design.</p>
+        <span class="card-foot">Working with the API →</span>
+      </a>
     </div>
   </div>
 </section>
-
-<section id="api">
-  <div class="wrap">
-    <div class="sec-head">
-      <div>
-        <h2>Build against the API</h2>
-        <p>The behaviours that cost integrators time, gathered from building four connectors against it. The endpoint reference lives in GitBook and is generated from the spec — this is the layer underneath it.</p>
-      </div>
-      <a class="sec-link" href="api/index.html">Working with the API →</a>
-    </div>
-    <div class="grid g3">
-      <a class="card" href="api/index.html#errors"><span class="chip">Errors</span><h3>Two response modes</h3><p>By default most rejections return HTTP 500 — indistinguishable from an outage. One <code>Accept</code> header gets you documented status codes and RFC 7807 bodies.</p></a>
-      <a class="card" href="api/index.html#auth"><span class="chip">Auth</span><h3>Login &amp; identity</h3><p>OAuth 2.0 client credentials is the current server-to-server path; <code>POST /v1/login</code> is legacy. Watch the scope format — the obvious one fails.</p></a>
-      <a class="card" href="api/index.html#partners"><span class="chip">Partners</span><h3>Discovery &amp; forms</h3><p>Fetch the process form fresh every time, and parse its SELECT options on newlines rather than commas.</p></a>
-      <a class="card" href="api/index.html#cases"><span class="chip">Cases</span><h3>Collaboration requests</h3><p>Save the token immediately. There is no idempotency key on create, and <code>responded</code> — not the status name — is what gates the SLA.</p></a>
-      <a class="card" href="api/index.html#content"><span class="chip">Content</span><h3>Notes &amp; attachments</h3><p>Two note fields rendered as two sections, so never copy one into the other. Attachments need both sides configured.</p></a>
-      <a class="card" href="api/index.html#webhooks"><span class="chip">Webhooks</span><h3>Event delivery</h3><p>v1 and v2 both accept your subscription and deliver different type strings. Payloads are thin; delivery is a single attempt.</p></a>
-    </div>
-  </div>
-</section>
-
 <section id="docs">
   <div class="wrap">
     <div class="sec-head">
       <div>
-        <h2>Design document library</h2>
+        <h2>Design Document Library</h2>
         <p>Interactive, web-native engineering documents. Published straight from the repo — every document is a page, not a PDF. The library is new; these are the first entries.</p>
       </div>
       <a class="sec-link" href="docs/index.html">All design docs →</a>
     </div>
     <div class="grid g3">
       <a class="card doc-card" href="docs/tsanet-2026-001-canonical-case-model.html">
-        <div style="display:flex;justify-content:space-between"><span class="doc-no">TSANET-2026-001</span><span class="doc-kind">Specification</span></div>
-        <h3>The canonical case model</h3>
-        <p>One case, two schemas: where the write and read models diverge, how custom fields come from the form template, and the two mappings that have no clean answer yet.</p>
+        <div style="display:flex;justify-content:space-between"><span class="doc-no">TSANET-2026-001</span><span class="doc-kind">Specification · Draft</span></div>
+        <h3>The Canonical Case Model</h3>
+        <p>One case, two schemas: where the write and read models diverge, how custom fields arrive from the form template, the two storage philosophies connectors have chosen, and the mappings that have no clean answer yet.</p>
       </a>
       <a class="card doc-card" href="docs/tsanet-2026-002-case-attachments.html">
-        <div style="display:flex;justify-content:space-between"><span class="doc-no">TSANET-2026-002</span><span class="doc-kind">Specification</span></div>
-        <h3>Case attachments</h3>
-        <p>Direct push, no platform storage, and delivery to both parties — plus the two responsibilities the platform leaves entirely to your connector.</p>
+        <div style="display:flex;justify-content:space-between"><span class="doc-no">TSANET-2026-002</span><span class="doc-kind">Specification · Draft</span></div>
+        <h3>Case Attachments and the Direct-Push Model</h3>
+        <p>The platform brokers file transfer and never stores it. What that forces on the connector, why delivery reaches both parties, and the two responsibilities the platform leaves entirely to you.</p>
       </a>
       <a class="card doc-card" href="connectors/fin-intercom.html">
         <div style="display:flex;justify-content:space-between"><span class="doc-no">CONNECTOR</span><span class="doc-kind">Architecture</span></div>
-        <h3>Fin / Intercom: the gateway adapter class</h3>
-        <p>Why a hosted gateway rather than an installed app, the runtime as built, and the submit-outcome taxonomy that keeps ambiguity from becoming duplicate cases.</p>
+        <h3>Fin / Intercom: The Gateway Adapter Class</h3>
+        <p>Why a hosted gateway rather than an installed app, the runtime as built, and the submit-outcome taxonomy that parks ambiguous submits for reconciliation rather than retrying them into duplicates.</p>
       </a>
       <a class="card doc-card" href="connectors/zendesk.html">
         <div style="display:flex;justify-content:space-between"><span class="doc-no">CONNECTOR</span><span class="doc-kind">Architecture</span></div>
-        <h3>Zendesk: two layers in your own tenant</h3>
-        <p>The ZAF sandbox constraints, ZIS integration naming, the three-audience note visibility model, and the API-token retirement clock.</p>
+        <h3>Zendesk: Two Layers in Your Own Tenant</h3>
+        <p>ZAF sandbox constraints, ZIS integration naming, the three-audience note visibility model, and the API-token retirement clock.</p>
       </a>
       <a class="card doc-card" href="connectors/servicenow.html">
         <div style="display:flex;justify-content:space-between"><span class="doc-no">PLATFORM</span><span class="doc-kind">Assessment</span></div>
-        <h3>ServiceNow: what the platform forces</h3>
+        <h3>ServiceNow: What the Platform Forces</h3>
         <p>A pre-implementation map with every claim tagged by evidence level — surfaces, Table API traps, and the distribution choice certification gates.</p>
       </a>
     </div>
   </div>
 </section>
-
 <section id="topics">
   <div class="wrap">
     <div class="sec-head">
       <div>
-        <h2>Topic areas</h2>
+        <h2>Topic Areas</h2>
         <p>Cross-cutting write-ups that are not tied to one connector or one endpoint.</p>
       </div>
       <a class="sec-link" href="topics/index.html">All topics →</a>
     </div>
     <div class="topic-band" style="border-left:3px solid var(--orange)">
-      <h3><a href="topics/connector-classes.html" style="color:var(--ink)">Two ways to build a connector →</a></h3>
-      <p>One question about your platform — will it run your code inside the member's tenant? — decides who operates the integration, where credentials live, whether connector faults are independent or correlated, and whether shipping a fix means asking every member to upgrade. The taxonomy behind all five platforms on this hub, with the decision procedure for a platform that isn't on it yet.</p>
+      <h3><a href="topics/connector-classes.html" style="color:var(--ink)">Two Ways to Build a Connector →</a></h3>
+      <p>One question about your platform — will it run your code inside the member's tenant? — decides who operates the integration, where credentials live, whether connector faults are independent or correlated, and whether shipping a fix means asking every member to upgrade. The taxonomy behind every connector on this hub, plus a four-question procedure for a platform that is not on it yet.</p>
       <div class="sys-row">
         <a class="sys" href="topics/connector-classes.html">Read the topic</a>
         <span class="sys muted">In-tenant <span>· Salesforce, Dynamics</span></span>
         <span class="sys muted">Partial <span>· Zendesk</span></span>
         <span class="sys muted">Gateway <span>· Fin / Intercom</span></span>
+        <span class="sys muted">Undecided <span>· ServiceNow</span></span>
       </div>
     </div>
     <div class="topic-band" style="border-left:3px solid var(--orange)">
-      <h3><a href="topics/entitlement-automation.html" style="color:var(--ink)">Deciding what to accept automatically →</a></h3>
-      <p>Every connector can accept inbound cases without an agent, and they disagree completely about when that is wise. Accepting stops the SLA clock — and tells a partner an engineer is engaged. Four shipping postures, from accept-everything to never-accept, and how to build a rule that asserts something actually true.</p>
+      <h3><a href="topics/entitlement-automation.html" style="color:var(--ink)">Deciding What to Accept Automatically →</a></h3>
+      <p>Three of the four shipped connectors can accept inbound cases without an agent, the fourth refuses to, and they disagree completely about when that is wise. Accepting stops the SLA clock and tells a partner an engineer is engaged — so a false acceptance is worse for them than an honest breach. Four shipping postures, and how to build a rule that asserts something actually true.</p>
       <div class="sys-row">
         <a class="sys" href="topics/entitlement-automation.html">Read the topic</a>
         <span class="sys muted">Accept everything <span>· Zendesk</span></span>
@@ -307,76 +333,118 @@
         <span class="sys muted">Human commits <span>· Fin / Intercom</span></span>
       </div>
     </div>
-    <div class="topic-band">
-      <h3>AI-focused problem resolution systems</h3>
-      <p>Evaluations, integration notes, and member experience with the new generation of AI-native support platforms — and how each connects to TSANet Connect for multi-vendor cases.</p>
+    <div class="topic-band" style="border-left:3px solid var(--orange)">
+      <h3><a href="topics/file-sharing.html" style="color:var(--ink)">Moving Files Between Members →</a></h3>
+      <p>A file attached to a collaboration case is delivered into the receiving member's own file store — not parked on a portal. The sender never learns how the receiver stores files, which is exactly what makes the system extensible. How sending works, what the normalized receiving contract requires, the five decisions every receiving member makes, and the sharp edges around one-attempt delivery.</p>
       <div class="sys-row">
-        <a class="sys" href="connectors/fin-intercom.html">Fin AI <span>· Intercom</span></a>
-        <span class="sys muted">Pylon</span>
-        <span class="sys muted">DevRev</span>
-        <span class="sys muted">Wolken</span>
-        <span class="sys muted">Agentforce <span>· Salesforce</span></span>
-        <span class="sys muted">Zendesk AI</span>
-        <span class="sys muted">Now Assist <span>· ServiceNow</span></span>
+        <a class="sys" href="topics/file-sharing.html">Read the topic</a>
+        <span class="sys muted">Live <span>· normalized HTTPS push</span></span>
+        <span class="sys muted">Sending <span>· connector, SDK, or REST</span></span>
+        <span class="sys muted">Pattern <span>· endpoint fronting object storage</span></span>
+        <span class="sys muted">Alpha <span>· direct-to-storage delivery</span></span>
       </div>
-      <p style="font-size:13px;color:var(--mute);margin:14px 0 0">Fin&nbsp;/&nbsp;Intercom is written up. The rest are on the list, not yet assessed.</p>
+    </div>
+    <div class="topic-band" style="border-left:3px solid var(--orange)">
+      <h3><a href="topics/agentic-usage.html" style="color:var(--ink)">Agentic Usage with TSANet Connect →</a></h3>
+      <p>Working on Connect with an AI agent rather than by hand, whichever provider's agent it is. The four skills TSANet ships and how any assistant loads them, the assistant embedded in this hub and the recipe for the Copilot Studio agent behind it, what every provider's framework needs from the API and the auth gap that separates hosted builders from code-first ones, plus a documented-only assessment of Copilot Studio with Claude.</p>
+      <div class="sys-row">
+        <a class="sys" href="topics/agentic-usage.html">Read the topic</a>
+        <span class="sys muted">Shipped <span>· four agent skills</span></span>
+        <span class="sys muted">Shipped <span>· the hub assistant launcher</span></span>
+        <span class="sys muted">Assessed <span>· Copilot Studio</span></span>
+        <span class="sys muted">Compared <span>· Anthropic, Microsoft, OpenAI, Google</span></span>
+      </div>
+    </div>
+    <div class="topic-band" style="border-left:3px solid var(--orange)">
+      <h3><a href="topics/end-to-end-encryption.html" style="color:var(--ink)">End-to-End Encryption of Case Content →</a></h3>
+      <p>Case text that only the two members on the case can read, with the keys at each member's own connector and none on the platform. The two API fields that carry it, how the one proof-of-concept implementation encrypts and signs, where every connector stands, and the platform behaviour that currently breaks the signature.</p>
+      <div class="sys-row">
+        <a class="sys" href="topics/end-to-end-encryption.html">Read the topic</a>
+        <span class="sys muted">Live <span>· two API fields</span></span>
+        <span class="sys muted">PoC <span>· Dynamics</span></span>
+        <span class="sys muted">Not yet <span>· SDK, Gateway</span></span>
+        <span class="sys muted">Open <span>· sanitizer rewrites ciphertext</span></span>
+      </div>
     </div>
     <div class="topic-band">
-      <h3>CRM &amp; ticketing, legacy to modern</h3>
-      <p>Migration stories, coexistence patterns, and what changes for collaboration workflows when a member moves platforms.</p>
+      <h3>On the List, Not Written Yet</h3>
+      <p>Headings that appear elsewhere on the hub but have no topic page, because nothing has been assessed behind them and a page that summarises nothing would be worse than an empty slot. <a href="topics/index.html#notyet">What each one is waiting on →</a></p>
       <div class="sys-row">
+        <span class="sys muted">AI-native support platforms <span>· Pylon, DevRev, Wolken, Agentforce, Zendesk AI, Now Assist</span></span>
         <span class="sys muted">Email-to-case patterns</span>
         <span class="sys muted">Swarming &amp; case ownership</span>
-        <span class="sys muted">Entitlement automation</span>
         <span class="sys muted">SLA &amp; escalation design</span>
       </div>
-      <p style="font-size:13px;color:var(--mute);margin:14px 0 0">Planned topic areas. Nothing published here yet.</p>
+      <p style="font-size:13px;color:var(--mute);margin:14px 0 0">Orange-edged cards above have a published write-up. <a href="connectors/fin-intercom.html">Fin / Intercom</a> is the one AI-native platform that has been probed; it has a connector page rather than a topic.</p>
     </div>
   </div>
 </section>
-
 <section id="community">
   <div class="wrap">
     <div class="sec-head">
       <div>
         <h2>Community</h2>
-        <p>Discussion runs on GitHub Discussions — no separate accounts, no separate platform. The space is open; pick the category that fits.</p>
+        <p>Discussion runs in the tsanetgit organisation Discussions, one space shared by every TSANet repository — no separate accounts, no separate platform. Pick the category that fits.</p>
       </div>
       <a class="sec-link" href="community/index.html">Where to take what →</a>
     </div>
     <div class="comm">
       <div class="comm-list">
-        <a class="comm-item" href="https://github.com/tsanetgit/tsanet-developer-hub/discussions/categories/q-a"><span class="comm-cat">Q&amp;A</span><span><b>Ask an implementation question</b><small>Auth, process forms, lifecycle transitions, webhook delivery</small></span></a>
-        <a class="comm-item" href="https://github.com/tsanetgit/tsanet-developer-hub/discussions/categories/troubleshooting"><span class="comm-cat">Troubleshooting</span><span><b>Something isn't working</b><small>Silent failures, signature mismatches, sync that stopped</small></span></a>
-        <a class="comm-item" href="https://github.com/tsanetgit/tsanet-developer-hub/discussions/categories/show-and-tell"><span class="comm-cat">Show and tell</span><span><b>Share what you built</b><small>Custom integrations, translation services, platform findings</small></span></a>
-        <a class="comm-item" href="https://github.com/tsanetgit/tsanet-developer-hub/discussions/categories/ideas"><span class="comm-cat">Ideas</span><span><b>Propose a change to the API</b><small>Gaps, papercuts, and behaviour that surprised you</small></span></a>
-        <a class="comm-item" href="https://github.com/tsanetgit/tsanet-developer-hub/discussions/categories/wish-list"><span class="comm-cat">Wish List</span><span><b>Which connector next?</b><small>Tell us the platform your team actually runs on</small></span></a>
-        <a class="comm-item" href="https://github.com/tsanetgit/tsanet-developer-hub/discussions/categories/membership"><span class="comm-cat">Membership</span><span><b>Early access &amp; onboarding</b><small>Credentials, pilot instances, connector early-access programmes</small></span></a>
+        <a class="comm-item" href="https://github.com/orgs/tsanetgit/discussions/categories/q-a"><span class="comm-cat">Q&amp;A</span><span><b>Ask an implementation question</b><small>Auth, process forms, lifecycle transitions, webhook delivery</small></span></a>
+        <a class="comm-item" href="https://github.com/orgs/tsanetgit/discussions/categories/troubleshooting"><span class="comm-cat">Troubleshooting</span><span><b>Something isn't working</b><small>Silent failures, signature mismatches, sync that stopped</small></span></a>
+        <a class="comm-item" href="https://github.com/orgs/tsanetgit/discussions/categories/show-and-tell"><span class="comm-cat">Show and tell</span><span><b>Share what you built</b><small>Custom integrations, translation services, platform findings</small></span></a>
+        <a class="comm-item" href="https://github.com/orgs/tsanetgit/discussions/categories/technology-committee"><span class="comm-cat">Technology Committee</span><span><b>Propose a change to the API</b><small>Gaps, papercuts, roadmap input, and behaviour that surprised you</small></span></a>
+        <a class="comm-item" href="https://github.com/orgs/tsanetgit/discussions/categories/wish-list"><span class="comm-cat">Wish List</span><span><b>Which connector next?</b><small>Tell us the platform your team actually runs on</small></span></a>
+        <a class="comm-item" href="https://github.com/orgs/tsanetgit/discussions/categories/membership"><span class="comm-cat">Membership</span><span><b>Early access &amp; onboarding</b><small>Credentials, pilot instances, connector early-access programmes</small></span></a>
       </div>
       <div>
+        <p style="font-size:14.5px;color:var(--slate);margin-bottom:16px">A bug or feature request in a shipped connector goes to <a href="community/index.html#trackers">that connector's public issue tracker</a>, where the maintainers and the history already are. Fin / Intercom, the Connect Gateway and ServiceNow have no public tracker yet; route those through membership.</p>
         <p style="font-size:14.5px;color:var(--slate);margin-bottom:16px">Anything involving credentials or account changes still goes to <b>membership@tsanet.org</b> — a discussion thread is public, and credentials never should be.</p>
         <p style="font-size:14.5px;color:var(--slate);margin-bottom:16px">The wish list is the one we most want answered. Which platform your team runs on is the single most useful thing you can tell us, and it is what decides which connector gets built next.</p>
-        <a class="btn btn-primary" href="https://github.com/tsanetgit/tsanet-developer-hub/discussions">Browse the discussions</a>
+        <a class="btn btn-primary" href="https://github.com/orgs/tsanetgit/discussions">Browse the discussions</a>
         <a class="btn btn-ghost" href="mailto:membership@tsanet.org" style="margin-left:8px">Get in touch</a>
       </div>
     </div>
   </div>
 </section>
-
 <footer>
-  <div class="wrap foot-in">
-    <div><img src="assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
-    <nav class="foot-nav" aria-label="Sections">
-      <a href="connectors/index.html">Connectors</a>
-      <a href="api/index.html">Working with the API</a>
-      <a href="docs/index.html">Design documents</a>
-      <a href="topics/index.html">Topics</a>
-      <a href="community/index.html">Community</a>
-    </nav>
-    <div class="foot-links mono">
-      <a href="https://connect2.tsanet.org">connect2.tsanet.org</a>
+  <div class="wrap">
+    <div class="foot-top"><img src="assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
+    <div class="foot-cols">
+      <nav class="foot-col" aria-label="Developers">
+        <h4>Developers</h4>
+        <a href="build/index.html">Build a New Integration</a>
+        <a href="connectors/index.html">Existing Solutions</a>
+        <a href="api/index.html">Working with the API</a>
+        <a href="docs/index.html">Design Documents</a>
+        <a href="topics/index.html">Topics</a>
+        <a href="tools/index.html">Tools</a>
+        <a href="community/index.html">Community</a>
+      </nav>
+      <div class="foot-col">
+        <h4>Members</h4>
+        <a href="https://www.tsanet.org/members/">Member List</a>
+        <a href="https://tsanet.gitbook.io/connect">Platform Documentation</a>
+        <a href="https://tsanet.gitbook.io/connect/help-center">Member Support</a>
+      </div>
+      <div class="foot-col">
+        <h4>About</h4>
+        <a href="https://www.tsanet.org/about-us/">About Us</a>
+        <a href="https://www.tsanet.org/board-of-directors/">Board of Directors</a>
+        <a href="https://www.tsanet.org/news-events/">News and Events</a>
+      </div>
+    </div>
+    <div class="foot-bottom mono">
+      <span>© TSANet Inc. All Rights Reserved</span>
+      <a href="https://www.tsanet.org/legal-policy/">Privacy Policy</a>
       <a href="https://github.com/tsanetgit">github.com/tsanetgit</a>
       <a href="mailto:membership@tsanet.org">membership@tsanet.org</a>
+      <span class="foot-social" aria-label="TSANet on social media">
+        <a href="https://twitter.com/TSANetTweet" aria-label="TSANet on X" title="X"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg></a>
+        <a href="https://www.linkedin.com/company/tsanet" aria-label="TSANet on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+        <a href="https://www.youtube.com/@tsanet8120" aria-label="TSANet on YouTube" title="YouTube"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+        <a href="https://github.com/tsanetgit" aria-label="TSANet on GitHub" title="GitHub"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+      </span>
     </div>
   </div>
 </footer>
@@ -414,5 +482,6 @@
   setInterval(step, 2800);
 })();
 </script>
+<script src="assets/assistant.js?v=20260913" defer></script>
 </body>
 </html>

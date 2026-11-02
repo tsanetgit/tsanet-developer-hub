@@ -8,7 +8,9 @@ No build step, no framework, no dependencies. Plain HTML and CSS, deployable as-
 
 ## Where this lives
 
-Public at `tsanetgit/tsanet-developer-hub`, with the site served by GitHub Pages at <https://developer.tsanet.org/> (the `tsanetgit.github.io/tsanet-developer-hub/` URL redirects there). The repo was transferred there from `shawn-tsanet` on 2026-08-21 as a whole-repo ownership transfer, which carried history, Discussions (all seven categories and the threads in them), and settings across intact. GitHub Discussions is enabled and linked throughout the site's Community section.
+Public at `tsanetgit/tsanet-developer-hub`, with the site served by GitHub Pages at <https://developer.tsanet.org/> (the `tsanetgit.github.io/tsanet-developer-hub/` URL redirects there). The repo was transferred there from `shawn-tsanet` on 2026-08-21 as a whole-repo ownership transfer, which carried history, Discussions, and settings across intact.
+
+Community discussion lives in the **organisation-level Discussions** at <https://github.com/orgs/tsanetgit/discussions> (hosted by the `Connect_SDK` repo); this repo's own Discussions feature is disabled. On 2026-09-13 the hub's extra categories (Membership, Show and tell, Troubleshooting, Wish List) were added there alongside the existing Announcements, Q&A and Technology Committee, the hub's Ideas category was merged into Technology Committee, and the welcome announcement was transferred across. Every discussion link on the site points at the org-level area; keep it that way.
 
 Two consequences of the transfer worth knowing:
 
@@ -19,21 +21,28 @@ Two consequences of the transfer worth knowing:
 
 ```
 index.html              Landing page — previews each section, links to its landing page
+build/index.html        Build a New Integration — the deciding question, four routes in
+                        order of effort, the first week, tools, worked examples
 assets/
   hub.css               The design system: brand tokens, nav, cards, tables,
                         pills, SVG diagram primitives, footer
   doc.css               Design-document layer only; loads on top of hub.css
   *.png                 Brand assets, generated from the TSANet Logo Suite
                         (2026 identity; the suite itself stays untracked)
-connectors/index.html   Section landing: routing table + comparison matrix
+connectors/index.html   Section landing ("Existing Solutions" in the navigation): routing table + comparison matrix
 connectors/*.html       One page per platform, plus the SDK and the Connect Gateway
 api/index.html          Behaviour and pitfalls; deliberately NOT an endpoint reference
 docs/index.html         Design-document library index + authoring conventions
 docs/tsanet-2026-*.html Numbered design documents
 docs/tsanet-design-doc-template.html   Copy this to start a new document
 topics/index.html       Section landing
-topics/*.html           Cross-connector write-ups
+topics/*.html           Cross-connector write-ups, including agentic-usage.html
+                        (skills, the hub assistant, provider comparison, Copilot Studio)
+assets/assistant.js     The hub assistant launcher — inert until embedUrl is set
 community/index.html    Where to take what: issue trackers, membership, discussions
+tools/index.html        Tools for building an integration: environments, reference,
+                        SDK and demo, test suites, agent skills — with public /
+                        at-onboarding / not-yet-public markers
 scripts/check.sh        Static checks — run before every commit
 ```
 
@@ -114,11 +123,16 @@ Visual inspection is not sufficient — this check found four defects on pages t
 
 Live: Pages deploys from `main` / root on every push — no action needed beyond pushing.
 
-**Custom domain.** `developer.tsanet.org` is set by the `CNAME` file in the repo root — Pages reads it on every branch build, so keep that file and do not add a second line to it. DNS is a Cloudflare record in the `tsanet.org` zone: `developer` → `CNAME tsanetgit.github.io`, **DNS-only (grey cloud, not proxied)** so GitHub can verify the domain and issue its certificate. That record overrides the zone's `*.tsanet.org` wildcard, which points every unclaimed subdomain at the Connect web app. *Enforce HTTPS* is a Pages setting that needs repo admin (in the `tsanetgit` org, an org owner or an explicit admin grant).
+**Custom domain.** `developer.tsanet.org` is set by the `CNAME` file in the repo root — Pages reads it on every branch build, so keep that file and do not add a second line to it. DNS is a Cloudflare record in the `tsanet.org` zone: `developer` → `CNAME tsanetgit.github.io`, **DNS-only (grey cloud, not proxied)** so GitHub can verify the domain and issue its certificate. That record overrides the zone's `*.tsanet.org` wildcard, which points every unclaimed subdomain at the Connect web app. Do not add a Cloudflare redirect for this hostname: with `CNAME` in place, github.io redirects here, so a redirect back would loop and take the hub down. *Enforce HTTPS* is a Pages setting that needs repo admin (in the `tsanetgit` org, an org owner or an explicit admin grant).
 
 ## Open items
 
 - **Enforce HTTPS on the custom domain** — tick it in Pages settings once GitHub has issued the certificate for `developer.tsanet.org` (repo admin).
-- **v1 → v2 migration** is now published: the API page's *Deprecation clocks* section carries the per-connector table, and the SDK page notes its own split posture (reads on `/v2/collaboration-requests/list`, webhook management on deprecated `/v1/webhooks` — verified against SDK source and its generated client). Dynamics has since been probed against `MS_Power_App` release v2.13.0.1: it registers on v2 with prefixed types (creation and note events only; responses and closures ride the poll), and its endpoint never matches type strings, so it cannot hit the no-op trap. Still open: the Zendesk CloudEvents migration has not shipped yet.
-- **Dynamics user guide** describes the Case form integration as a "Lightning Web Component". That is Salesforce terminology; the solution ships an HTML web resource. The hub notes the discrepancy; the source doc is still wrong.
-- **API reference drift** — the GitBook reference shows `description` as a query parameter on the attachment forward call; the spec has it as a required multipart form field (re-verified against `openapi.yaml`). The hub now flags it in the API page's attachments section; the GitBook reference itself is still wrong.
+- **v1 → v2 migration** is published: the API page's *Deprecation clocks* section carries the per-connector table. Re-checked 2026-10-20: the SDK (v3.0.0) still reads on `/v2/collaboration-requests/list` and manages webhooks on deprecated `/v1/webhooks`; Dynamics (re-verified at `MS_Power_App` v2.14.0.0) registers on v2 with prefixed types and `payloadVersion V2`; Salesforce 2.14 (released 2026-10-21, re-verified 2026-10-24 at `TSANetConnect-2.14-Release`) is fully on v2. Still open: the Zendesk CloudEvents migration has not shipped (`Zendesk_App#101`).
+- **Salesforce 2.14 on Production** — the package always registers its webhook with `OAUTH2_CLIENT_CREDENTIALS` `callbackAuth`. Production's spec lacked it on 2026-10-24 and has carried it since 2026-10-26 (spec-read 2026-10-28), so registration should now be accepted. Nobody has registered a 2.14 webhook on Production yet. The Salesforce page reports both readings and marks it unconfirmed; close this once a Production registration is seen Active. The page also publishes two source disagreements: the installation guide says the Asset flow rejects on no match (the shipped flow requests information), and the guide and the integration permission set disagree on whether a Salesforce Integration licence is enough. Re-check both when the guide changes.
+- **Dynamics user guide** still says "LWC located on the Case Form" (unchanged at v2.14.0.0). LWC is Salesforce terminology; the solution ships an HTML web resource. The hub notes the discrepancy; the source doc is still wrong.
+- **Hub assistant** — the launcher (`assets/assistant.js`, styles at the end of `hub.css`) is shipped but inert: it renders nothing until `embedUrl` holds the Copilot Studio custom-website iframe URL. The agent has to be created in TSANet's Microsoft tenant; the recipe is on `topics/agentic-usage.html#assistant`. Bump the script's `?v=` when you set the URL.
+- **Copilot Studio assessment** (in `topics/agentic-usage.html`) is documented-only, against Microsoft Learn pages dated in the page's *Verified against* table. Microsoft's model tables change monthly; re-read them before citing the page. Claude Haiku is not offered in Copilot Studio — the page is written around Claude Sonnet 4.6 / Sonnet 5.
+- **API reference drift** — the old attachment-forward `description` drift is fixed in GitBook (re-checked 2026-10-20). GitBook's webhooks-v2 page showed `caseDirections` and `OAUTH2_CLIENT_CREDENTIALS` before Production's spec had them; since 2026-10-26 it does, so that drift has closed at the spec level. Still open: GitBook documents `POST /v1/webhooks/{id}/secret`, which answers 501 on Beta, and it has no pages for the alpha Attachment V2 paths both environments now serve (checked 2026-10-28). The API page flags these.
+- **Self-issued client secrets** — `api/index.html#self-issue` documents members creating their own OAuth client secrets under *Admin → Company → Integration*, read from the webapp's Beta branch source (2026-10-24) and reported working on Beta and Development. Production was scheduled for the week of 2026-10-26. Production's API spec changed on 2026-10-26, but the spec does not describe the webapp page, so that is no evidence either way. The pill and the Zendesk note now say "scheduled, not confirmed". Once someone sees *Manage Secret Keys* on Production, drop the Production pill and the "Production's page changes under you" gotcha, and re-word the Zendesk page's rollout note. Not yet probed by the hub.
+- **Beta vs Production** — the specs are level. On 2026-10-28 the `openapi.yaml` both environments serve was byte-identical: 4606 lines, 42 paths, last modified 2026-10-26 on Production and 2026-10-19 on Beta. It is also identical to the private spec repository's commit `46fc91f`, which the SDK and the Gateway authoring kit vendor. So note types, note direction and company, webhook filters, OAuth2 client-credentials `callbackAuth`, the E2EE `manifest`/`encrypted` fields and Attachment V2 are in Production's spec. All 17 V2 operations are still `x-stability-level: alpha`. The hub's pages now date each of these "in Production's spec since 2026-10-26", and the parts that were Beta-only before are marked as such. All of it is spec-read: nothing has been probed on Production, and the pages say so. Still open: the first Production probe of note direction or types, webhook filters, or OAuth `callbackAuth`, which turns "spec-read" into "probed" on the API page, Salesforce and TSANET-2026-001. Two side findings were made in the same read. The spec names Google Cloud Storage as a third V2 receiver store, and File sharing and TSANET-2026-002 now say so. The SDK's V2 facade covers S3 and Azure Blob only.

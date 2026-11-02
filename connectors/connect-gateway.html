@@ -7,8 +7,8 @@
 <link rel="icon" href="../assets/tsanet-favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/hub.css?v=20260815">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/hub.css?v=20260914c">
 <style>
   pre{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--ink);margin:16px 0}
   pre code{background:none;padding:0;font-size:inherit}
@@ -29,12 +29,14 @@
 
 <nav>
   <div class="wrap nav-in">
-    <a class="brand" href="../index.html"><img class="brand-img" src="../assets/tsanet-logo-white.png" alt="TSANet"><small>Developer Hub</small></a>
+    <a class="brand" href="../index.html"><img class="brand-img" src="../assets/tsanet-devhub-horizontal.png" alt="TSANet Developer Hub"></a>
     <div class="nav-links">
-      <a href="index.html" aria-current="page">Connectors</a>
+      <a href="../build/index.html">Build</a>
+      <a href="index.html" aria-current="page">Existing Solutions</a>
       <a href="../api/index.html">API</a>
       <a href="../docs/index.html">Design Docs</a>
       <a href="../topics/index.html">Topics</a>
+      <a href="../tools/index.html">Tools</a>
       <a href="../community/index.html">Community</a>
     </div>
   </div>
@@ -42,12 +44,12 @@
 
 <header class="pagehead">
   <div class="wrap">
-    <div class="crumb"><a href="../index.html">Hub</a> / <a href="index.html">Connectors</a> / Connect Gateway</div>
+    <div class="crumb"><a href="../index.html">Hub</a> / <a href="index.html">Existing Solutions</a> / Connect Gateway</div>
     <h1>Connect Gateway</h1>
     <p class="lede">One shared TSANet-facing core with thin per-platform adapters, for members whose platform has no native connector. This is the machinery behind <a href="fin-intercom.html">Fin&nbsp;/&nbsp;Intercom</a> and the gateway-class connectors that follow it — and the contract a member or platform vendor builds against to write an adapter of their own.</p>
     <div class="meta-row">
       <span><b>Status</b> <span class="pill warn">Work in progress</span></span>
-      <span><b>Certification pin</b> v0.1.2</span>
+      <span><b>Latest release</b> v3.0.0</span>
       <span><b>First adapter</b> Fin / Intercom (early access)</span>
       <span><b>Class</b> Gateway</span>
     </div>
@@ -66,10 +68,11 @@
 <section id="what">
   <div class="wrap">
     <p class="eyebrow">Status</p>
-    <h2>What it is, and how far along</h2>
+    <h2>What It Is, and How Far Along</h2>
     <p>Members on Salesforce, Dynamics and Zendesk install a connector into their own tenant. Members on platforms that will not host member code — Intercom today; Pylon, DevRev and the like are the obvious candidates — need the integration to run somewhere else. The Connect Gateway is that somewhere: a TSANet-facing engine that owns everything on the Connect side, embedded by a thin adapter that owns everything on the platform side. Why a platform lands in this class at all is a property of the platform, not a choice — the <a href="../topics/connector-classes.html">connector classes topic</a> has the procedure.</p>
     <p>The engine was not designed on paper. It was built and verified end to end inside the Fin&nbsp;/&nbsp;Intercom connector first, and extraction into its own repository deliberately waited until a second platform committed — so the module boundary was fixed by two real consumers rather than one and a guess. The Fin connector now consumes the published engine artifact like any other adapter.</p>
-    <p><strong>Where it stands:</strong> the contract, the engine, the conformance harness and the worked example are real, published, and pinned at <code>v0.1.2</code> — a tag cut only after the engine suite ran green including a live contract run against Beta. Around that pinned core, plenty is still moving; the <a href="#moving">last section</a> is honest about what.</p>
+    <p><strong>Where it stands:</strong> the contract, the engine, the conformance harness and the worked example are real and published. The current release is <strong>v3.0.0</strong> (2026-10-20): the engine takes <a href="connect-sdk.html">connect-library</a> <strong>3.0.0</strong>, and all four modules (<code>connector-core</code>, <code>conformance</code>, <code>gateway-engine</code> and the parent) publish at <code>3.0.0</code>. It is a dependency move and nothing else: between the v2.0.0 and v3.0.0 tags the only change under any module's main sources is one Javadoc line, so the <code>TsanetGateway</code> contract and the conformance suite are unchanged and an adapter that compiles against <code>2.0.0</code> compiles against <code>3.0.0</code> unchanged. The one difference on the wire comes from the library: a case create now carries two additional fields, which production ignores (read from production's code, not from a live call). v2.0.0 (2026-09-09) was the release that moved login handling: a failed login is classified and never ambiguous, and a stale token is renewed in a login lane before the operation, under its own budget rather than the operation's deadline. The runtime line v1.0.0 set (2026-08-28), <strong>Spring Boot 4.1.1 and Jackson 3</strong>, is unchanged. Around that core, plenty is still moving; the <a href="#moving">last section</a> is honest about what.</p>
+    <div class="note"><strong>The pin label and the artifacts now agree.</strong> Earlier revisions of this page recorded a drift: <code>v1.0.0</code> shipped while the repository README and the adapter-author onboarding still named <code>v0.1.2</code> as the certification pin. The repository closed that on 2026-09-09. The member-facing documents were moved to the published version, <code>v1.0.0</code> was re-certified with a live contract run against Beta (9/9), and the publish workflow now refuses to publish a version those documents do not name, so the label cannot fall behind the artifacts again. <code>v2.0.0</code> and <code>v3.0.0</code> were each cut under that gate, documents first, and re-certified the same way on the engine tree they tag — v3.0.0 with the engine suite (59 passed, none failed or skipped) and a live Beta contract run (9/9). Consume <code>3.0.0</code>; the repository's pin language is current.</div>
     <div class="note">The repository (<code>tsanetgit/Connect_Gateway</code>) is currently private. Adapter authors get access at onboarding, along with the published artifacts and a self-contained authoring kit — <a href="../community/index.html">start with membership</a> if that is you.</div>
   </div>
 </section>
@@ -77,7 +80,7 @@
 <section id="split">
   <div class="wrap">
     <p class="eyebrow">Design</p>
-    <h2>One engine, thin adapters, one certified seam</h2>
+    <h2>One Engine, Thin Adapters, One Certified Seam</h2>
     <p>The design rests on a single asymmetry: TSANet knows the Connect API and its failure modes; the platform owner knows the platform. So the gateway owns the whole TSANet side — authentication, per-member sessions, partner search, process forms, submission, reconciliation, deadline enforcement, and the classification of every failure — and the adapter owns the platform side in both directions. <strong>Adapter code never implements TSANet semantics:</strong> it never decides when a submission may be retried and never interprets a Connect error. That rule is what makes it safe for someone who is not TSANet to write an adapter, because the part that pages real engineers at real partner companies is not theirs to get wrong.</p>
     <figure>
       <div class="diagram">
@@ -220,31 +223,31 @@
           <path class="ln" d="M1070,282 H1150" marker-end="url(#gwB)"/>
         </svg>
       </div>
-      <figcaption>The estate view, drawn from the gateway proposal's topology. Only the engine touches the Connect API; the registry keeps one credential set per member and never shares a client between them. One committed platform is a member's internal case system, unnamed here by this hub's redaction standard. TSANet-hosted is the default topology — a member-deployed adapter embeds the same engine in the member's own service instead.</figcaption>
+      <figcaption>The estate view, drawn from the gateway proposal's topology. Only the engine touches the Connect API; the registry keeps one credential set per member and never shares a client between them. One committed platform is a member's internal case system, unnamed here by this hub's redaction standard. TSANet-hosted is the default topology as designed; today the one shipped adapter, <a href="fin-intercom.html">Fin / Intercom</a>, runs as its own process with the engine embedded, and the shared runtime is at proposal stage (see below). A member-deployed adapter embeds the same engine in the member's own service instead.</figcaption>
     </figure>
-    <h3>The modules</h3>
+    <h3>The Modules</h3>
     <div class="grid g2">
       <div class="mod"><h4>connector-core</h4><p>The <code>TsanetGateway</code> contract, its DTOs and its two exception types. Zero dependencies, compile-scope — your adapter's own code is written against it.</p></div>
-      <div class="mod"><h4>gateway-engine</h4><p>The TSANet-facing engine an adapter embeds: the contract implementation over the Connect API, the per-member session registry, and a Spring configuration the embedding service imports. Configuration under <code>gateway.tsanet.*</code>.</p></div>
-      <div class="mod"><h4>conformance</h4><p>The harness an adapter author runs to prove their adapter survives Connect's failure modes, plus the live certification suite the pin itself is cut against.</p></div>
+      <div class="mod"><h4>gateway-engine</h4><p>The TSANet-facing engine an adapter embeds: the contract implementation over the Connect API, the per-member session registry, and a Spring configuration the embedding service imports. Configuration under <code>gateway.tsanet.*</code>; the engine wires itself only when <code>gateway.tsanet.mode=sdk</code> is set, and without it the application starts with no gateway bean, which is the right state for tests against the conformance double.</p></div>
+      <div class="mod"><h4>conformance</h4><p>The harness an adapter author runs to prove their adapter survives Connect's failure modes, plus the live certification suite the certification pin was cut against.</p></div>
       <div class="mod"><h4>example-adapter &amp; example-service</h4><p>A complete runnable worked example: adapter over the contract, in-memory platform, conformance suite green, and a bootable service embedding the real engine. Fake mode runs the whole story with zero credentials.</p></div>
     </div>
-    <p style="margin-top:16px">There is also a TSANet-internal admin console (read and validate, not operate) over a versioned admin contract every adapter exposes. All published modules ship from the repository's package registry at the version matching the certification pin.</p>
+    <p style="margin-top:16px">There is also a TSANet-internal admin console (read and validate, not operate) over a versioned admin contract that TSANet-hosted adapters expose; member-embedded adapters are explicitly outside its scope, so monitoring and on-call for those stay with the author. Three of the modules above — <code>connector-core</code>, <code>gateway-engine</code> and <code>conformance</code> — ship from the repository's package registry together with the parent POM, at the release version — <code>3.0.0</code> since 2026-10-20. Only the current release is supported: earlier versions remain in the registry, but they are obsolete and not offered to adapter authors, and there are no external deployments to keep them for. The examples and the admin console are source-only, built from the repository rather than published. (Verified against the registry's package versions on 2026-10-20.)</p>
   </div>
 </section>
 
 <section id="contract">
   <div class="wrap">
     <p class="eyebrow">Contract</p>
-    <h2>Eight methods, and an error model that does the hard part for you</h2>
-    <p>The surface is deliberately small. Outbound: <code>searchPartners</code>, <code>form</code> (fetched fresh per submission, never cached), <code>submit</code>, and <code>findSubmission</code> for reconciling by your own case number. Inbound: <code>fetchByToken</code> and <code>listInboundUpdatedSince</code> for the poll behind the push. Files: <code>forwardAttachments</code> outbound, and an <code>AttachmentDeliveryHandler</code> seam for inbound delivery.</p>
+    <h2>Eleven Methods, and an Error Model That Does the Hard Part for You</h2>
+    <p>The surface is deliberately small. Outbound: <code>searchPartners</code>, <code>form</code> (fetched fresh per submission, never cached), <code>submit</code>, and <code>findSubmission</code> for reconciling by your own case number. Inbound: <code>fetchByToken</code> and <code>listInboundUpdatedSince</code> — the poll behind the push on a TSANet-hosted adapter, and the whole inbound surface for a member-embedded one, since there is no push channel from TSANet to a member-embedded adapter and the poll interval is its inbound latency bound — plus the three response actions an adapter calls when its own user answers — <code>approve</code>, <code>reject</code> and <code>requestInformation</code>, each taking the request token and the responding engineer's identity (approval also carries the case number and next-steps text, as the Fin sequence shows). Files: <code>forwardAttachments</code> outbound, and an <code>AttachmentDeliveryHandler</code> seam for inbound delivery; the inbound delivery object it receives is marked provisional in the source, and may gain fields once the receiver is wired. One more, <code>healthy</code>, for readiness. The contract has no webhook seam: as of v3.0.0 the TSANet push — signature verification, CloudEvents parsing, routing — is terminated by the adapter itself (Fin / Intercom's <code>TsanetWebhookController</code>), so the next adapter would carry that too until the engine takes it on.</p>
     <p>The centre of the design is the exception model. <a href="../api/index.html#cases">Submitting a collaboration case is not idempotent and there is no idempotency key</a> — a submit that fails may still have created a case at your partner, and a blind retry pages a second real engineer. So the contract splits every failure into exactly two kinds:</p>
     <div class="twrap">
       <table>
         <thead><tr><th>Exception</th><th>Meaning</th><th>What you do</th></tr></thead>
         <tbody>
-          <tr><td><code>GatewayException</code></td><td>Definitively rejected — no case exists or can exist</td><td>Surface it to the user; retrying cannot succeed</td></tr>
-          <tr><td><code>GatewayTimeoutException</code></td><td>Outcome unknown — deadline expiry, 5xx after send, reset mid-response</td><td>Park it; reconcile with <code>findSubmission</code> before any resubmit</td></tr>
+          <tr><td><code>GatewayException</code></td><td>Definitively rejected — no case exists or can exist</td><td>Nothing was created: show the problem detail next to the field that fixes it, and let the user correct and submit again — a blind retry cannot succeed</td></tr>
+          <tr><td><code>GatewayTimeoutException</code></td><td>Outcome unknown — deadline expiry, 5xx after send, reset mid-response, or a 200 with no token</td><td>Park it; reconcile with <code>findSubmission</code> before any resubmit</td></tr>
         </tbody>
       </table>
     </div>
@@ -267,16 +270,18 @@ catch (<span class="good-v">GatewayException</span> rejected)        { surfaceTo
 <section id="adapters">
   <div class="wrap">
     <p class="eyebrow">Adapters</p>
-    <h2>Building an adapter</h2>
-    <p>Two audiences, split by one question: can TSANet reach the platform? Where it can — a multi-tenant platform with a public API — <strong>TSANet builds and operates the adapter</strong>, the way Fin&nbsp;/&nbsp;Intercom shipped. Where it cannot, which is the case whenever the target is a member's own internal system, <strong>the member or vendor writes the adapter themselves</strong> against a self-contained kit: the contract, the engine artifact, the conformance harness, and an authoring guide that assumes no access to TSANet's tooling. The split is not cosmetic — one audience can probe the platform and one cannot.</p>
-    <h3>The build order the kit prescribes</h3>
+    <h2>Building an Adapter</h2>
+    <p>Two audiences, split by one question: can TSANet reach the platform? Where it can — a multi-tenant platform with a public API — <strong>TSANet builds the adapter</strong>, the way Fin&nbsp;/&nbsp;Intercom shipped; who then runs it is the member's choice, TSANet-hosted or self-hosted in the member's own cloud (the <a href="fin-intercom.html#hosting">Fin page compares the two</a>). Where it cannot, which is the case whenever the target is a member's own internal system, <strong>the member or vendor writes the adapter themselves</strong> against a self-contained kit: the contract, the engine artifact, the conformance harness, and an authoring guide that assumes no access to TSANet's tooling. The split is not cosmetic — one audience can probe the platform and one cannot.</p>
+    <h3>The Build Order the Kit Prescribes</h3>
     <ul class="tight">
-      <li><strong>Answer the platform questions first.</strong> What the gateway needs to know about your system — object model, states, webhook capability. Several answers are decisions, not facts; make them deliberately and write down why.</li>
+      <li><strong>Onboard before anything else.</strong> The kit's onboarding reference pins the toolchain and the certified set — JDK 21, Maven 3.9.16, Gateway and SDK at <code>v3.0.0</code>, <code>connect-library</code> 3.0.0, and the vendored spec at a named beta-branch commit (<code>46fc91f</code>) — with the rule never to bump any of them yourself. Reaching the private registry needs a classic PAT with <code>repo</code> as well as <code>read:packages</code>; the published artifacts are BSD-2-Clause.</li>
+        <li><strong>Answer the platform questions first.</strong> What the gateway needs to know about your system — object model, states, webhook capability. Several answers are decisions, not facts; make them deliberately and write down why.</li>
       <li><strong>Outbound first, against the harness.</strong> Outbound is where the irreversible mistakes live and where the conformance suite gives you a correctness signal from day one. Run it continuously, not once at the end.</li>
       <li><strong>Then inbound, with two properties built in:</strong> guard-create, because the same partner case can arrive twice and creating on a token that already has a case must be a no-op; and read-back after every write, because many platform APIs answer 200 while quietly ignoring a field they do not recognize.</li>
-      <li><strong>Keep submissions test-flagged</strong> until going live is a deliberate, agreed step. Every case that is not test-flagged reaches a real partner.</li>
+      <li><strong>Keep submissions test-flagged</strong> until going live is a deliberate, agreed step. Every case that is not test-flagged reaches a real partner. The kit's go-live sequence is conformance green, then BETA with the test flag at its default, then a coordinated end-to-end with TSANet, then the flip on the platform-questions sign-off — verified by read-back, because you write <code>testSubmission</code> and read <code>testCase</code>, and that read-back is the receipt.</li>
+        <li><strong>Operate one replica per store.</strong> Exactly one replica with one <code>sqlite-path</code> per deployment; two writers on one store is undefined. The store is not the token-to-case routing table. Credential rotation is configuration plus a full restart, not a rolling update. The bounded startup health probe never fails boot and logs <code>healthy=false</code> instead; <code>tsanet_gateway_timeout</code> and <code>tsanet_gateway_unhealthy</code> are the two log keys to watch.</li>
     </ul>
-    <h3>What the conformance suite certifies</h3>
+    <h3>What the Conformance Suite Certifies</h3>
     <p>Everything it checks exists because submission is not idempotent. The first two rows together are an <em>exactly-once</em> property — checking only for duplicates would pass an adapter that drops every ambiguous case.</p>
     <div class="twrap">
       <table>
@@ -296,11 +301,11 @@ catch (<span class="good-v">GatewayException</span> rejected)        { surfaceTo
       <h4>Passing is necessary, not sufficient</h4>
       <p>The harness only sees the TSANet side of your adapter, because TSANet has no access to your platform. Your inbound path, your platform writes actually landing, credential isolation (one client per member, never shared), and test-flag discipline are yours to test.</p>
     </div>
-    <h3>Using the kit with an agentic coding assistant</h3>
-    <p>The authoring kit is written as an <strong>agent skill</strong>, deliberately: a <code>SKILL.md</code> that carries the build order and the rules, plus reference files it points into — the platform questions, the binding semantics, onboarding, deploy-and-go-live, and the vendored API spec. Loaded into an agentic assistant, it makes the assistant apply TSANet's rules while it writes your adapter, instead of you relaying them.</p>
+    <h3>Using the Kit with an Agentic Coding Assistant</h3>
+    <p>The authoring kit is written as an <strong>agent skill</strong>, deliberately: a <code>SKILL.md</code> that carries the build order and the rules, plus reference files it points into — the platform questions, the binding semantics, onboarding, deploy-and-go-live, and the vendored API spec. The spec is vendored because the specification's own repository is private and deliberately not granted; the copy is pinned to beta-branch commit <code>46fc91f</code>, the same one <code>connect-library</code> 3.0.0 builds from. Since the 3.0.0 move it carries the webhook subscription filters (<code>caseDirections</code>, <code>partnerCompanyIds</code>) and the V2 attachment operations, which the spec marks alpha; both are live on Beta. Until 2026-10-26 they were not in Production's specification, so the vendored copy described Beta only. On 2026-10-28 the vendored file was byte-identical to the spec both Beta and Production serve, so it now describes both specifications. Production's behaviour is spec-read, not probed. Loaded into an agentic assistant, it makes the assistant apply TSANet's rules while it writes your adapter, instead of you relaying them.</p>
     <p>When onboarding grants you repository access, copy the whole kit folder — the references must ride along with the <code>SKILL.md</code> that cites them:</p>
     <pre><code>cp -R Connect_Gateway/skills/connect-adapter-author  your-adapter-project/.claude/skills/</code></pre>
-    <p>That path is Claude Code's project skills directory; for other assistants, attach <code>SKILL.md</code> and the <code>references/</code> files as project instructions — the kit is plain markdown and assumes no particular tool. (A second, TSANet-internal skill covers the adapters TSANet builds itself; it is not part of the member kit.)</p>
+    <p>That path is Claude Code's project skills directory; for other assistants, attach <code>SKILL.md</code> and the <code>references/</code> files as project instructions — the kit is plain markdown and assumes no particular tool. (A second, TSANet-internal skill covers the adapters TSANet builds itself; it is not part of the member kit.) Every skill TSANet ships, and how to load one into any assistant, is collected on <a href="../topics/agentic-usage.html#skills">Agentic usage with TSANet Connect</a>.</p>
     <p><strong>Typical first steps, in the kit's own order:</strong></p>
     <ul class="tight">
       <li><em>"Complete references/platform-questions.md with me for &lt;platform&gt;."</em> Do this before any design talk — several answers are decisions, and the completed document is what TSANet works from when you raise a question.</li>
@@ -315,13 +320,13 @@ catch (<span class="good-v">GatewayException</span> rejected)        { surfaceTo
 <section id="attachments">
   <div class="wrap">
     <p class="eyebrow">Attachments</p>
-    <h2>The attachment plane: transit-only by design</h2>
+    <h2>The Attachment Plane: Transit-Only by Design</h2>
     <p>Case files get their own set of gateway-wide decisions, made ahead of any consumer because the first runtime that references a configuration key freezes it:</p>
     <ul class="tight">
-      <li><strong>One artifact, two hosting modes.</strong> The attachment receiver ships once and runs either TSANet-hosted multi-tenant (the default — members deploy nothing) or member-deployed, for members whose policy requires files to touch only their own infrastructure. The mode is a deployment decision, never a code fork.</li>
-      <li><strong>Transit-only compute.</strong> In hosted mode, bytes stream from the push to the tenant's own storage backend — nothing is spooled to gateway disk. That property is what keeps "files are never stored on TSANet Connect" defensible while TSANet operates the compute.</li>
-      <li><strong>Storage at rest is member-owned.</strong> Production tenants configure their own S3 or Azure Files targets; credential custody stays with the member and revocation is always member-side.</li>
-      <li><strong>Storage alone earns the 2xx.</strong> The platform pushes exactly once, so the receiver acknowledges when the bytes are secured in storage — never contingent on delivery into the member's platform, which runs after and apart. A failed delivery leaves the file in storage and surfaces to the member; it is never silently dropped.</li>
+      <li><strong>One artifact, two hosting modes.</strong> The attachment receiver is designed to ship once and run either TSANet-hosted multi-tenant (the default — members deploy nothing) or member-deployed, for members whose policy requires files to touch only their own infrastructure. The mode is a deployment decision, never a code fork. (The <a href="connect-sdk.html">SDK page</a>, which re-verified its module list against the 3.0.0 source, records the HTTPS endpoint that accepts the push as not yet built; the two pages disagree on how much of this receiver is shipped, and the SDK page is the better evidenced.)</li>
+      <li><strong>Transit-only compute.</strong> In hosted mode, bytes are to stream from the push to the tenant's own storage backend — nothing is spooled to gateway disk. That property is what keeps "files are never stored on TSANet Connect" defensible while TSANet operates the compute.</li>
+      <li><strong>Storage at rest is member-owned.</strong> Production tenants configure their own S3, Azure Blob Storage, Azure Files or Google Cloud Storage targets; credential custody stays with the member and revocation is always member-side.</li>
+      <li><strong>Storage alone earns the 2xx.</strong> The platform makes one delivery attempt per destination (documented, not probed), so the receiver acknowledges when the bytes are secured in storage — never contingent on delivery into the member's platform, which runs after and apart. A failed delivery leaves the file in storage and surfaces to the member; it is never silently dropped.</li>
       <li><strong>Per-file outcomes are data, not exceptions.</strong> On the outbound side, one file's failure cannot masquerade as a whole-call failure.</li>
     </ul>
     <p class="gotcha" style="border-left-color:var(--blue)">The platform-wide attachment model — no store, no listing, two-party configuration — is specified in <a href="../docs/tsanet-2026-002-case-attachments.html">TSANET-2026-002</a>; the gateway decisions above are the gateway's answer to it.</p>
@@ -331,10 +336,10 @@ catch (<span class="good-v">GatewayException</span> rejected)        { surfaceTo
 <section id="lessons">
   <div class="wrap">
     <p class="eyebrow">Field lessons</p>
-    <h2>What the adapters that exist already paid for</h2>
+    <h2>What the Adapters That Exist Already Paid For</h2>
     <p>The gateway repository keeps a lessons-learned log with a deliberate promotion path: something seen on one platform is a lesson, something seen on two is a rule, and rules move into the adapter kits where they load automatically. The entries below are the ones that matter to anyone building an adapter, each tagged with where it was seen — the same probed-versus-read discipline the platform pages use.</p>
 
-    <h3>Probing a new platform</h3>
+    <h3>Probing a New Platform</h3>
     <div class="gotcha">
       <h4>Published documentation is a lead, not a fact</h4>
       <p>On the Intercom spike, the vendor's own documentation was wrong or silent on the majority of the findings that shaped the design — the response deadline, the signature byte format, the behaviour on unknown fields. Reading produces a plausible design; probing produces a correct one. Budget the spike accordingly, and tag every claim with whether it was probed or merely read.</p>
@@ -366,7 +371,7 @@ catch (<span class="good-v">GatewayException</span> rejected)        { surfaceTo
       <p class="where">Platform-independent · seen repeatedly</p>
     </div>
 
-    <h3>Building and operating</h3>
+    <h3>Building and Operating</h3>
     <div class="gotcha">
       <h4>A library correct in its reference embedding is not a correct library</h4>
       <p>The Connect client library worked perfectly inside Spring Boot and failed time serialization everywhere else — Boot was invisibly supplying a Jackson module the library needed. The gateway extraction's standalone certification run caught it: three of nine live contract tests failing outside Boot, the exact defect a member embedding the engine would have hit on day one. Certify an embeddable artifact outside its reference framework, and when a failure appears or disappears with the harness, suspect the classpath before the code.</p>
@@ -403,42 +408,70 @@ catch (<span class="good-v">GatewayException</span> rejected)        { surfaceTo
 <section id="moving">
   <div class="wrap">
     <p class="eyebrow">Work in progress</p>
-    <h2>What is settled, and what is still moving</h2>
+    <h2>What Is Settled, and What Is Still Moving</h2>
     <div class="twrap">
       <table>
         <thead><tr><th>Area</th><th>State</th></tr></thead>
         <tbody>
-          <tr><td>The contract, its exception model, the conformance checks</td><td><span class="pill ok">settled</span> — pinned at v0.1.2, certified against a live Beta run</td></tr>
-          <tr><td>The engine and the worked example</td><td><span class="pill ok">settled</span> — published artifacts; the Fin connector consumes them like any other adapter</td></tr>
+          <tr><td>The contract, its exception model, the conformance checks</td><td><span class="pill ok">settled</span> — unchanged through v3.0.0; certified against a live Beta run (9/9) at v3.0.0 on the same sources</td></tr>
+          <tr><td>The engine and the worked example</td><td><span class="pill ok">settled</span> — published artifacts at <code>3.0.0</code>; the Fin connector consumes the published engine like any other adapter, and has been on <code>gateway-engine</code> 3.0.0 with <code>connect-library</code> 3.0.0 since 2026-10-20 — its build moves the two pins together — so older releases are not needed by anyone</td></tr>
+          <tr><td>The runtime line</td><td><span class="pill warn">moving</span> — v3.0.0 runs Spring Boot 4.1.1, Jackson 3 and <code>connect-library</code> 3.0.0, all in a tagged release; still open is moving the generated API calls onto the library's own HTTP client so every failure is one type</td></tr>
+          <tr><td>Outbound files</td><td><span class="pill warn">moving</span> — <code>forwardAttachments</code> still sends over the V1 upload, which the platform refuses (409) when the receiving member has V2 storage configured; the V1 upload's retirement is planned but not dated, so the engine has to move to V2 direct delivery before then</td></tr>
           <tr><td>Adapters in production</td><td><span class="pill warn">one</span> — Fin / Intercom, in early access; patterns have not yet been stress-tested by a second shipped adapter</td></tr>
           <tr><td>Cross-integration conventions</td><td><span class="pill warn">converging</span> — the authoring kit keeps an explicit "not settled" list; those questions go to TSANet rather than being answered locally</td></tr>
           <tr><td>Attachment hosting</td><td><span class="pill warn">deciding</span> — self-service credential intake is the target state, not the day-one state, and whether TSANet ever offers production file storage is an open business decision</td></tr>
+          <tr><td>Self-hosting a TSANet-built adapter</td><td><span class="pill warn">moving</span> — a step-by-step guide for a member's own Azure or AWS account exists and Azure is the reference; AWS has not been run, members build the image from a release tag rather than pulling a published one, and <a href="../topics/end-to-end-encryption.html">end-to-end encryption</a> is not implemented in the engine</td></tr>
           <tr><td>Hosting and sizing of the shared runtime</td><td><span class="pill warn">proposal stage</span> — the production topology is designed, not yet operated at member scale</td></tr>
         </tbody>
       </table>
     </div>
     <p>This page is deliberately ahead of the estate it describes — that is what the work-in-progress marker means. Expect it to change as the second and third adapters land, and read the <a href="fin-intercom.html">Fin&nbsp;/&nbsp;Intercom page</a> for what operating the first one actually looks like.</p>
-    <p class="gotcha" style="border-left-color:var(--blue)">Verified against <code>tsanetgit/Connect_Gateway</code> at the <code>v0.1.2</code> certification pin and main (2026-08-14): the repository README, the gateway decision log, the conformance harness documentation, both adapter-authoring kits, the wiki's lessons-learned log (2026-08-13), and the as-built architecture reference (2026-08-13).</p>
+    <p class="gotcha" style="border-left-color:var(--blue)">Verified against <code>tsanetgit/Connect_Gateway</code> at the <code>v3.0.0</code> release (2026-10-20) and main at <code>1d68535</code>: the release notes, the published package versions on GitHub Packages, the module poms and the main-source diff between the v2.0.0 and v3.0.0 tags, the repository README, the adapter-author onboarding kit and its vendored spec; the Fin connector's pins were read from its build at <code>417af2f</code>. The design material this page draws on (the gateway decision log, the wiki's lessons-learned log of 2026-08-13 and the as-built architecture reference of 2026-08-13) is unchanged: the wiki has had no commits since 2026-08-13.</p>
   </div>
 </section>
 
 <footer>
-  <div class="wrap foot-in">
-    <div><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
-    <nav class="foot-nav" aria-label="Sections">
-      <a href="index.html">Connectors</a>
-      <a href="../api/index.html">Working with the API</a>
-      <a href="../docs/index.html">Design documents</a>
-      <a href="../topics/index.html">Topics</a>
-      <a href="../community/index.html">Community</a>
-    </nav>
-    <div class="foot-links mono">
-      <a href="https://connect2.tsanet.org">connect2.tsanet.org</a>
+  <div class="wrap">
+    <div class="foot-top"><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
+    <div class="foot-cols">
+      <nav class="foot-col" aria-label="Developers">
+        <h4>Developers</h4>
+        <a href="../build/index.html">Build a New Integration</a>
+        <a href="../connectors/index.html">Existing Solutions</a>
+        <a href="../api/index.html">Working with the API</a>
+        <a href="../docs/index.html">Design Documents</a>
+        <a href="../topics/index.html">Topics</a>
+        <a href="../tools/index.html">Tools</a>
+        <a href="../community/index.html">Community</a>
+      </nav>
+      <div class="foot-col">
+        <h4>Members</h4>
+        <a href="https://www.tsanet.org/members/">Member List</a>
+        <a href="https://tsanet.gitbook.io/connect">Platform Documentation</a>
+        <a href="https://tsanet.gitbook.io/connect/help-center">Member Support</a>
+      </div>
+      <div class="foot-col">
+        <h4>About</h4>
+        <a href="https://www.tsanet.org/about-us/">About Us</a>
+        <a href="https://www.tsanet.org/board-of-directors/">Board of Directors</a>
+        <a href="https://www.tsanet.org/news-events/">News and Events</a>
+      </div>
+    </div>
+    <div class="foot-bottom mono">
+      <span>© TSANet Inc. All Rights Reserved</span>
+      <a href="https://www.tsanet.org/legal-policy/">Privacy Policy</a>
       <a href="https://github.com/tsanetgit">github.com/tsanetgit</a>
       <a href="mailto:membership@tsanet.org">membership@tsanet.org</a>
+      <span class="foot-social" aria-label="TSANet on social media">
+        <a href="https://twitter.com/TSANetTweet" aria-label="TSANet on X" title="X"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg></a>
+        <a href="https://www.linkedin.com/company/tsanet" aria-label="TSANet on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+        <a href="https://www.youtube.com/@tsanet8120" aria-label="TSANet on YouTube" title="YouTube"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+        <a href="https://github.com/tsanetgit" aria-label="TSANet on GitHub" title="GitHub"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+      </span>
     </div>
   </div>
 </footer>
 
+<script src="../assets/assistant.js?v=20260913" defer></script>
 </body>
 </html>

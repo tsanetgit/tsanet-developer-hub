@@ -7,22 +7,24 @@
 <link rel="icon" href="../assets/tsanet-favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <!-- hub.css owns the brand tokens, fonts and SVG diagram primitives.
      doc.css adds only what is specific to a numbered design document. -->
-<link rel="stylesheet" href="../assets/hub.css?v=20260815">
-<link rel="stylesheet" href="../assets/doc.css?v=20260815">
+<link rel="stylesheet" href="../assets/hub.css?v=20260914c">
+<link rel="stylesheet" href="../assets/doc.css?v=20260914c">
 </head>
 <body>
 
 <nav>
   <div class="wrap nav-in">
-    <a class="brand" href="../index.html"><img class="brand-img" src="../assets/tsanet-logo-white.png" alt="TSANet"><small>Developer Hub</small></a>
+    <a class="brand" href="../index.html"><img class="brand-img" src="../assets/tsanet-devhub-horizontal.png" alt="TSANet Developer Hub"></a>
     <div class="nav-links">
-      <a href="../connectors/index.html">Connectors</a>
+      <a href="../build/index.html">Build</a>
+      <a href="../connectors/index.html">Existing Solutions</a>
       <a href="../api/index.html">API</a>
       <a href="index.html" aria-current="page">Design Docs</a>
       <a href="../topics/index.html">Topics</a>
+      <a href="../tools/index.html">Tools</a>
       <a href="../community/index.html">Community</a>
     </div>
   </div>
@@ -35,13 +37,13 @@
       <span class="chip no">TSANET-2026-001</span>
       <span class="chip status">DRAFT</span>
     </div>
-    <h1>The canonical case model, and how connectors map onto it</h1>
+    <h1>The Canonical Case Model, and How Connectors Map onto It</h1>
     <p class="abstract">Every TSANet connector maps the same canonical collaboration case onto a different platform's data model. This document specifies that canonical model, the places where the write schema and the read schema deliberately diverge, and the mapping decisions each connector has to make. It is for anyone building or reviewing an integration against the Connect API.</p>
     <div class="meta-table">
-      <div class="meta-cell"><b>Date</b><span>2026-08-15</span></div>
-      <div class="meta-cell"><b>Version</b><span>0.1</span></div>
+      <div class="meta-cell"><b>Date</b><span>2026-10-28</span></div>
+      <div class="meta-cell"><b>Version</b><span>0.4</span></div>
       <div class="meta-cell"><b>Audience</b><span>Member integrators</span></div>
-      <div class="meta-cell"><b>Verified against</b><span>Connect API OpenAPI spec</span></div>
+      <div class="meta-cell"><b>Verified against</b><span>Connect API OpenAPI spec as served by Production and Beta, 2026-10-28: byte-identical, last modified 2026-10-26 (Production) and 2026-10-19 (Beta). Earlier: Production (v3.2.3) and Beta (v3.2.5), 2026-10-20. Spec-read; Production not probed</span></div>
     </div>
   </div>
 </header>
@@ -55,13 +57,13 @@
 
     <div class="callout">
       <b>Related</b>
-      Behavioural guidance for working with these endpoints is on <a href="../api/index.html">Working with the Connect API</a>. Platform-specific mappings are on the individual <a href="../connectors/index.html">connector pages</a>.
+      Behavioural guidance for working with these endpoints is on <a href="../api/index.html">Working with the Connect API</a>. Platform-specific mappings are on the individual <a href="../connectors/index.html">connector pages</a>. File transfer is specified separately in <a href="tsanet-2026-002-case-attachments.html">TSANET-2026-002</a>; every endpoint there is scoped by the <code>token</code> this document introduces.
     </div>
 
-    <h2><span class="sec-no">2</span>Two schemas, one case</h2>
+    <h2><span class="sec-no">2</span>Two Schemas, One Case</h2>
     <p>The most consequential property of the model is that <strong>the shape you write is not the shape you read</strong>. Case creation takes a request schema; retrieval returns a status schema; the field names differ between them. This is not a defect, and it is not documented as a mapping anywhere — an integrator meets it when a read-back returns nothing under the names they just sent.</p>
 
-    <h3>2.1 Field-name divergence</h3>
+    <h3>2.1 Field-Name Divergence</h3>
     <table class="doc">
       <tr><th>Concept</th><th>Write (create request)</th><th>Read (case status)</th></tr>
       <tr><td>Short problem title</td><td><code>problemSummary</code></td><td><code>summary</code></td></tr>
@@ -69,6 +71,7 @@
       <tr><td>Your own case number</td><td><code>internalCaseNumber</code></td><td><code>submitterCaseNumber</code> or <code>receiverCaseNumber</code>, depending which side you are</td></tr>
       <tr><td>Submitter contact</td><td><code>submitterContactDetails</code> object</td><td>flattened onto the case</td></tr>
       <tr><td>Counterparty identity</td><td>implied by the form target</td><td><code>submitCompanyName</code> / <code>receiveCompanyName</code> and their IDs</td></tr>
+      <tr><td>Test flag</td><td><code>testSubmission</code></td><td><code>testCase</code></td></tr>
     </table>
 
     <div class="callout warn">
@@ -76,17 +79,22 @@
       A mapping layer written from the create request alone will fail silently on read-back. Model the two schemas separately and map between them explicitly, rather than assuming one round-trips into the other.
     </div>
 
-    <h3>2.2 Fields that only exist on read</h3>
+    <h3>2.2 Fields That Only Exist on Read</h3>
     <p>The status schema carries lifecycle state the write schema has no concept of: <code>token</code>, <code>status</code>, <code>direction</code>, <code>createdAt</code> and <code>updatedAt</code>, <code>respondBy</code>, and <code>responded</code>. Two of these deserve particular attention.</p>
     <ul>
       <li><code>token</code> is the join key for everything. It appears in every subsequent URL and in every webhook payload. Persist it at creation, before anything else in your flow can fail.</li>
       <li><code>responded</code> is a boolean, and it — not the status name — is what gates the response SLA. Once it is true the platform has stopped tracking <code>respondBy</code>, so any countdown built on the status name alone will display a deadline nobody is measuring.</li>
     </ul>
 
-    <h2><span class="sec-no">3</span>Custom fields are data, not schema</h2>
+    <div class="callout">
+      <b>Pilot fields</b>
+      Both environments' specifications add two fields to case create and read, and to notes: <code>encrypted</code> (a boolean, default <code>false</code>) and <code>manifest</code> (an opaque value the platform passes through untouched). Beta's has carried them since 2026-10-19 and Production's since 2026-10-26. They belong to an end-to-end encryption pilot; see <a href="../topics/end-to-end-encryption.html">End-to-end encryption</a>. Don't design around them yet.
+    </div>
+
+    <h2><span class="sec-no">3</span>Custom Fields Are Data, Not Schema</h2>
     <p>Beyond the canonical fields, each partner defines their own intake form. Those fields arrive as a typed template from the form endpoints and are submitted back as a <code>customFields[]</code> array. No connector hardcodes them — the mapping is driven by the template fetched at submission time.</p>
 
-    <h3>3.1 Form sections</h3>
+    <h3>3.1 Form Sections</h3>
     <p>The template groups fields into sections, which is what lets a connector lay the form out sensibly rather than as a flat list:</p>
     <table class="doc">
       <tr><th>Section</th><th>Carries</th></tr>
@@ -101,14 +109,14 @@
       Fetch the form template fresh for every submission. Partners change their forms, and the <code>documentId</code> you must submit alongside comes from that same fetch. A cached template means a stale <code>documentId</code> and a rejected case.
     </div>
 
-    <h3>3.2 Field types the template can specify</h3>
+    <h3>3.2 Field Types the Template Can Specify</h3>
     <p>Custom fields are typed — <code>STRING</code>, <code>TEXT</code>, <code>EMAIL</code>, <code>PHONE</code>, <code>INTEGER</code>, <code>URL</code>, <code>SELECT</code> and <code>HIDDEN</code> among them — and a connector is expected to render each appropriately rather than treating everything as free text.</p>
     <div class="callout warn">
       <b>Constraint</b>
       A <code>SELECT</code> field's options are <strong>newline-delimited</strong>, not comma-delimited, and the structured <code>selections[]</code> array is frequently empty. Splitting on commas collapses every choice into a single option — a bug that renders perfectly and is wrong. Parse <code>selections[].value</code> first, fall back to splitting on newlines, and only then on commas.
     </div>
 
-    <h2><span class="sec-no">4</span>Where connectors put the data</h2>
+    <h2><span class="sec-no">4</span>Where Connectors Put the Data</h2>
     <p>The canonical model says nothing about storage, and the shipped connectors have made genuinely opposite choices. Both are correct; the difference is worth understanding before designing a new one.</p>
     <table class="doc">
       <tr><th>Approach</th><th>Example</th><th>Consequence</th></tr>
@@ -139,23 +147,44 @@
       <figcaption>Figure 1 — One case, two representations. Neither member sees the other's mapping; the token is what makes them the same case.</figcaption>
     </div>
 
-    <h2><span class="sec-no">5</span>Known mapping gaps</h2>
-    <p>Two mappings are not cleanly expressible today. Both are recorded here so integrators design around them deliberately rather than discovering them mid-build.</p>
+    <h2><span class="sec-no">5</span>Known Mapping Gaps</h2>
+    <p>Two mappings were not cleanly expressible on the platform until October 2026. Both are recorded here so integrators design around them deliberately rather than discovering them mid-build. The second is solved in the specification both environments now serve, and §5.2 and §5.3 say how. On Production that rests on the specification alone, which it has served since 2026-10-26; nothing there has been probed.</p>
 
-    <h3>5.1 Priority is three levels; most members use four</h3>
+    <h3>5.1 Priority Is Three Levels; Most Members Use Four</h3>
     <p>The canonical model has <code>LOW</code>, <code>MEDIUM</code> and <code>HIGH</code>. Members commonly run a four-level severity scale (S1–S4), so a three-to-four mapping is required in both directions, and it has to stay synchronised across the case lifecycle for both sides' service levels to hold. There is no canonical answer; each connector currently decides its own collapse, which means a case can read as a different severity to each party.</p>
 
-    <h3>5.2 Note direction is a case property, not a note property</h3>
-    <p>The note object carries no direction field. Notes are written under a synchronisation identity, so author fields are identical regardless of who sent one, and the only available signal is the company name — which is ambiguous when both organisations have similar names. Direction is reliably derivable from the case, not from the note. A connector that labels notes "sent" or "received" should derive that from case direction and its own record of what it posted.</p>
+    <h3 id="notes">5.2 Note Direction: from a Case Property to a Note Property</h3>
+    <p><strong>In the earlier specification</strong>, which Production served until 2026-10-26, the note object carries no direction field. Notes are written under a synchronisation identity, so author fields are identical regardless of who sent one. The only available signal is <code>companyName</code>, which is ambiguous when both organisations have similar names. Direction is reliably derivable from the case, not from the note. A connector that labels notes "sent" or "received" should derive that from case direction and its own record of what it posted. Keep that fallback until direction has been seen on Production notes.</p>
 
-    <div class="callout">
-      <b>Note</b>
-      A useful convention where both sides agree to it: put a structured event type in the note <code>summary</code> ("status change", "severity change", "new public note") and the human content in <code>description</code>. That gives either side something to build automation on without an API change. It is a convention, not a platform feature.
+    <p><strong>In the current specification</strong>, the gap is closed. Beta served it first. Production has served the same specification since 2026-10-26, spec-read and not probed. The note object there carries:</p>
+
+    <table class="doc">
+      <tr><th>Field</th><th>Earlier spec (v3.2.3; Production until 2026-10-26)</th><th>Current spec (v3.2.5; Beta, and Production since 2026-10-26)</th></tr>
+      <tr><td><code>companyName</code></td><td>present</td><td>present; absent on system notes</td></tr>
+      <tr><td><code>companyId</code></td><td>—</td><td>the authoring company; absent on system notes</td></tr>
+      <tr><td><code>direction</code></td><td>—</td><td>relative to <em>the reader</em>, not the author; absent when <code>companyId</code> is</td></tr>
+      <tr><td><code>type</code></td><td>—</td><td><code>{code, displayName}</code>, or null</td></tr>
+      <tr><td><code>priority</code> on create</td><td>required</td><td>optional</td></tr>
+    </table>
+
+    <p>Because <code>direction</code> is relative to whoever reads the note, the same note reads as one direction to the submitter and the opposite to the receiver. Store it per side; never copy it across.</p>
+
+    <h3>5.3 Note Types Replace a Convention</h3>
+    <p>Before note types, the only way to tag a note was a convention both sides had to agree to: a structured event type in the note <code>summary</code> ("status change", "severity change", "new public note") and the human content in <code>description</code>. Until Production's specification changed on 2026-10-26, that convention was the only option there. Keep it readable until note types have been seen working on Production.</p>
+
+    <p>In the current specification, the platform carries the tag itself. <code>GET /v1/note-types</code> lists the available types, which on Beta today are <code>partner</code>, <code>public</code>, <code>escalation</code> and <code>status</code>. Creating a note takes an optional <code>type: {code}</code>, matched case-insensitively. An unknown code, <code>system</code>, or an empty object is rejected with 400, and leaving the type out creates the note with none. Those answers were seen on Beta; Production's list and answers have not been read.</p>
+
+    <div class="callout warn">
+      <b>Constraint</b>
+      The specification sets three rules for reading a type. The set of types can grow without a release, so fetch the list rather than hard-coding it. A null or unknown type must not be treated as <code>public</code>. And the type is a label, not an access-control filter: it does not decide who can see the note.
     </div>
 
-    <h2><span class="sec-no">6</span>Revision history</h2>
+    <h2><span class="sec-no">6</span>Revision History</h2>
     <table class="doc">
       <tr><th>Version</th><th>Date</th><th>Change</th></tr>
+      <tr><td>0.4</td><td>2026-10-28</td><td>Production now serves the same specification as Beta (byte-identical on 2026-10-28; Production's last modified 2026-10-26). §2.2 and §5 re-framed from Production-versus-Beta to earlier-versus-current specification, with Production spec-read and unprobed. §2.2 links the end-to-end encryption topic.</td></tr>
+      <tr><td>0.3</td><td>2026-10-20</td><td>§5.2 split Production from Beta: the Beta note object carries <code>companyId</code>, reader-relative <code>direction</code> and <code>type</code>, and makes <code>priority</code> optional. New §5.3 on note types. Beta-only <code>encrypted</code> / <code>manifest</code> fields noted in §2.2. Verified-against names both environments.</td></tr>
+      <tr><td>0.2</td><td>2026-09-13</td><td>Add the <code>testSubmission</code> / <code>testCase</code> row to the divergence table; cross-reference TSANET-2026-002.</td></tr>
       <tr><td>0.1</td><td>2026-08-15</td><td>Initial draft. Field names verified against the OpenAPI specification rather than taken from connector source.</td></tr>
     </table>
 
@@ -164,10 +193,46 @@
 
 <footer>
   <div class="wrap">
-    <div>TSANet Connect Platform Engineering · <a href="../index.html">Developer Hub</a></div>
-    <div class="mono">TSANET-2026-001 · v0.1</div>
+    <div class="foot-top"><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
+    <div class="foot-cols">
+      <nav class="foot-col" aria-label="Developers">
+        <h4>Developers</h4>
+        <a href="../build/index.html">Build a New Integration</a>
+        <a href="../connectors/index.html">Existing Solutions</a>
+        <a href="../api/index.html">Working with the API</a>
+        <a href="../docs/index.html">Design Documents</a>
+        <a href="../topics/index.html">Topics</a>
+        <a href="../tools/index.html">Tools</a>
+        <a href="../community/index.html">Community</a>
+      </nav>
+      <div class="foot-col">
+        <h4>Members</h4>
+        <a href="https://www.tsanet.org/members/">Member List</a>
+        <a href="https://tsanet.gitbook.io/connect">Platform Documentation</a>
+        <a href="https://tsanet.gitbook.io/connect/help-center">Member Support</a>
+      </div>
+      <div class="foot-col">
+        <h4>About</h4>
+        <a href="https://www.tsanet.org/about-us/">About Us</a>
+        <a href="https://www.tsanet.org/board-of-directors/">Board of Directors</a>
+        <a href="https://www.tsanet.org/news-events/">News and Events</a>
+      </div>
+    </div>
+    <div class="foot-bottom mono">
+      <span>© TSANet Inc. All Rights Reserved</span>
+      <a href="https://www.tsanet.org/legal-policy/">Privacy Policy</a>
+      <a href="https://github.com/tsanetgit">github.com/tsanetgit</a>
+      <a href="mailto:membership@tsanet.org">membership@tsanet.org</a>
+      <span class="foot-social" aria-label="TSANet on social media">
+        <a href="https://twitter.com/TSANetTweet" aria-label="TSANet on X" title="X"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg></a>
+        <a href="https://www.linkedin.com/company/tsanet" aria-label="TSANet on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+        <a href="https://www.youtube.com/@tsanet8120" aria-label="TSANet on YouTube" title="YouTube"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+        <a href="https://github.com/tsanetgit" aria-label="TSANet on GitHub" title="GitHub"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+      </span>
+    </div>
   </div>
 </footer>
 
+<script src="../assets/assistant.js?v=20260913" defer></script>
 </body>
 </html>

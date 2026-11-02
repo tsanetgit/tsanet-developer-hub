@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>End-to-End Encryption of Case Content — TSANet Connect Developer Hub</title>
+<link rel="icon" href="../assets/tsanet-favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/hub.css?v=20260914c">
+<style>
+  pre{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--ink);margin:16px 0}
+  pre code{background:none;padding:0;font-size:inherit}
+  .c{color:var(--mute)}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-in">
+    <a class="brand" href="../index.html"><img class="brand-img" src="../assets/tsanet-devhub-horizontal.png" alt="TSANet Developer Hub"></a>
+    <div class="nav-links">
+      <a href="../build/index.html">Build</a>
+      <a href="../connectors/index.html">Existing Solutions</a>
+      <a href="../api/index.html">API</a>
+      <a href="../docs/index.html">Design Docs</a>
+      <a href="../topics/index.html" aria-current="page">Topics</a>
+      <a href="../tools/index.html">Tools</a>
+      <a href="../community/index.html">Community</a>
+    </div>
+  </div>
+</nav>
+
+<header class="pagehead">
+  <div class="wrap">
+    <div class="crumb"><a href="../index.html">Hub</a> / <a href="index.html">Topics</a> / End-to-end encryption</div>
+    <h1>End-to-End Encryption of Case Content</h1>
+    <p class="lede">Connect can now carry case text that only the two members on the case can read. The sending connector encrypts and signs it before the API call, the receiving connector verifies and decrypts it after the fetch, and the platform in between stores it without holding a key. What exists today is an API contract on every environment and one proof-of-concept connector. This page covers both, and the sharp edges already found.</p>
+    <div class="meta-row">
+      <span><b>Topic</b> Case content confidentiality</span>
+      <span><b>Grounded in</b> The served API spec + the Dynamics PoC source</span>
+      <span><b>Audience</b> Members evaluating or building E2EE</span>
+      <span><b>Updated</b> 2026-10-28</span>
+    </div>
+    <div class="toc">
+      <a href="#model">What it protects</a>
+      <a href="#contract">The API contract</a>
+      <a href="#mechanics">How the PoC does it</a>
+      <a href="#status">Where each connector stands</a>
+      <a href="#edges">Sharp edges</a>
+      <a href="#sources">Verified against</a>
+    </div>
+  </div>
+</header>
+
+<section id="model">
+  <div class="wrap">
+    <p class="eyebrow">The model</p>
+    <h2>What the Platform Can and Cannot Read</h2>
+    <p>Without E2EE, case content is encrypted in transit and readable by the platform: Connect renders it in the web app, sanitizes it, and stores it as text. End-to-end encryption removes the platform's ability to read a named set of fields. The keys live at each member's own connector. Connect's part is to store two extra fields, return everything exactly as it was submitted, and stay out of the cryptography.</p>
+
+    <figure>
+      <div class="diagram">
+        <svg viewBox="0 0 1000 286" style="min-width:880px" role="img" aria-label="The sending member's connector encrypts protected fields and signs a manifest, keeping its private keys. TSANet Connect stores the ciphertext, the manifest and the encrypted flag, returns them as submitted, parses nothing and holds no keys. The receiving member's connector fetches by token, verifies the manifest, checks every digest and decrypts or refuses. Public keys are published by each member as a JWKS at a URL it hosts and fetched directly by partners, outside Connect.">
+          <defs><marker id="e2A" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--slate)"/></marker></defs>
+
+          <rect class="bx-grn" x="20" y="40" width="220" height="130" rx="8"/>
+          <text class="tt" x="130" y="66" text-anchor="middle">Sending connector</text>
+          <text class="ts" x="130" y="90" text-anchor="middle">encrypts protected fields</text>
+          <text class="ts" x="130" y="108" text-anchor="middle">signs one manifest</text>
+          <text class="ts" x="130" y="126" text-anchor="middle">private keys stay here</text>
+          <text class="tl" x="130" y="152" text-anchor="middle">the member's own key store</text>
+
+          <path class="ln" d="M240,105 H374" marker-end="url(#e2A)"/>
+          <text class="tl" x="310" y="96" text-anchor="middle">create · add note</text>
+          <text class="tl" x="310" y="124" text-anchor="middle">ciphertext + JWS</text>
+
+          <rect class="bx-acc" x="380" y="40" width="240" height="130" rx="8"/>
+          <text class="tt" x="500" y="66" text-anchor="middle">TSANet Connect</text>
+          <text class="ts" x="500" y="90" text-anchor="middle">stores manifest + encrypted</text>
+          <text class="ts" x="500" y="108" text-anchor="middle">returns values as submitted</text>
+          <text class="ts" x="500" y="126" text-anchor="middle">parses nothing, holds no keys</text>
+          <text class="tl" x="500" y="152" text-anchor="middle">routing fields stay readable</text>
+
+          <path class="ln" d="M620,105 H754" marker-end="url(#e2A)"/>
+          <text class="tl" x="690" y="96" text-anchor="middle">fetch by token</text>
+          <text class="tl" x="690" y="124" text-anchor="middle">returned as sent</text>
+
+          <rect class="bx-grn" x="760" y="40" width="220" height="130" rx="8"/>
+          <text class="tt" x="870" y="66" text-anchor="middle">Receiving connector</text>
+          <text class="ts" x="870" y="90" text-anchor="middle">verifies the manifest</text>
+          <text class="ts" x="870" y="108" text-anchor="middle">checks every digest</text>
+          <text class="ts" x="870" y="126" text-anchor="middle">decrypts, or refuses</text>
+          <text class="tl" x="870" y="152" text-anchor="middle">no plaintext fallback</text>
+
+          <path class="ln" d="M130,170 V210" style="stroke-dasharray:4 4"/>
+          <path class="ln" d="M870,170 V210" style="stroke-dasharray:4 4"/>
+          <rect class="bx-ext" x="20" y="210" width="960" height="60" rx="8"/>
+          <text class="ts" x="500" y="236" text-anchor="middle">Each member publishes its public keys as a JWKS at a URL it hosts, and partners fetch them directly. No key passes through Connect.</text>
+          <text class="tl" x="500" y="256" text-anchor="middle">In the Dynamics PoC: RSA-OAEP-256 keys for encryption, ES256 keys for signing</text>
+        </svg>
+      </div>
+      <figcaption>Connect is a courier for ciphertext. It still has to route the case, so everything it needs for that stays in the clear.</figcaption>
+    </figure>
+
+    <div class="twrap">
+      <table>
+        <thead><tr><th>Encrypted</th><th>Left in the clear</th></tr></thead>
+        <tbody>
+          <tr><td>
+            <code>problemSummary</code> and <code>problemDescription</code> on the request<br>
+            each <code>customFields[].value</code><br>
+            note <code>summary</code> and <code>description</code>
+          </td><td>
+            Who the case is from and to, the form, priority and status<br>
+            contact details and both internal case numbers<br>
+            the notes Connect writes itself (<em>Case Created</em>, approval, rejection, closure)<br>
+            attachments, which travel by <a href="file-sharing.html">file delivery</a> and are not covered<br>
+            webhook events, which carry only tokens on v2
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The field list above is what the one implementation protects. A draft specification from the TSANet E2EE workgroup defines the authoritative list, the encryption and manifest profile, a per-relationship opt-in model, and test vectors. It is not public, so this page is read from the implementation and the API, which are.</p>
+  </div>
+</section>
+
+<section id="contract">
+  <div class="wrap">
+    <p class="eyebrow">The API contract</p>
+    <h2>Two Fields, Stored and Never Read</h2>
+    <p>The platform's whole contribution is two optional fields on collaboration requests and notes. <code>manifest</code> is an opaque Compact JWS that the receiving connector uses to verify what it got. <code>encrypted</code> says whether the content is encrypted. Connect stores both and returns them exactly as submitted. It never parses or changes them, and it does no cryptography.</p>
+    <div class="twrap">
+      <table>
+        <thead><tr><th>Schema</th><th><code>manifest</code></th><th><code>encrypted</code></th></tr></thead>
+        <tbody>
+          <tr><td><code>CollaborationRequestDTO</code> (create)</td><td>optional string</td><td>boolean, <code>default: false</code></td></tr>
+          <tr><td><code>CollaborationRequestStatusDTO</code> (read)</td><td>left out when unset</td><td>always <code>true</code> or <code>false</code></td></tr>
+          <tr><td><code>CaseNoteTemplateDTO</code> (create note)</td><td>optional string</td><td>boolean, <code>default: false</code></td></tr>
+          <tr><td><code>CaseNoteDTO</code> (read note)</td><td>left out when unset</td><td>always <code>true</code> or <code>false</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul class="tight">
+      <li><strong>Every read surface carries them:</strong> the POST response, <code>GET …/{token}</code>, the list endpoints, and the notes timeline, for sender and receiver alike.</li>
+      <li><strong>A non-boolean <code>encrypted</code> is a 400,</strong> and nothing is created. A <code>manifest</code> that is not a JWS is stored anyway, because the platform does not look.</li>
+      <li><strong>The case keeps its fields through its whole life:</strong> information request and response, approval, rejection, closure. The system notes those transitions generate are always <code>encrypted: false</code> with no manifest.</li>
+      <li><strong>Webhooks carry nothing to protect.</strong> v2 events hold tokens only, so a receiver fetches by token as usual and the manifest comes back with the content.</li>
+    </ul>
+    <div class="twrap">
+      <table>
+        <thead><tr><th>Environment</th><th>Status</th><th>Evidence</th></tr></thead>
+        <tbody>
+          <tr><td>Development</td><td><span class="pill ok">live</span></td><td>Round trip probed by TSANet's contract-test harness on 2026-10-12 and 2026-10-13, including the full case lifecycle.</td></tr>
+          <tr><td>Beta</td><td><span class="pill ok">live</span></td><td>In the served spec since 2026-10-19. The harness's API-level E2EE checks pass 10/10 there (reported 2026-10-20).</td></tr>
+          <tr><td>Production</td><td><span class="pill info">in the spec</span></td><td>The served spec carries both fields since 2026-10-26, identical to Beta's. Spec-read; not probed by the hub.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="mechanics">
+  <div class="wrap">
+    <p class="eyebrow">The one implementation</p>
+    <h2>How the Dynamics PoC Encrypts, Signs and Verifies</h2>
+    <p>The <a href="../connectors/dynamics.html">Dynamics connector</a> carries the only working implementation, in <a href="https://github.com/tsanetgit/MS_Power_App/tree/main/TSANETBasePlugins/E2ee"><code>TSANETBasePlugins/E2ee</code></a>. It names its profile <code>tsanet-e2ee-1</code>. Read here at <code>main</code> <code>0586c96</code> as a worked example of the shape, not as the specification.</p>
+    <ul class="legend">
+      <li><span class="n">1</span><span><b>Each protected field becomes its own JWE</b>, in general JSON serialization: a fresh 256-bit content key, <code>A256GCM</code>. The protected header binds the profile, the manifest's <code>jti</code> and the field's name (<code>tsa_ver</code>, <code>tsa_jti</code>, <code>tsa_fld</code>), so a ciphertext cannot be moved to another field or replayed onto another request.</span></li>
+      <li><span class="n">2</span><span><b>The content key is wrapped twice</b> with <code>RSA-OAEP-256</code>: once for the partner, and once for the sender's own key, so the sender can still read its own outbound case.</span></li>
+      <li><span class="n">3</span><span><b>One manifest signs the lot.</b> A Compact JWS, <code>ES256</code>, <code>typ: tsanet-manifest+jws</code>, holding a SHA-256 digest of each encrypted value exactly as sent. That means one signature per request or note rather than one per field, and a single record of who sent what to whom.</span></li>
+      <li><span class="n">4</span><span><b>The receiver verifies before it decrypts:</b> the signature against the sender's published key, then the recipient binding, then that the set of fields matches the manifest, then each digest against the value Connect returned. Only then does it unwrap and decrypt. Any failure stops processing with a named reason. It never falls back to showing the raw value.</span></li>
+    </ul>
+<pre><code><span class="c">// manifest claims, decoded (values illustrative)</span>
+{
+  "ver": "tsanet-e2ee-1",
+  "iss": "&lt;sending member&gt;",   "aud": "&lt;receiving member&gt;",
+  "jti": "&lt;unique per request or note&gt;",  "iat": 1761600000,
+  "ref": "&lt;sender's case number&gt;",
+  "fields": [
+    { "name": "problemSummary",     "alg": "S256", "dig": "&lt;base64url&gt;" },
+    { "name": "problemDescription", "alg": "S256", "dig": "&lt;base64url&gt;" }
+  ]
+}</code></pre>
+    <p><strong>Keys.</strong> The private keys live in Azure Key Vault. The plugin asks the vault to sign and to unwrap, so the private key material never enters Dynamics. The two key ids are set as the environment variables <code>ap_SigningKeyId</code> and <code>ap_UnwrapKeyId</code>. Partners' public keys come from their JWKS URLs, configured as settings: one <code>encryptedRecipient</code> for the partner it encrypts to, and a <code>signingKeyCounterParty</code> for each sender it accepts.</p>
+    <p>Its failure reasons give a checklist for any receiver you build: <code>ManifestMissing</code>, <code>SignatureInvalid</code>, <code>BindingMismatch</code>, <code>FieldSetMismatch</code>, <code>FingerprintMismatch</code>, <code>NoMatchingRecipient</code>, <code>AeadFailure</code>, <code>HeaderBindingMismatch</code>.</p>
+  </div>
+</section>
+
+<section id="status">
+  <div class="wrap">
+    <p class="eyebrow">Adoption</p>
+    <h2>Where Each Connector Stands</h2>
+    <p>Both members on a case need E2EE support for it to work. Nothing in the platform checks that the receiver can decrypt before an encrypted case is sent.</p>
+    <div class="twrap">
+      <table>
+        <thead><tr><th>Connector</th><th>Status</th><th>Detail</th></tr></thead>
+        <tbody>
+          <tr><td><a href="../connectors/dynamics.html">Dynamics</a></td><td><span class="pill warn">PoC</span></td><td>v2.14.0.0's release notes list an "End to End Encryption PoC". That release encrypts requests and custom fields. Note encryption followed on <code>main</code> on 2026-10-20 and is not in a release yet.</td></tr>
+          <tr><td><a href="../connectors/connect-sdk.html">Connect SDK</a></td><td><span class="pill bad">not yet</span></td><td><code>connect-library</code> does not expose either field, so nothing built on it can send or read them. Tracked in <a href="https://github.com/tsanetgit/Connect_SDK/issues/137">Connect_SDK#137</a>, which also requires the library never to trim or re-serialize the manifest.</td></tr>
+          <tr><td><a href="../connectors/connect-gateway.html">Connect Gateway</a> · <a href="../connectors/fin-intercom.html#hosting-e2ee">Fin / Intercom</a></td><td><span class="pill bad">not yet</span></td><td>The engine sends <code>encrypted: false</code> on every create and waits on the SDK. One open question is policy, not code: on a TSANet-hosted adapter, TSANet would hold the member's private key. Until the workgroup decides on that, E2EE on a gateway adapter is a self-hosting feature.</td></tr>
+          <tr><td><a href="../connectors/zendesk.html">Zendesk</a> · <a href="../connectors/salesforce.html">Salesforce</a></td><td><span class="pill bad">none</span></td><td>No code in either repository reads <code>encrypted</code> or <code>manifest</code>. An encrypted case sent to one of them would show its JWE JSON in place of the summary and description. That follows from the design and has not been observed.</td></tr>
+          <tr><td>Direct REST</td><td><span class="pill info">open</span></td><td>Any integration can send and read the two fields today. The cryptography, the keys and the partner agreement are yours.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="edges">
+  <div class="wrap">
+    <p class="eyebrow">Sharp edges</p>
+    <h2>What Breaks First</h2>
+    <ul class="tight">
+      <li><strong>The API rewrites some ciphertext on create.</strong> Connect runs <code>problemDescription</code> and note <code>summary</code> and <code>description</code> through its HTML sanitizer whatever <code>encrypted</code> says. The sanitizer stores every <code>"</code> as <code>&amp;#34;</code>, so the value is no longer JSON and its digest no longer matches the manifest. Observed on Development on 2026-10-23 for <code>problemDescription</code>; <code>problemSummary</code> came back intact, and the note paths call the same sanitizer in the source. A fix is requested from the platform. Until it lands, a receiver has to HTML-decode a protected value that starts <code>{&amp;#34;</code> before computing its digest, as the Dynamics PoC does in <a href="https://github.com/tsanetgit/MS_Power_App/blob/main/TSANETBasePlugins/E2ee/Payload/PayloadFieldMap.cs"><code>PayloadFieldMap.cs</code></a>. It is the same rewrite behind <a href="../api/index.html#content">note content coming back as HTML</a>.</li>
+      <li><strong>Encrypted values outgrow the spec's limits.</strong> A JWE runs to roughly 1,200 characters even for an empty field. The spec caps <code>problemSummary</code> and note <code>summary</code> at 500 characters, yet Development accepted a 1,237-character encrypted <code>problemSummary</code>. The spec and the server disagree, and the note limit has not been tested. <span class="pill warn">needs probe</span></li>
+      <li><strong>The PoC encrypts to one partner, for every case.</strong> Its <code>encryptedRecipient</code> setting is a single record, and the plugin does not compare it with the case's receiver. An org with it set encrypts every outbound case and note to that one partner's key, whoever the case is addressed to. Configure it only in an org that sends to that partner alone. Source-read, not probed.</li>
+      <li><strong>Decide what an unencrypted note means.</strong> On an encrypted case, the notes Connect writes are legitimately plaintext. A partner note with no manifest is unauthenticated by definition, because only the platform could have vouched for it, and it holds no keys. Your receiver needs a rule for that case, not a default.</li>
+      <li><strong>Treat the manifest as bytes.</strong> Trimming, re-encoding or re-serializing it, or any protected value, breaks verification at the far end. The platform does not change it; make sure your own stack doesn't either. The spec sets no maximum size for <code>manifest</code>.</li>
+      <li><strong>The web app shows what is stored.</strong> Anyone viewing an encrypted case in the Connect web app sees ciphertext in the protected fields. That is the point, and it also means the web app is no longer a fallback for reading the case.</li>
+    </ul>
+    <div class="note">E2EE is a bilateral arrangement between two members, built on a contract the platform only carries. Before planning one, agree keys, fields and failure handling with the partner, and test both directions on Beta. Questions and pilot interest belong in <a href="../community/index.html">Community</a>.</div>
+  </div>
+</section>
+
+<section id="sources">
+  <div class="wrap">
+    <p class="eyebrow">Verified against</p>
+    <h2>Sources, with the Dates That Were Read</h2>
+    <div class="twrap">
+      <table>
+        <thead><tr><th>Read on</th><th>Source</th><th>Used for</th></tr></thead>
+        <tbody>
+          <tr><td>2026-10-28</td><td><code>openapi.yaml</code> as Beta and Production serve it (last modified 2026-10-19 and 2026-10-26; identical)</td><td>The four schemas, the defaults, the field length limits, the per-environment status</td></tr>
+          <tr><td>2026-10-28</td><td><code>webhook-asyncapi.yaml</code> on the API source's Beta branch (private repository)</td><td>v2 event payloads carry tokens only</td></tr>
+          <tr><td>2026-10-28</td><td><a href="https://github.com/tsanetgit/MS_Power_App/tree/main/TSANETBasePlugins/E2ee"><code>MS_Power_App</code> <code>TSANETBasePlugins/E2ee</code></a> at <code>main</code> <code>0586c96</code>, and the <a href="https://github.com/tsanetgit/MS_Power_App/releases/tag/v2.14.0.0">v2.14.0.0 release notes</a></td><td>Algorithms, header and manifest claims, key custody, failure reasons, the single-recipient setting, the decode workaround</td></tr>
+          <tr><td>2026-10-28</td><td><a href="https://github.com/tsanetgit/Connect_SDK/issues/137">Connect_SDK#137</a></td><td>The SDK's status; the Beta 10/10 harness result</td></tr>
+          <tr><td>2026-10-12 to 2026-10-23</td><td>TSANet contract-test harness results on Development, as reported to the API team; not re-run by the hub</td><td>Round trip, lifecycle, the 400 on a non-boolean flag, the sanitizer rewrite, the 1,237-character summary</td></tr>
+          <tr><td>2026-10-28</td><td>Source search of <code>Zendesk_App</code> and <code>SFDC_App</code></td><td>Neither handles the fields</td></tr>
+          <tr><td>not read</td><td>The workgroup's draft specification</td><td>Referenced only; the authoritative field list and test vectors</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-top"><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
+    <div class="foot-cols">
+      <nav class="foot-col" aria-label="Developers">
+        <h4>Developers</h4>
+        <a href="../build/index.html">Build a New Integration</a>
+        <a href="../connectors/index.html">Existing Solutions</a>
+        <a href="../api/index.html">Working with the API</a>
+        <a href="../docs/index.html">Design Documents</a>
+        <a href="../topics/index.html">Topics</a>
+        <a href="../tools/index.html">Tools</a>
+        <a href="../community/index.html">Community</a>
+      </nav>
+      <div class="foot-col">
+        <h4>Members</h4>
+        <a href="https://www.tsanet.org/members/">Member List</a>
+        <a href="https://tsanet.gitbook.io/connect">Platform Documentation</a>
+        <a href="https://tsanet.gitbook.io/connect/help-center">Member Support</a>
+      </div>
+      <div class="foot-col">
+        <h4>About</h4>
+        <a href="https://www.tsanet.org/about-us/">About Us</a>
+        <a href="https://www.tsanet.org/board-of-directors/">Board of Directors</a>
+        <a href="https://www.tsanet.org/news-events/">News and Events</a>
+      </div>
+    </div>
+    <div class="foot-bottom mono">
+      <span>© TSANet Inc. All Rights Reserved</span>
+      <a href="https://www.tsanet.org/legal-policy/">Privacy Policy</a>
+      <a href="https://github.com/tsanetgit">github.com/tsanetgit</a>
+      <a href="mailto:membership@tsanet.org">membership@tsanet.org</a>
+      <span class="foot-social" aria-label="TSANet on social media">
+        <a href="https://twitter.com/TSANetTweet" aria-label="TSANet on X" title="X"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg></a>
+        <a href="https://www.linkedin.com/company/tsanet" aria-label="TSANet on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+        <a href="https://www.youtube.com/@tsanet8120" aria-label="TSANet on YouTube" title="YouTube"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+        <a href="https://github.com/tsanetgit" aria-label="TSANet on GitHub" title="GitHub"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+      </span>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/assistant.js?v=20260913" defer></script>
+</body>
+</html>

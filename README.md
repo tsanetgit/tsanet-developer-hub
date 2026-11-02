@@ -8,7 +8,7 @@ No build step, no framework, no dependencies. Plain HTML and CSS, deployable as-
 
 ## Where this lives
 
-Public at `tsanetgit/tsanet-developer-hub`, with the site served by GitHub Pages at <https://tsanetgit.github.io/tsanet-developer-hub/>. The repo was transferred there from `shawn-tsanet` on 2026-08-21 as a whole-repo ownership transfer, which carried history, Discussions, and settings across intact.
+Public at `tsanetgit/tsanet-developer-hub`, with the site served by GitHub Pages at <https://developer.tsanet.org/> (the `tsanetgit.github.io/tsanet-developer-hub/` URL redirects there). The repo was transferred there from `shawn-tsanet` on 2026-08-21 as a whole-repo ownership transfer, which carried history, Discussions, and settings across intact.
 
 Community discussion lives in the **organisation-level Discussions** at <https://github.com/orgs/tsanetgit/discussions> (hosted by the `Connect_SDK` repo); this repo's own Discussions feature is disabled. On 2026-09-13 the hub's extra categories (Membership, Show and tell, Troubleshooting, Wish List) were added there alongside the existing Announcements, Q&A and Technology Committee, the hub's Ideas category was merged into Technology Committee, and the welcome announcement was transferred across. Every discussion link on the site points at the org-level area; keep it that way.
 
@@ -121,11 +121,13 @@ Visual inspection is not sufficient — this check found four defects on pages t
 
 ## Deploying
 
-Live: Pages deploys from `main` / root on every push — no action needed beyond pushing. The repo location is now settled, so the custom domain is the next step: point `developer.tsanet.org` at `tsanetgit.github.io` in DNS and set it as the custom domain in Pages settings. Changing Pages settings needs repo admin, which in the `tsanetgit` org means an org owner (or an explicit admin grant on this repo).
+Live: Pages deploys from `main` / root on every push — no action needed beyond pushing.
+
+**Custom domain.** `developer.tsanet.org` is set by the `CNAME` file in the repo root — Pages reads it on every branch build, so keep that file and do not add a second line to it. DNS is a Cloudflare record in the `tsanet.org` zone: `developer` → `CNAME tsanetgit.github.io`, **DNS-only (grey cloud, not proxied)** so GitHub can verify the domain and issue its certificate. That record overrides the zone's `*.tsanet.org` wildcard, which points every unclaimed subdomain at the Connect web app. Do not add a Cloudflare redirect for this hostname: with `CNAME` in place, github.io redirects here, so a redirect back would loop and take the hub down. *Enforce HTTPS* is a Pages setting that needs repo admin (in the `tsanetgit` org, an org owner or an explicit admin grant).
 
 ## Open items
 
-- **Custom domain** — `developer.tsanet.org` is not yet set on Pages (see *Deploying*). Until it is, the canonical URL is `tsanetgit.github.io/tsanet-developer-hub`.
+- **Enforce HTTPS on the custom domain** — tick it in Pages settings once GitHub has issued the certificate for `developer.tsanet.org` (repo admin).
 - **v1 → v2 migration** is published: the API page's *Deprecation clocks* section carries the per-connector table. Re-checked 2026-10-20: the SDK (v3.0.0) still reads on `/v2/collaboration-requests/list` and manages webhooks on deprecated `/v1/webhooks`; Dynamics (re-verified at `MS_Power_App` v2.14.0.0) registers on v2 with prefixed types and `payloadVersion V2`; Salesforce 2.14 (released 2026-10-21, re-verified 2026-10-24 at `TSANetConnect-2.14-Release`) is fully on v2. Still open: the Zendesk CloudEvents migration has not shipped (`Zendesk_App#101`).
 - **Salesforce 2.14 on Production** — the package always registers its webhook with `OAUTH2_CLIENT_CREDENTIALS` `callbackAuth`. Production's spec lacked it on 2026-10-24 and has carried it since 2026-10-26 (spec-read 2026-10-28), so registration should now be accepted. Nobody has registered a 2.14 webhook on Production yet. The Salesforce page reports both readings and marks it unconfirmed; close this once a Production registration is seen Active. The page also publishes two source disagreements: the installation guide says the Asset flow rejects on no match (the shipped flow requests information), and the guide and the integration permission set disagree on whether a Salesforce Integration licence is enough. Re-check both when the guide changes.
 - **Dynamics user guide** still says "LWC located on the Case Form" (unchanged at v2.14.0.0). LWC is Salesforce terminology; the solution ships an HTML web resource. The hub notes the discrepancy; the source doc is still wrong.

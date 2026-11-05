@@ -54,7 +54,7 @@
       <span><b>Surface</b> Canvas Kit sidebar, Help Desk</span>
       <span><b>Hosting</b> TSANet-hosted or self-hosted</span>
       <span><b>Last verified</b> 2026-10-20</span>
-      <span><b>Updated</b> 2026-10-28</span>
+      <span><b>Updated</b> 2026-11-05</span>
       <span><b>Repo</b> tsanetgit/Fin-Intercom_App (private during early access)</span>
     </div>
     <div class="toc">
@@ -230,7 +230,7 @@
     <h3>Moving From TSANet-Hosted to Self-Hosted</h3>
     <p>Agree a cutover window with TSANet first. TSANet stops its deployment and hands over the final copies of both stores, taken after the stop rather than from the last periodic backup; you place them where your restore step reads them and only then start yours. Never run the two side by side: the reconciliation poller alone, with no webhook at all, is enough to double-create tickets.</p>
 
-    <div class="note" id="hosting-e2ee"><strong>End-to-end encryption: tracked, not built.</strong> In Connect's end-to-end encryption design, protected case fields are encrypted and signed at the member's own connector, and the platform holds no keys. For a gateway adapter, that puts the keys wherever the adapter runs, which makes self-hosting the mode in which a member holds its own keys. Neither the engine nor this adapter implements it yet: today the adapter sends the encryption fields empty on every create. Do not plan an encrypted deployment on this adapter until it ships; it is listed under <a href="#gaps">known gaps</a>. How the design works, and where the other connectors stand, is on the <a href="../topics/end-to-end-encryption.html">end-to-end encryption topic</a>.</div>
+    <div class="note" id="hosting-e2ee"><strong>End-to-end encryption: in the engine, off here.</strong> In Connect's end-to-end encryption design, protected case fields are encrypted and signed at the member's own connector, and the platform holds no keys. For a gateway adapter, that puts the keys wherever the adapter runs, which makes self-hosting the mode in which a member holds its own keys. The <a href="connect-gateway.html#e2ee">gateway engine</a> has implemented it since its v4.0.0, opt-in and for self-hosted deployments only, and since v0.3.0 this adapter passes the partner company id the engine needs to encrypt. But the reference deployment configures no encryption settings, so cases go out and come in exactly as before, and neither the adapter's deployment skill nor its release notes cover switching it on. No encrypted Fin deployment has been run; it is listed under <a href="#gaps">known gaps</a>. How the design works, and where the other connectors stand, is on the <a href="../topics/end-to-end-encryption.html">end-to-end encryption topic</a>.</div>
   </div>
 </section>
 
@@ -515,6 +515,7 @@
       </div>
       <figcaption>The UNRESOLVED → DRAFT transition on an empty lookup is the <em>server-side</em> marker that re-arms retry; component ids from the client are never trusted for it. An empty lookup cannot prove the original request is not still in flight, so the residual duplicate window is accepted and named in the agent-facing copy. The same taxonomy gates the inbound response actions — a 5xx on an approve read as "definitively rejected" would invite answering a partner twice.</figcaption>
     </figure>
+    <p>Two failures moved from ambiguous to definite in v0.3.0 (2026-11-03), because the engine can now tell that nothing reached TSANet. A submit that runs out of time before its create has started re-renders the form with "nothing was sent; fix and resubmit" instead of parking for reconcile. A login that fails, such as an expired or rotated client secret, does the same on submit, and on approve, reject or request information returns the inbound panel to pending with the form offered again, where it used to say the response may or may not have reached the partner. A token endpoint that stalls past the deadline while a write is under way is still ambiguous.</p>
   </div>
 </section>
 
@@ -726,13 +727,14 @@
     <h2>Recent Changes, and What Is Tracked Next</h2>
     <div class="cols">
       <div>
-        <h3>Landed (August–October 2026)</h3>
+        <h3>Landed (August–November 2026)</h3>
         <ul class="tight">
           <li><strong>First full design-level security review</strong> against the connector security taxonomy (supply chain, credential lifecycle, authentication boundaries, data flow and retention, audit, untrusted-content rendering), with the authentication boundary live-probed. Findings are filed as <code>security</code>-labelled issues in the repository; several of the items below are its outcomes.</li>
           <li><strong>Hardened deployment profile:</strong> no webhook topics (verified functionally free), tickets-only mode, verified-minimum grants with a documented provision-then-revoke step — all in the deployment skill's <code>intercom-setup.md</code>.</li>
           <li><strong>SDK-cache retention sweep:</strong> age-based eviction of terminal-case content on a per-deployment window, default off (see the persistence table). The eviction itself now lives in <a href="connect-sdk.html"><code>connect-library</code></a> (since 0.2.0); the connector keeps only the schedule and the window, and its interim hand-rolled sweep is retired.</li>
           <li><strong>Backups gained history:</strong> hourly dated snapshots on a 48-hour window beside the 5-minute latest copy, with a delete-first restore procedure that survives a snapshot lacking a WAL file.</li>
           <li><strong>Engine and library at 3.0.0</strong> (2026-10-20): the connector moved to <code>gateway-engine</code> 3.0.0 and <code>connect-library</code> 3.0.0. On first start the library adds four columns to the SDK cache's note table automatically; that migration was probed against an existing 2.0.0 cache. The connector's first release to carry them is v0.2.0 (2026-10-21), also its first attested release; its notes include an "Upgrading a deployment" section.</li>
+          <li><strong>Engine and library at 5.0.0</strong> (v0.3.0, 2026-11-03): the connector moved through <a href="connect-gateway.html">gateway-engine</a> 4.0.0 to 5.0.0, with <code>connect-library</code> pinned to match (the build fails if the two differ), and to Spring Boot 4.1.2. Each submission now carries the selected partner's company id, and the connector's copy of the gateway contract is held to <code>connector-core</code> by a test. No new configuration is required. Verified on Beta at release: an outbound test case filed from Intercom, an inbound test case becoming a <code>[TEST]</code> ticket about two seconds after the push, and an accept with an out-of-domain engineer email refused by Connect with the form offered again. The repository is now MIT-licensed.</li>
           <li><strong>Build provenance:</strong> the deployable image is built in CI from a repository commit and pushed with a secretless, registry-scoped identity (no admin credential); images are addressed by digest. Dependency updates are automated; workflow actions are SHA-pinned.</li>
           <li><strong>Registry pull by managed identity</strong> (2026-10-21): the reference deployment pulls its image with a user-assigned identity that can only pull, the registry's admin user is disabled, and deploys take only attested release images. Checked against the live registry and app on 2026-10-24.</li>
           <li><strong>A self-hosting guide</strong> (2026-10-21): installing, upgrading, rolling back and migrating a deployment in a member's own Azure or AWS account, written for an engineer with no prior knowledge of the code. It is what the <a href="#hosting">hosting options</a> section summarizes, and it is provided at onboarding.</li>
@@ -760,7 +762,7 @@
         <li><strong>Status sync:</strong> the poller recovers missing <em>tickets</em>, not missing <em>state</em>.</li>
         <li><strong>Notes in both directions</strong>, and the <code>information-response</code> reply leg, land with the notes slice; <code>note.created</code> drains unclaimed today.</li>
         <li><strong>No ready-to-pull image for self-hosting:</strong> a self-hosting member builds the image from the release tag, and the build needs a token for TSANet's private package registry. A published image would make install and upgrade a pull, with nothing else in the procedure changing. AWS and other non-Azure platforms are also unexercised; see <a href="#hosting">hosting options</a>.</li>
-        <li><strong>End-to-end encryption is not implemented:</strong> neither the engine nor this adapter encrypts, signs or verifies protected fields yet; creates carry the encryption fields empty. See the <a href="#hosting-e2ee">note under hosting options</a>.</li>
+        <li><strong>End-to-end encryption is not switched on:</strong> the engine supports it since 4.0.0, for cases only and on self-hosted deployments, but no Fin deployment configures it and nothing documents how to. Creates carry <code>encrypted: false</code>. See the <a href="#hosting-e2ee">note under hosting options</a>.</li>
         <li><strong>Multi-case tickets render no panel:</strong> <code>byTicketId</code> correctly refuses to pick between several cases, but the agent currently sees nothing at all. A "this ticket has N collaboration cases" panel is the follow-up.</li>
       </ul>
       <ul class="tight">

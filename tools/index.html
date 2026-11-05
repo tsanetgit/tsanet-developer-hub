@@ -46,8 +46,8 @@
     <h1>Tools for Building an Integration</h1>
     <p class="lede">Everything you use while building against TSANet Connect, in one place: the environments and the test flag, the reference and the Postman collection, the SDK and its demo, the test suites, and the agent skills. Each entry says what it is for, how you get it, and what access it needs. Things that exist but are not reachable by members yet are marked, with what to do instead.</p>
     <div class="meta-row">
-      <span><b>Public now</b> Beta environment · API reference · Postman collection · connect-library · two agent skills</span>
-      <span><b>At onboarding</b> conformance harness · two agent skills</span>
+      <span><b>Public now</b> Beta environment · API reference · Postman collection · connect-library · three agent skills</span>
+      <span><b>At onboarding</b> conformance harness · one agent skill</span>
       <span><b>Not yet public</b> hosted demo · connector test harness · hub assistant</span>
     </div>
     <div class="toc">
@@ -116,7 +116,7 @@
       <div class="tool">
         <span class="chip live">Public</span>
         <h3>connect-library</h3>
-        <p>The Java client, generated from the specification and wrapped in ten typed facades. Published to GitHub Packages as a public package; only the current release, v3.0.0, is supported. 3.0.0 is a breaking major — read its upgrade note before moving from 2.0.0. A token with <code>read:packages</code> is still required to resolve it, even for public artifacts.</p>
+        <p>The Java client, generated from the specification and wrapped in ten typed facades. Published to GitHub Packages as a public package; only the current release, v5.0.0, is supported. 4.0.0 and 5.0.0 were both breaking majors — read the upgrade entries in order before moving from 3.0.0. End-to-end encryption is an optional companion package, <code>connect-e2ee</code>, at the same version. A token with <code>read:packages</code> is still required to resolve it, even for public artifacts.</p>
         <p class="get"><b>Get it</b> as a Maven dependency from GitHub Packages; the coordinates and the token requirement are on the SDK page.</p>
         <a class="foot" href="../connectors/connect-sdk.html#getting">Connect SDK → Getting it →</a>
       </div>
@@ -146,7 +146,7 @@
         <span class="chip">Access at onboarding</span>
         <h3>The Gateway Conformance Harness</h3>
         <p>For anyone writing an adapter on the <a href="../connectors/connect-gateway.html">Connect Gateway</a>: it drives your real adapter through Connect's failure modes — timeouts, ambiguous submits, duplicate inbound deliveries — and certifies the seam between your code and the engine. Run it continuously from day one, not once at the end.</p>
-        <p class="get"><b>Get it</b> the <code>conformance</code> module publishes with the gateway at v3.0.0 from the repository's package registry; the repository is private and access comes with adapter onboarding. Details under Building an adapter.</p>
+        <p class="get"><b>Get it</b> the <code>conformance</code> module publishes with the gateway at v5.0.0 from the repository's package registry; the repository is private and access comes with adapter onboarding. Details under Building an adapter.</p>
         <a class="foot" href="../connectors/connect-gateway.html#build">Building an adapter →</a>
       </div>
       <div class="tool pending">
@@ -171,7 +171,7 @@
         <tbody>
           <tr><td>Zendesk connector</td><td>Building or extending the ZAF + ZIS connector</td><td><span class="chip live">Public</span></td><td><a href="../connectors/zendesk.html#skill">Zendesk → Build with an assistant</a></td></tr>
           <tr><td>Connect SDK deployment</td><td>Consuming the artifact, credentials, the demo runbook, troubleshooting</td><td><span class="chip live">Public</span></td><td><a href="../connectors/connect-sdk.html#skill">SDK → Build with an assistant</a></td></tr>
-          <tr><td>Fin / Intercom deployment</td><td>Deploying the hosted adapter for a member workspace</td><td><span class="chip">Access at onboarding</span></td><td><a href="../connectors/fin-intercom.html#skill">Fin / Intercom → Build with an assistant</a></td></tr>
+          <tr><td>Fin / Intercom deployment</td><td>Deploying the hosted adapter for a member workspace</td><td><span class="chip live">Public</span></td><td><a href="../connectors/fin-intercom.html#skill">Fin / Intercom → Build with an assistant</a></td></tr>
           <tr><td>Gateway adapter author</td><td>Writing your own adapter against the contract</td><td><span class="chip">Access at onboarding</span></td><td><a href="../connectors/connect-gateway.html#kit">Gateway → The authoring kit</a></td></tr>
           <tr><td>The hub assistant</td><td>Asking this site questions from any page</td><td><span class="chip beta">Not yet public</span></td><td>The launcher is in this site; the agent behind it is not created yet — <a href="../topics/agentic-usage.html#assistant">what it will be</a></td></tr>
         </tbody>

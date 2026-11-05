@@ -173,8 +173,8 @@
       <a class="sec-link" href="build/index.html">Start here →</a>
     </div>
     <div class="grid g2">
-      <a class="card" href="connectors/connect-gateway.html"><span class="chip beta">Work in progress · v3.0.0</span><h3>Build on the Connect Gateway</h3><p>TSANet supplies the engine, the contract and a conformance harness; you write only the half that talks to your platform. The route when the platform will not run your code in the member's tenant.</p><span class="card-foot">Design &amp; adapter guide →</span></a>
-      <a class="card" href="connectors/connect-sdk.html"><span class="chip live">v3.0.0 · Java</span><h3>Use the SDK</h3><p>A Java client with typed facades, validation and both auth modes, as a public package. The shortest JVM path that is not hand-rolled HTTP.</p><span class="card-foot">Library reference →</span></a>
+      <a class="card" href="connectors/connect-gateway.html"><span class="chip beta">Work in progress · v5.0.0</span><h3>Build on the Connect Gateway</h3><p>TSANet supplies the engine, the contract and a conformance harness; you write only the half that talks to your platform. The route when the platform will not run your code in the member's tenant.</p><span class="card-foot">Design &amp; adapter guide →</span></a>
+      <a class="card" href="connectors/connect-sdk.html"><span class="chip live">v5.0.0 · Java</span><h3>Use the SDK</h3><p>A Java client with typed facades, validation and both auth modes, as a public package. The shortest JVM path that is not hand-rolled HTTP.</p><span class="card-foot">Library reference →</span></a>
       <a class="card" href="api/index.html"><span class="chip">Pattern</span><h3>Build Against the API</h3><p>Your platform's events in, Connect API calls out, <code>updatedAfter</code> polling back. For any stack; read the behaviour guide before you design.</p><span class="card-foot">Working with the API →</span></a>
       <a class="card" href="community/index.html"><span class="chip">Wish list</span><h3>Tell Us the Platform</h3><p>Which platform your team runs on decides which connector gets built next. If yours is common, waiting may be the right route.</p><span class="card-foot">Community →</span></a>
     </div>
@@ -244,13 +244,13 @@
         <span class="card-foot">Architecture &amp; platform notes →</span>
       </a>
       <a class="card" href="connectors/connect-gateway.html">
-        <span class="chip beta">Work in progress · v3.0.0</span>
+        <span class="chip beta">Work in progress · v5.0.0</span>
         <h3>Connect Gateway</h3>
         <p>One shared TSANet-facing engine, thin per-platform adapters: the machinery behind Fin / Intercom, and the contract a member or vendor builds their own adapter against. The least effort when your platform has no connector.</p>
         <span class="card-foot">Design &amp; adapter guide →</span>
       </a>
       <a class="card" href="connectors/connect-sdk.html">
-        <span class="chip live">v3.0.0 · Java</span>
+        <span class="chip live">v5.0.0 · Java</span>
         <h3>TSANet Connect SDK</h3>
         <p>A Java client generated from the Connect API spec, wrapped in ten typed facades — plus a console app, attachment receiver and web demo. Python and TypeScript not started.</p>
         <span class="card-foot">Library reference →</span>
@@ -357,7 +357,7 @@
     </div>
     <div class="topic-band" style="border-left:3px solid var(--orange)">
       <h3><a href="topics/end-to-end-encryption.html" style="color:var(--ink)">End-to-End Encryption of Case Content →</a></h3>
-      <p>Case text that only the two members on the case can read, with the keys at each member's own connector and none on the platform. The two API fields that carry it, how the one proof-of-concept implementation encrypts and signs, where every connector stands, and the platform behaviour that currently breaks the signature.</p>
+      <p>Case text that only the two members on the case can read, with the keys at each member's own connector and none on the platform. The two API fields that carry it, how the first implementation, a proof of concept, encrypts and signs, where every connector stands (the SDK and the gateway engine now implement it too), and the platform behaviour that currently breaks the signature.</p>
       <div class="sys-row">
         <a class="sys" href="topics/end-to-end-encryption.html">Read the topic</a>
         <span class="sys muted">Live <span>· two API fields</span></span>

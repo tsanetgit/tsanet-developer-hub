@@ -194,7 +194,7 @@
         </tbody>
       </table>
     </div>
-    <div class="note"><strong>If you host the demo UI, set its auth password.</strong> The demo runs with no authentication gate unless <code>TSANET_DEMO_AUTH_PASSWORD</code> is set. That is fine on a laptop and not fine on anything reachable from the internet. Registering storage from its Settings page is off by default — the page is read-only unless <code>TSANET_DEMO_RECEIVER_STORAGE_EDITABLE=true</code> — and should stay off on a shared instance. Since 5.0.0 the demo refuses cross-site form posts, refuses a request that isn't signed in before reading its body, and holds a guest login to a lower upload limit (1 GB by default, against 20 GB for the operator).</div>
+    <div class="note"><strong>If you host the demo UI, set its auth password.</strong> The demo runs with no authentication gate unless <code>TSANET_DEMO_AUTH_PASSWORD</code> is set. That is fine on a laptop and not fine on anything reachable from the internet. Registering storage from its Settings page is off by default — the page is read-only unless <code>TSANET_DEMO_RECEIVER_STORAGE_EDITABLE=true</code> — and should stay off on a shared instance. Since 5.0.0 the demo refuses cross-site form posts, refuses a request that isn't signed in before reading its body, and holds a guest login to a lower upload limit (1 GB by default, against 20 GB for the operator). Where to run it, and what each cloud does to the cache and the secrets, is on the <a href="../topics/cloud-hosting.html">cloud hosting topic</a>.</div>
   </div>
 </section>
 

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hosting an SDK Integration in Your Own Cloud — TSANet Connect Developer Hub</title>
+<link rel="icon" href="../assets/tsanet-favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/hub.css?v=20260914c">
+<style>
+  pre{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--ink);margin:16px 0}
+  pre code{background:none;padding:0;font-size:inherit}
+  .c{color:var(--mute)}
+  .evline{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;font-family:var(--mono);font-size:12px;color:var(--mute);margin:-4px 0 18px}
+  .evline span.what{color:var(--slate)}
+  .twrap td:first-child{white-space:nowrap;font-weight:600;color:var(--ink)}
+  .twrap.wrapfirst td:first-child{white-space:normal}
+  h3.sub{font-family:var(--disp);font-size:17px;font-weight:700;letter-spacing:-.01em;margin:26px 0 8px}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-in">
+    <a class="brand" href="../index.html"><img class="brand-img" src="../assets/tsanet-devhub-horizontal.png" alt="TSANet Developer Hub"></a>
+    <div class="nav-links">
+      <a href="../build/index.html">Build</a>
+      <a href="../connectors/index.html">Existing Solutions</a>
+      <a href="../api/index.html">API</a>
+      <a href="../docs/index.html">Design Docs</a>
+      <a href="../topics/index.html" aria-current="page">Topics</a>
+      <a href="../tools/index.html">Tools</a>
+      <a href="../community/index.html">Community</a>
+    </div>
+  </div>
+</nav>
+
+<header class="pagehead">
+  <div class="wrap">
+    <div class="crumb"><a href="../index.html">Hub</a> / <a href="index.html">Topics</a> / Cloud hosting</div>
+    <h1>Hosting an SDK Integration in Your Own Cloud</h1>
+    <p class="lede">The <a href="../connectors/connect-sdk.html">Connect SDK</a> is a library, so "hosting an SDK solution" means hosting whatever you wrapped around it: your own service, the console app, or the web demo. All of them share one runtime shape — a JDK&nbsp;21 process that talks outbound HTTPS to the Connect API, keeps a SQLite cache on local disk, and reads its secrets from the environment — and that shape, not the cloud, decides what a correct deployment looks like. This page maps it onto AWS, Azure and Google Cloud, says what TSANet has actually run on each, and tags everything else as read from the vendor's documentation.</p>
+    <div class="meta-row">
+      <span><b>Topic</b> Running SDK-based services</span>
+      <span><b>Grounded in</b> The hosted demo on AWS, the gateway's Azure reference, vendor docs</span>
+      <span><b>Audience</b> Members and developers hosting on AWS, Azure or Google Cloud</span>
+      <span><b>Updated</b> 2026-11-06</span>
+    </div>
+    <div class="toc">
+      <a href="#shapes">What you are hosting</a>
+      <a href="#invariants">The shape</a>
+      <a href="#aws">AWS</a>
+      <a href="#azure">Azure</a>
+      <a href="#gcp">Google Cloud</a>
+      <a href="#matrix">Side by side</a>
+      <a href="#golive">Go-live</a>
+      <a href="#sources">Verified against</a>
+    </div>
+  </div>
+</header>
+
+<section id="shapes">
+  <div class="wrap">
+    <p class="eyebrow">First question</p>
+    <h2>Which of Four Things You Are Hosting</h2>
+    <p>Nobody deploys <code>connect-library</code>. They deploy something that embeds it, and the four things that do have different needs from a host. Settle which one you are before you open a cloud console, because the answer decides whether you need a public URL at all, what you would lose if the filesystem vanished, and which secrets have to reach the process.</p>
+    <div class="twrap wrapfirst">
+      <table>
+        <thead><tr><th>What you run</th><th>Built from</th><th>Needs inbound HTTPS?</th><th>Keeps on disk</th><th>Reads from the environment</th></tr></thead>
+        <tbody>
+          <tr><td>Your own JVM service embedding <code>connect-library</code><br><span class="mono" style="font-size:11.5px;color:var(--mute)">the common case</span></td><td>The artifact from GitHub Packages. No source build, no access to the private specification (<a href="../connectors/connect-sdk.html#getting">how</a>).</td><td>Only if it receives webhooks.</td><td>One SQLite file per account at the <code>sqlitePath</code> you configure: every read and successful write upserts into it.</td><td>The member password, or the Entra client id and secret in client-credentials mode, through your own configuration (<a href="../connectors/connect-sdk.html#auth">both modes</a>).</td></tr>
+          <tr><td>The console app<br><span class="mono" style="font-size:11.5px;color:var(--mute)">TSANet-integration-app</span></td><td>A source build (needs the private specification sibling on its <code>beta</code> branch) or a jar from TSANet.</td><td>Yes when <code>tsanet.webhook.enabled</code> is on, which it is by default: port&nbsp;8090, path <code>/webhooks/tsanet</code>.</td><td>SQLite under <code>tsanet.storage.sqlite-path</code>, including each webhook subscription's HMAC secret and every inbound event it received.</td><td>Accounts, through an untracked profile or <code>SPRING_APPLICATION_JSON</code>; the public base URL it registers as its callback.</td></tr>
+          <tr><td>The web demo<br><span class="mono" style="font-size:11.5px;color:var(--mute)">demo-ui</span></td><td>A source build plus the repository's runtime-only <code>Dockerfile</code>. No image is published anywhere; you build and push your own.</td><td>Yes: it is a website on port&nbsp;8090, with <code>/healthz</code> open for probes and everything else behind its login.</td><td>Per-environment member credentials, SQLite caches and the E2EE partner-key table under <code>TSANET_DEMO_DATA_DIR</code>, ephemeral by design on a hosted container.</td><td>The auth gate, optional seeds and lock, the Entra tenant and audiences, the private JWKS (<a href="https://github.com/tsanetgit/Connect_SDK/blob/main/docs/RUNBOOK.md">runbook</a>).</td></tr>
+          <tr><td>A direct-delivery attachment receiver<br><span class="mono" style="font-size:11.5px;color:var(--mute)">attachment-receiver</span></td><td>A library with no main class. The HTTPS half that accepts the push is being built in the gateway's attachments-only profile; nothing standalone ships yet.</td><td>Yes: a <code>PUT</code> endpoint in front of your own store (<a href="file-sharing.html#receiving">the contract</a>).</td><td>Encrypted per-tenant configuration files.</td><td>Storage credentials where the cloud cannot supply an identity: S3 and GCS fall back to the platform's own credential chain; Azure takes a SAS URL or connection string only.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note"><strong>Gateway-class adapters are the same shape.</strong> The <a href="../connectors/connect-gateway.html">Connect Gateway</a> engine embeds <code>connect-library</code> and keeps the same SQLite cache, so a self-hosted <a href="../connectors/fin-intercom.html">Fin / Intercom</a> adapter is everything on this page plus the gateway's own member-hosting guide. That guide has been run on Azure, and its findings are cited below where they apply to any SDK-based service.</div>
+  </div>
+</section>
+
+<section id="invariants">
+  <div class="wrap">
+    <p class="eyebrow">The shape</p>
+    <h2>Six Things Every Cloud Has to Give It</h2>
+    <p>Whichever service you pick on whichever cloud, the deployment is correct when these six hold. They come from the SDK's own source and runbook and from the gateway's reference deployment, not from any cloud's marketing, which is why the cloud sections below are mostly about how each platform satisfies or violates them.</p>
+
+    <figure>
+      <div class="diagram">
+        <svg viewBox="0 0 1000 400" style="min-width:880px" role="img" aria-label="Inside your cloud account: a secret store feeds environment variables into one container running your service with connect-library and a SQLite cache on local disk. The container makes outbound HTTPS calls to the TSANet Connect API and to the Entra token endpoint. An optional TLS ingress receives signed webhook deliveries from the Connect API and passes the raw body to the container. An optional object store receives files when the service is an attachment receiver.">
+          <rect x="20" y="40" width="630" height="350" rx="14" fill="none" stroke="var(--line)" stroke-width="1.5" stroke-dasharray="6 5"/>
+          <text class="tl" x="34" y="62">Your cloud account</text>
+          <text class="tl" x="740" y="62">TSANet side</text>
+
+          <rect class="bx" x="30" y="70" width="200" height="80" rx="12"/>
+          <text class="tt" x="130" y="97" text-anchor="middle">Secret store</text>
+          <text class="ts" x="130" y="118" text-anchor="middle">SSM · Key Vault</text>
+          <text class="ts" x="130" y="134" text-anchor="middle">Secret Manager</text>
+
+          <rect class="bx-acc" x="330" y="70" width="290" height="120" rx="12"/>
+          <text class="tt" x="475" y="102" text-anchor="middle">Your service + connect-library</text>
+          <text class="ts" x="475" y="126" text-anchor="middle">JDK 21 · Spring Boot 4.1 · one replica</text>
+          <text class="ts" x="475" y="146" text-anchor="middle">SQLite cache on local disk</text>
+
+          <rect class="bx" x="30" y="250" width="200" height="70" rx="12"/>
+          <text class="tt" x="130" y="280" text-anchor="middle">TLS ingress, optional</text>
+          <text class="ts" x="130" y="302" text-anchor="middle">load balancer at the edge</text>
+
+          <rect class="bx" x="330" y="250" width="290" height="70" rx="12"/>
+          <text class="tt" x="475" y="280" text-anchor="middle">Your object store (receiver only)</text>
+          <text class="ts" x="475" y="302" text-anchor="middle">S3 · Azure Blob or Files · GCS</text>
+
+          <rect class="bx-ext" x="740" y="70" width="230" height="80" rx="12"/>
+          <text class="tt" x="855" y="100" text-anchor="middle">TSANet Connect API</text>
+          <text class="ts" x="855" y="124" text-anchor="middle">connect2.tsanet.org · Beta on .net</text>
+
+          <rect class="bx-ext" x="740" y="190" width="230" height="70" rx="12"/>
+          <text class="tt" x="855" y="218" text-anchor="middle">Entra token endpoint</text>
+          <text class="ts" x="855" y="240" text-anchor="middle">token for client-credentials mode</text>
+
+          <path class="ln" d="M 230 110 L 322 110"/>
+          <polygon points="330,110 320,105 320,115" fill="var(--slate)"/>
+          <text class="ts" x="276" y="98" text-anchor="middle">secrets as env</text>
+
+          <path class="lnA" d="M 620 110 L 732 110"/>
+          <polygon points="740,110 730,105 730,115" fill="var(--blue)"/>
+          <text class="ts" x="676" y="98" text-anchor="middle">outbound HTTPS</text>
+
+          <path class="lnA" d="M 620 165 L 732 222"/>
+          <polygon points="740,226 728,226 731,216" fill="var(--blue)"/>
+
+          <path class="ln" d="M 740 135 L 700 135 L 700 360 L 160 360 L 160 322" stroke-dasharray="5 4"/>
+          <polygon points="160,320 155,330 165,330" fill="var(--slate)"/>
+          <text class="ts" x="430" y="352" text-anchor="middle">signed webhook deliveries</text>
+
+          <path class="ln" d="M 230 285 L 300 285 L 300 160 L 322 160"/>
+          <polygon points="330,160 320,155 320,165" fill="var(--slate)"/>
+          <text class="ts" x="306" y="226">inbound POST, raw body</text>
+
+          <path class="ln" d="M 475 190 L 475 242"/>
+          <polygon points="475,250 470,240 480,240" fill="var(--slate)"/>
+          <text class="ts" x="486" y="222">receiver writes files</text>
+        </svg>
+      </div>
+      <figcaption>The whole deployment. The solid blue edges are the only mandatory traffic: outbound HTTPS to the Connect API, plus the Entra token endpoint when the account authenticates with client credentials. The ingress, the webhook path and the object store exist only for the shapes that need them.</figcaption>
+    </figure>
+
+    <ol class="legend">
+      <li><span class="n">1</span><div><b>A JDK 21 container that you built.</b> The runtime line is JDK&nbsp;21, Spring Boot&nbsp;4.1 and Jackson&nbsp;3, unchanged from 1.0.0 through 5.0.0. The repository's <code>Dockerfile</code> is runtime-only, on <code>eclipse-temurin:21-jre-alpine</code> as a non-root user, and copies in a jar you built outside Docker, because the code generation needs the private specification sibling that no build context carries. No image is published to any registry, for the demo or anything else: you build, you push to your own registry, and you deploy by digest. Build for <code>linux/amd64</code> on Apple silicon or the container fails at start with an exec-format error.</div></li>
+      <li><span class="n">2</span><div><b>One replica, one SQLite file, on local disk.</b> The library requires a <code>sqlitePath</code> and upserts into it on every remote read. Two processes on one file is undefined; the gateway's deploy rule is exactly one replica per store. "Local" means the container's own filesystem or a block volume attached to one instance. It does not mean a network share: SQLite in WAL mode on an SMB mount fails at the first connection with <code>SQLITE_BUSY</code>, as the gateway's member-hosting guide records from its Azure deployment, and NFS (EFS, Filestore, Azure Files over NFS) and FUSE object mounts have the same class of problem. Treat the file as a cache you can afford to lose: <code>syncAllDetails()</code> rebuilds it from the API. What it holds that you cannot rebuild is under <a href="#golive">go-live</a>. Nothing runs <code>CacheRetention.sweep</code> for you; schedule it.</div></li>
+      <li><span class="n">3</span><div><b>Outbound HTTPS, and nothing else, for an outbound-only service.</b> Egress goes to the Connect API host for the environment (<code>connect2.tsanet.org</code> is Production, <code>connect2.tsanet.net</code> Beta; the demo also carries a Development host), to <code>login.microsoftonline.com</code> for the token in client-credentials mode, and to your package registry at build time. Every shipped app refuses a plain-http base URL at startup. Through a corporate proxy the JDK's <code>https.proxyHost</code> and <code>javax.net.ssl.*</code> settings apply, but a default <code>Authenticator</code> for an authenticating proxy does not, because the library moved to <code>java.net.http.HttpClient</code> in 3.0.0; redirects are not followed either. A service that only sends needs no load balancer and no public IP: a private subnet with a NAT route is a complete deployment.</div></li>
+      <li><span class="n">4</span><div><b>Secrets in through the environment, read once.</b> Every app binds <code>${VAR}</code> placeholders at startup, so the source of truth is your cloud's secret store and the delivery mechanism is an injected environment variable (or a mounted file you read yourself). Three consequences hold on all three clouds: rotation is a new value <em>plus</em> a restart, a new revision or a forced deployment, never a live reload; a value must not contain <code>${</code>, because Spring resolves it inside a bound value; and a value set from a file carries its trailing newline, so set it from an argument. Never in the image, never in a committed file.</div></li>
+      <li><span class="n">5</span><div><b>A TLS-terminated public URL only when something comes in.</b> Three things come in: webhook deliveries, the demo's browser traffic, and a receiver's <code>PUT</code>. Terminate TLS at the cloud's edge and let the container speak plain HTTP on 8090 inside. For webhooks the edge must hand over the body byte-for-byte: every delivery is signed <code>X-Hub-Signature-256: sha256=&lt;hex&gt;</code>, HMAC-SHA256 over the raw payload, and anything that re-serializes JSON on the way in makes every signature fail. The console app registers <code>tsanet.webhook.public-base-url</code> as its callback, so that value is the public https URL, not <code>localhost</code>. For the demo the gate is mandatory and <code>/healthz</code> and <code>/.well-known/jwks.json</code> are the only paths outside it.</div></li>
+      <li><span class="n">6</span><div><b>An identity for the object store, where there is one.</b> The attachment receiver's S3 adapter uses the AWS default credential chain when no key pair is configured, and its GCS adapter uses Application Default Credentials when no service-account JSON is: a task role, an instance profile or a runtime service account carries the access and no key sits anywhere. The Azure Files and Azure Blob adapters take a SAS URL or a connection string only, with no managed-identity path at 5.0.0, so on Azure that SAS is a secret like the rest. One identity that cannot help anywhere: a managed identity in <em>your</em> tenant does not stand in for the Entra client secret TSANet issued, because the token is minted in TSANet's tenant.</div></li>
+    </ol>
+  </div>
+</section>
+
+<section id="aws">
+  <div class="wrap">
+    <p class="eyebrow">Amazon Web Services</p>
+    <h2>AWS: Express Mode Is the Path That Has Been Run</h2>
+    <div class="evline">
+      <span class="pill ok">run</span><span class="what">the SDK web demo on Amazon ECS Express Mode since 2026-10-29, moved there from App Runner</span>
+      <span class="pill info">documented</span><span class="what">plain ECS, EKS and the storage and secrets rules, read from AWS documentation on 2026-11-06</span>
+    </div>
+    <p>TSANet's own hosted demo runs on <strong>Amazon ECS Express Mode</strong>: one Fargate task behind a managed Application Load Balancer with TLS, created from the image the repository's <code>Dockerfile</code> builds, with the procedure in the SDK runbook's section&nbsp;6. It replaced an App Runner service because <strong>App Runner stopped accepting new customers on 2026-04-30</strong>; existing services keep running with no announced shutdown date, and AWS names Express Mode as the successor. One difference matters to the build: App Runner could build from source, Express Mode takes an image only, which for this SDK was already the only option.</p>
+    <p>What Express Mode gives a single container is close to what a demo or a small integration service needs and nothing more: a URL of the form <code>https://&lt;name&gt;.ecs.&lt;region&gt;.on.aws</code> with TLS terminated, a target-group health check on the path you name (<code>/healthz</code> for the demo), CloudWatch logging, and canary deployments with 5XX rollback alarms on every update. Express Mode itself is free; you pay for the Fargate task, the load balancer and the logs for as long as the service exists. The demo runs at 0.25&nbsp;vCPU and 512&nbsp;MiB.</p>
+    <h3 class="sub">What the runbook learned the hard way</h3>
+    <ul class="tight">
+      <li><strong>Two IAM roles, and IAM is eventually consistent.</strong> A task execution role (trusting <code>ecs-tasks.amazonaws.com</code>, with <code>AmazonECSTaskExecutionRolePolicy</code> plus permission to read your parameters) and an infrastructure role (trusting <code>ecs.amazonaws.com</code>, with <code>AmazonECSInfrastructureRoleforExpressGatewayServices</code>). A create that runs within a minute of making them fails with a permissions message; the first create on a new account can also fail with "Unable to assume the service linked role" and succeed on a retry, because that call creates the role.</li>
+      <li><strong>Secrets ride in <code>secrets[].valueFrom</code>.</strong> SSM Parameter Store SecureStrings (or Secrets Manager ARNs) named in the container definition arrive as environment variables, resolved when the task starts. AWS states the rule plainly: if the secret changes, force a new deployment or launch a new task. The runbook observed that an <code>update-express-gateway-service</code> with an identical container block still starts a new deployment, which is the rotation mechanism.</li>
+      <li><strong>Pin the SHA tag, not <code>latest</code>.</strong> The container definition names <code>&lt;registry&gt;/connect-sdk-demo:&lt;sha&gt;</code> so <code>describe-express-gateway-service</code> always says which build is running. The first deployment takes about twelve minutes while the load balancer and alarms are provisioned; a redeploy is a canary.</li>
+      <li><strong>There is no pause.</strong> The service bills while it exists, and the URL is minted per service: delete and recreate to save money and every link you handed out dies. The demo runs with <code>minTaskCount</code> and <code>maxTaskCount</code> both at 1; the console defaults are 1 and 20. The <code>ExpressGatewayScalingTarget</code> reference gives no valid range for the minimum, so whether Express Mode accepts a floor of 0 is not stated and has not been tried <span class="pill warn">needs probe</span>.</li>
+      <li><strong>ARM64 is on offer; the image is amd64.</strong> Express Mode can run Graviton tasks, but the repository's build is <code>linux/amd64</code>. Match the two or the task exits on start.</li>
+    </ul>
+    <h3 class="sub">Storage, and the two things that are not ECS Express</h3>
+    <p>A Fargate task gets 20&nbsp;GiB of ephemeral storage by default (up to 200), encrypted, and deleted with the task. That is the right home for the SQLite cache: the demo's data directory lives there and is re-seeded from SSM on every start, and a service of your own can rebuild its cache with one call. Amazon EFS is NFS, so it is not where the live file goes; if a file must survive, copy it to S3 on a schedule from a sidecar, which is the pattern the gateway's guide prescribes (its AWS section is written but has not been run).</p>
+    <p><strong>Plain ECS on Fargate with your own task definition</strong> is the step up when you need what Express Mode's one-call form hides: a task role (the receiver's S3 adapter picks it up with no keys configured), a private subnet with a NAT route and no load balancer at all for an outbound-only service, a sidecar container, or Secrets Manager's rotation. Express Mode accepts a bring-your-own task definition too, provided the container is named <code>Main</code> with one port mapping and the family is Fargate-compatible, so you can start on the short form and graduate without leaving the service.</p>
+    <p><strong>Amazon EKS</strong> is for members who already run Kubernetes. The rules translate directly: a Deployment with one replica and the <code>Recreate</code> strategy, not <code>RollingUpdate</code>, so two pods never overlap on one volume; an <code>emptyDir</code> or a single-attach gp3 volume through the EBS CSI driver for the cache, never EFS; secrets into environment variables through the Secrets Store CSI driver or External Secrets; IAM roles for service accounts for S3. <strong>AWS Lambda</strong> is the wrong shape: a Spring Boot process with a local database, a renewed bearer token and a webhook secret on disk is a long-lived service, not a function.</p>
+  </div>
+</section>
+
+<section id="azure">
+  <div class="wrap">
+    <p class="eyebrow">Microsoft Azure</p>
+    <h2>Azure: Container Apps, with the One Failure Already Found for You</h2>
+    <div class="evline">
+      <span class="pill ok">run</span><span class="what">the Connect Gateway engine, which embeds this SDK, on Azure Container Apps as the member-hosting reference</span>
+      <span class="pill warn">written, not run</span><span class="what">the SDK demo's Container Apps procedure, taken from Microsoft Learn on 2026-08-04 with no subscription to execute it</span>
+      <span class="pill info">documented</span><span class="what">App Service, AKS, billing, secrets and storage, read from Microsoft Learn on 2026-11-06</span>
+    </div>
+    <p><strong>Azure Container Apps</strong> is the analogue of Express Mode: an image in, a managed HTTPS hostname out, and a replica count that can reach zero. Two TSANet documents cover it from opposite directions. The SDK repository's <code>docs/azure-deployment.md</code> walks the demo onto it command by command and is honest that nobody has executed it; the gateway's member-hosting guide was executed, on the engine that embeds this same library, and is where the hard finding below comes from.</p>
+    <h3 class="sub">The recipe, and the gotcha on line one</h3>
+    <p>A registry (<code>az acr create</code>), a user-assigned managed identity with <code>AcrPull</code> so no registry password lives in the app, a Container Apps environment, and then one create with <code>--target-port 8090 --ingress external --min-replicas 0 --max-replicas 1</code>, the gate password in <code>--secrets</code> and referenced from the environment as <code>secretref:</code>. The gotcha is the registry hostname: ACR's domain-name-label feature appends a hash, so a registry named <code>connectsdkdemo</code> answers at something like <code>connectsdkdemo-e7gg….azurecr.io</code>, the scope is immutable after creation, and a script that assumes <code>&lt;name&gt;.azurecr.io</code> fails with an image-pull error that reads like a permissions problem. Read <code>loginServer</code> from the create output.</p>
+    <h3 class="sub">Scaling and what it costs</h3>
+    <p>On the Consumption plan a revision scaled to zero incurs no resource-consumption charge; a revision kept at a minimum above zero is billed at an idle rate while it sits idle. An environment with only Consumption workload profiles carries no plan-management fee; a Dedicated profile does. So a demo can sit at zero between calls and pay a JVM cold start on the first request, and a service that works between requests (webhook post-processing, a scheduled sync or sweep) keeps one replica at the idle rate. Send one warm-up request before a demo.</p>
+    <h3 class="sub">Secrets, and the revision that does not happen</h3>
+    <p>Secrets live in the app's own secret store or as Key Vault references (<code>keyvaultref:</code> plus a managed identity holding the Key Vault Secrets User role). Microsoft's rule, which bites exactly where you would expect: adding, removing or changing a secret <em>does not create a revision</em>, and an updated secret does not affect a running revision until you deploy a new revision or restart the existing one. The one case the platform handles for you is a Key Vault reference without a version: the app picks up a new version within 30 minutes and active revisions that use it in an environment variable are restarted automatically, which for a single-replica service is the rotation restart done on your behalf.</p>
+    <h3 class="sub">Storage: the finding</h3>
+    <p>A container app has its own filesystem (1&nbsp;GiB at a quarter vCPU, rising to 8&nbsp;GiB above one vCPU, shared with any replica-scoped <code>EmptyDir</code> volume) that disappears with the container, and Azure Files over SMB or NFS as the only durable mount, shared across replicas. The live SQLite file goes on the first, never the second: the gateway's member-hosting guide records that on an Azure Files SMB mount the database fails at the first connection with <code>SQLITE_BUSY</code>, which is why its reference spec keeps the files local. The pattern that shipped is the database on local disk plus a backup sidecar that copies the files to an Azure Files share every five minutes and keeps hourly snapshots for 48 hours, restored on start. One more reason the live file is local: in single-revision mode Container Apps starts the new revision before stopping the old one, so for a short window two replicas run, and a shared file would have two writers.</p>
+    <p>Deploy by digest. <code>az containerapp update --image</code> creates and activates a revision, and the pull policy is always <code>always</code>, but an update whose template is unchanged (the same tag string after you pushed new code under it) is not a configuration change and rolls nothing; the gateway page records that exact no-op on this platform. The receiver's Blob and Files adapters want a SAS URL or connection string, so that value goes in Key Vault with the rest, with <code>rw</code> (or <code>rcw</code>) on the container.</p>
+    <h3 class="sub">App Service and AKS</h3>
+    <p><strong>Azure App Service</strong> (Java SE on Linux) is for teams that already run it: you deploy the executable jar with <code>az webapp deploy --type jar</code> and there is no container to build, and Java&nbsp;21 is a supported runtime. Two things to set deliberately. The built-in image starts the jar on port&nbsp;80, so the demo's and the console's 8090 have to be overridden in the startup command. And <code>/home</code> is persisted, shared storage, which is a network share (the platform's own <code>JAVA_COPY_ALL</code> setting exists "to address file-locking issues" on it), so the SQLite path belongs outside <code>/home</code>, where it is per-instance and gone on restart, exactly as on a container. App Service does not scale to zero; run one instance with Always On.</p>
+    <p><strong>AKS</strong> follows the EKS rules: one replica, <code>Recreate</code>, an Azure Disk (block) volume or <code>emptyDir</code> for the cache and never an Azure Files volume, Key Vault through the Secrets Store CSI driver. Workload identity is welcome for everything except the two things it cannot replace: the receiver's SAS, and the Entra client secret for the Connect API, which TSANet's tenant issues.</p>
+  </div>
+</section>
+
+<section id="gcp">
+  <div class="wrap">
+    <p class="eyebrow">Google Cloud</p>
+    <h2>Google Cloud: Cloud Run Fits, with Two Settings That Decide It</h2>
+    <div class="evline">
+      <span class="pill info">documented</span><span class="what">nothing SDK-side has been run on Google Cloud by TSANet; everything here is read from Google's documentation on 2026-11-06</span>
+      <span class="pill warn">spec-read</span><span class="what">Google Cloud Storage is a direct-delivery receiver store in the API specification; the SDK's registration facade covers S3 and Azure Blob only, while the receiver library does ship a GCS adapter</span>
+    </div>
+    <p><strong>Cloud Run</strong> takes the same image from Artifact Registry, gives it an HTTPS <code>run.app</code> URL, and scales to zero by default: minimum instances is 0 unless you raise it, and an idle instance is kept at most 15 minutes. Set the service's container port to 8090 and the demo listens where Cloud Run sends. The container must be listening within four minutes of start (startup CPU boost shortens a JVM boot), gets <code>SIGTERM</code> and ten seconds at shutdown, and must answer every request inside the configured request timeout, which for the demo means a timeout long enough for the largest attachment you will push through one request.</p>
+    <h3 class="sub">Setting one: CPU allocation</h3>
+    <p>Cloud Run's default is request-based billing, where "CPU is only allocated during request processing". Everything an SDK service does <em>between</em> requests runs without CPU in that mode: the console's cache sync after it has answered a webhook, a scheduled <code>syncAllDetails</code> or <code>CacheRetention.sweep</code>, the library's token renewal ahead of expiry. Any shape that works outside a request needs instance-based billing ("CPU is always allocated"), which bills for the instance's whole life, together with a minimum of one instance so there is a process to do the work. A pure request-and-response wrapper around the library can stay request-based.</p>
+    <h3 class="sub">Setting two: maximum instances</h3>
+    <p>Cloud Run scales out on load. Two instances are two SQLite caches, and with v1 webhooks they are worse than that: the subscription's HMAC secret exists only in the cache of the instance that created it, so the other instance reports every delivery as unsigned. Set maximum instances to 1.</p>
+    <h3 class="sub">Filesystem, secrets, identity</h3>
+    <p>The writable filesystem is in memory: "writing to it uses the instance's memory", and "data written to the file system doesn't persist when the instance stops". The SQLite cache therefore sits inside the memory limit, which makes the retention sweep a sizing matter rather than housekeeping, and it is lost on every instance replacement, not only on every deploy. The demo's seeds and lock were built for precisely this (credentials and partner keys re-created at start from secrets). Cloud Storage FUSE volumes are durable but "do not provide concurrency control for multiple writes (file locking) to the same file" and "the last write wins", so they are a backup target, never the live database.</p>
+    <p>Secrets come from Secret Manager as environment variables (resolved at instance startup; Google recommends pinning a version rather than <code>latest</code>) or as mounted files (the latest version is fetched on each read). The runtime service account needs the Secret Manager Secret Accessor role. Since every shipped app reads its configuration at startup, rotation is a new version plus a new revision either way. The receiver's GCS adapter uses Application Default Credentials when no <code>credentialsJson</code> is configured, so the same runtime service account, granted object write on the bucket, carries storage access with no key file in any configuration.</p>
+    <p><strong>GKE Autopilot</strong> for Kubernetes shops: one replica, <code>Recreate</code>, a Persistent Disk (block) volume or <code>emptyDir</code> and never Filestore, Workload Identity Federation for GCS, Secret Manager through the add-on or External Secrets.</p>
+  </div>
+</section>
+
+<section id="matrix">
+  <div class="wrap">
+    <p class="eyebrow">Side by side</p>
+    <h2>The Same Six Concerns on Three Managed Container Services</h2>
+    <p>The three services below are each cloud's shortest path to "an image in, an HTTPS URL out". The rows are the invariants from <a href="#invariants">the shape</a>, plus what each platform has actually run for TSANet.</p>
+    <div class="twrap">
+      <table>
+        <thead><tr><th>Concern</th><th>AWS · ECS Express Mode</th><th>Azure · Container Apps</th><th>Google Cloud · Cloud Run</th></tr></thead>
+        <tbody>
+          <tr><td>Managed HTTPS URL</td><td>Yes, <code>&lt;name&gt;.ecs.&lt;region&gt;.on.aws</code>, minted per service</td><td>Yes, the ingress FQDN</td><td>Yes, a <code>run.app</code> hostname</td></tr>
+          <tr><td>Scale to zero</td><td>Not established: the minimum defaults to 1 and the API reference gives it no valid range; there is no pause; the demo runs 1/1</td><td>Yes, <code>--min-replicas 0</code>; no compute charge at zero</td><td>Yes, the default; idle instances end within 15 minutes</td></tr>
+          <tr><td>Where the cache lives</td><td>Task ephemeral storage, 20&nbsp;GiB default, encrypted, gone with the task</td><td>The container filesystem, 1 to 8&nbsp;GiB by vCPU, gone with the container</td><td>An in-memory filesystem that counts against the memory limit, gone with the instance</td></tr>
+          <tr><td>Not for the live file</td><td>Amazon EFS (NFS)</td><td>Azure Files, SMB or NFS: <code>SQLITE_BUSY</code> recorded</td><td>Cloud Storage FUSE (no locking), Filestore (NFS)</td></tr>
+          <tr><td>Secrets into the environment</td><td>SSM or Secrets Manager through <code>secrets[].valueFrom</code></td><td>App secrets or Key Vault references, <code>secretref:</code></td><td>Secret Manager, as variables or files</td></tr>
+          <tr><td>Rotation</td><td>Update the service or force a new deployment</td><td>New revision or restart; automatic for an unversioned Key Vault reference</td><td>New version, then a new revision</td></tr>
+          <tr><td>Identity to the object store</td><td>Task role, no keys (default credential chain)</td><td>SAS URL or connection string only</td><td>Runtime service account, no keys (ADC)</td></tr>
+          <tr><td>Work between requests</td><td>Always has CPU</td><td>Always has CPU while a replica is up</td><td>Only with instance-based CPU allocation</td></tr>
+          <tr><td>Run for TSANet</td><td>The SDK demo, since 2026-10-29</td><td>The gateway engine (reference); the demo's procedure written, not run</td><td>Nothing yet</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="golive">
+  <div class="wrap">
+    <p class="eyebrow">Sharp edges</p>
+    <h2>The Go-Live List, in the Order It Bites</h2>
+    <ul class="tight">
+      <li><strong>There is no image to pull, and the build needs the private specification.</strong> A member consuming the artifact builds its own service and this is a non-issue. Anyone hosting the demo or the console builds from source with read access to the specification repository, or asks TSANet for a jar or image. Settle that before the cloud account, not after.</li>
+      <li><strong>The demo's gate is the whole security model.</strong> With <code>TSANET_DEMO_AUTH_PASSWORD</code> unset it runs open; behind it sit live member credentials and the ability to page a partner's engineer with a real case. A guest login (<code>TSANET_DEMO_AUTH_GUEST_*</code>) gives members a second password with a lower upload limit. The demo will not talk to Production at all; a service of your own will, so keep Production credentials in the production deployment only.</li>
+      <li><strong>One writer, enforced by the deploy strategy.</strong> Kubernetes: <code>Recreate</code>. Container Apps: single-revision mode overlaps old and new, harmless on local files and fatal on a shared one. Cloud Run: maximum instances 1. Express Mode: a canary briefly runs two tasks, each with its own ephemeral disk, so two caches and never two writers.</li>
+      <li><strong>Know what the filesystem takes with it.</strong> The cache rebuilds. Two things do not: a v1 webhook subscription's HMAC secret, which the API returns once at creation and the library stores only in your <code>webhook_subscription</code> row; and the demo's per-environment credentials and partner-key table, which you seed instead (<code>TSANET_DEMO_SEED_*</code>, <code>TSANET_DEMO_E2EE_PARTNERS_*</code>, with <code>TSANET_DEMO_CREDENTIALS_LOCKED</code> so visitors cannot change them). For the secret, either back the file up to object storage on a schedule or plan to create a new subscription after a loss and delete the old one, which keeps delivering until you do.</li>
+      <li><strong>The SDK's webhook client is v1, and v1 sunsets on 2027-01-01.</strong> A receiver built on <code>receiveInbound</code> has a clock on it whatever cloud it runs in. The v2 CloudEvents contract, including <code>OAUTH2_CLIENT_CREDENTIALS</code> callback auth, which means your edge also fronts a token endpoint, is on <a href="../api/index.html#webhooks">the API page</a>. Hosting does not change this; it just makes the endpoint real.</li>
+      <li><strong>Raw bytes for the signature.</strong> HMAC-SHA256 over the body as delivered, compared against <code>X-Hub-Signature-256</code>. An API gateway that pretty-prints JSON, or a framework that re-serializes before your handler, breaks every verification silently: the library records <code>signatureValid=false</code> on each event and nothing errors.</li>
+      <li><strong>Rotation is a restart, everywhere.</strong> New value in the secret store, then a forced deployment (ECS), a new revision or restart (Container Apps), a new revision (Cloud Run). No <code>${</code> in any value; set values from arguments, not files.</li>
+      <li><strong>Cold starts are real.</strong> A Spring Boot&nbsp;4 process on a quarter vCPU takes a while to listen. Warm a scaled-to-zero demo before the call, and give a startup probe room before a liveness probe can kill it.</li>
+      <li><strong>The proxy that is not there.</strong> Egress through a corporate proxy works with <code>https.proxyHost</code>; an authenticating proxy needs something in front of the process, since the JDK client the library uses ignores a default <code>Authenticator</code>.</li>
+      <li><strong>Logs are safe by design; keep them that way.</strong> <code>ConnectApiException</code> messages carry no URL, header or token, the receiver's storage errors carry no credential, and the demo's key generator prints the private JWKS once to standard output and nowhere else. Don't undo that with a <code>docker inspect</code> pasted into a ticket; AWS's own guidance prefers file-mounted secrets to environment variables for the same reason.</li>
+      <li><strong>Sweep the cache.</strong> <code>CacheRetention.sweep</code> evicts closed and rejected cases by age and never touches an open one, and nothing calls it for you. On Cloud Run it is your memory budget.</li>
+      <li><strong>Pin by digest.</strong> A moved tag rolled nothing on Container Apps; the ECS runbook pins SHA tags so the running build is always readable from the service description. The gateway's guide deploys by <code>sha256:</code> digest for the same reason.</li>
+    </ul>
+    <div class="note">Cloud Run is the gap: nothing SDK-based has been run there and reported back. If you host on Google Cloud, or on anything not listed, <a href="../community/index.html">say so in Community</a> with what you had to change; the platform rows above are only as good as the deployments behind them. The <a href="../connectors/connect-sdk.html#skill">deployment skill</a> carries the runbook knowledge in a form a coding assistant can apply while it plans your deployment.</div>
+  </div>
+</section>
+
+<section id="sources">
+  <div class="wrap">
+    <p class="eyebrow">Verified against</p>
+    <h2>Sources, with the Dates That Were Read</h2>
+    <div class="twrap wrapfirst">
+      <table>
+        <thead><tr><th>Read on</th><th>Source</th><th>Used for</th></tr></thead>
+        <tbody>
+          <tr><td>2026-11-06</td><td><a href="https://github.com/tsanetgit/Connect_SDK">Connect_SDK</a> <code>main</code> at <code>b565e5e</code> (2026-11-01; v5.0.0 released 2026-10-31): the root <code>Dockerfile</code>, <code>demo-ui</code> and <code>TSANet-integration-app</code> <code>application.yml</code>, <a href="https://github.com/tsanetgit/Connect_SDK/blob/main/docs/RUNBOOK.md"><code>docs/RUNBOOK.md</code></a> §6, <a href="https://github.com/tsanetgit/Connect_SDK/blob/main/docs/aws-hosting-options.md"><code>docs/aws-hosting-options.md</code></a>, <a href="https://github.com/tsanetgit/Connect_SDK/blob/main/docs/azure-deployment.md"><code>docs/azure-deployment.md</code></a>, <code>RegisteringStorageFactory</code>, <code>WebhookSignatureVerifier</code>, <code>DatabaseInitializer</code></td><td>The four shapes, the image, the environment surface, the ECS procedure and what it observed, the Azure procedure and its status, the credential fallback of each storage adapter, the signature contract, what the cache stores</td></tr>
+          <tr><td>2026-11-06</td><td><code>Connect_Gateway</code> v5.0.0 <code>docs/member-hosting.md</code> (private repository)</td><td>SQLite on an Azure Files SMB mount (<code>SQLITE_BUSY</code>), the backup sidecar, single-revision overlap, deploy by digest, rotation by restart, the AWS section's unrun status</td></tr>
+          <tr><td>2026-11-06</td><td>AWS documentation: <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/express-service-getting-started.html">Create your first Express Mode service</a>, <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/express-service-first-run.html">Create your first Express Mode service in the console</a>, <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_ExpressGatewayScalingTarget.html"><code>ExpressGatewayScalingTarget</code></a>, <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/specifying-sensitive-data.html">Pass sensitive data to a container</a>, <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/fargate-task-storage.html">Fargate task ephemeral storage</a>, <a href="https://docs.aws.amazon.com/apprunner/latest/dg/apprunner-availability-change.html">App Runner availability change</a></td><td>What Express Mode provisions and its URL form, the roles, the console scaling defaults and the unstated scaling floor, secret injection and the rotation rule, ephemeral storage size and lifetime, the App Runner cutoff</td></tr>
+          <tr><td>2026-11-06</td><td>Microsoft Learn: <a href="https://learn.microsoft.com/en-us/azure/container-apps/billing">Billing in Azure Container Apps</a> (2025-12-09), <a href="https://learn.microsoft.com/en-us/azure/container-apps/manage-secrets">Manage secrets</a> (2026-09-04), <a href="https://learn.microsoft.com/en-us/azure/container-apps/storage-mounts">Use storage mounts</a> (2026-10-13), <a href="https://learn.microsoft.com/en-us/azure/app-service/configure-language-java-deploy-run">Deploy and configure Java apps</a> (2026-10-08), <a href="https://learn.microsoft.com/azure/app-service/language-support-policy">App Service language support policy</a></td><td>Scale-to-zero and idle billing, secrets and the no-revision rule, Key Vault auto-refresh, storage types and sizes, App Service deployment and <code>/home</code>, Java&nbsp;21 support</td></tr>
+          <tr><td>2026-11-06</td><td>Google Cloud documentation: <a href="https://docs.cloud.google.com/run/docs/container-contract">Container runtime contract</a>, <a href="https://docs.cloud.google.com/run/docs/configuring/services/secrets">Configure secrets</a>, <a href="https://docs.cloud.google.com/run/docs/configuring/cpu-allocation">CPU allocation</a>, <a href="https://docs.cloud.google.com/run/docs/configuring/services/cloud-storage-volume-mounts">Cloud Storage volume mounts</a></td><td>The in-memory filesystem, ports, startup and shutdown, request-based versus instance-based CPU, secret delivery and the Secret Accessor role, the FUSE locking limitation</td></tr>
+          <tr><td>not probed</td><td><code>minTaskCount: 0</code> on Express Mode; any SDK component on Google Cloud; the SDK demo on Container Apps</td><td>Each is marked where it appears</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-top"><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
+    <div class="foot-cols">
+      <nav class="foot-col" aria-label="Developers">
+        <h4>Developers</h4>
+        <a href="../build/index.html">Build a New Integration</a>
+        <a href="../connectors/index.html">Existing Solutions</a>
+        <a href="../api/index.html">Working with the API</a>
+        <a href="../docs/index.html">Design Documents</a>
+        <a href="../topics/index.html">Topics</a>
+        <a href="../tools/index.html">Tools</a>
+        <a href="../community/index.html">Community</a>
+      </nav>
+      <div class="foot-col">
+        <h4>Members</h4>
+        <a href="https://www.tsanet.org/members/">Member List</a>
+        <a href="https://tsanet.gitbook.io/connect">Platform Documentation</a>
+        <a href="https://tsanet.gitbook.io/connect/help-center">Member Support</a>
+      </div>
+      <div class="foot-col">
+        <h4>About</h4>
+        <a href="https://www.tsanet.org/about-us/">About Us</a>
+        <a href="https://www.tsanet.org/board-of-directors/">Board of Directors</a>
+        <a href="https://www.tsanet.org/news-events/">News and Events</a>
+      </div>
+    </div>
+    <div class="foot-bottom mono">
+      <span>© TSANet Inc. All Rights Reserved</span>
+      <a href="https://www.tsanet.org/legal-policy/">Privacy Policy</a>
+      <a href="https://github.com/tsanetgit">github.com/tsanetgit</a>
+      <a href="mailto:membership@tsanet.org">membership@tsanet.org</a>
+      <span class="foot-social" aria-label="TSANet on social media">
+        <a href="https://twitter.com/TSANetTweet" aria-label="TSANet on X" title="X"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg></a>
+        <a href="https://www.linkedin.com/company/tsanet" aria-label="TSANet on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+        <a href="https://www.youtube.com/@tsanet8120" aria-label="TSANet on YouTube" title="YouTube"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+        <a href="https://github.com/tsanetgit" aria-label="TSANet on GitHub" title="GitHub"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+      </span>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/assistant.js?v=20260913" defer></script>
+</body>
+</html>

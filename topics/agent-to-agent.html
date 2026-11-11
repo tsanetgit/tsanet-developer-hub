@@ -75,6 +75,7 @@
         <div class="status-item"><b>MCP server for Connect</b><span>None exists. Under consideration. <span class="pill warn">PROPOSED</span></span></div>
         <div class="status-item"><b>A2A endpoint and support extension</b><span>None exists. Under consideration. <span class="pill warn">PROPOSED</span></span></div>
         <div class="status-item"><b>Member agent directory</b><span>None exists. Under consideration. <span class="pill warn">PROPOSED</span></span></div>
+        <div class="status-item"><b>Terms for agents</b><span>None exist. A change to the Code of Conduct and an opt-in addendum are under consideration. <span class="pill warn">PROPOSED</span></span></div>
       </div>
       <div class="legend-key">
         <span><span class="pill ok">PRIMARY</span> read in the specification or the vendor's own documentation</span>
@@ -227,6 +228,20 @@
       <li><strong>Off until a member turns it on, and Beta first.</strong></li>
     </ul>
 
+    <h3 class="sub">How terms for agents might be adopted</h3>
+    <p>Members accept a <a href="https://www.tsanet.org/legal-documents/">Code of Conduct</a>, and each relationship type is defined by an addendum to it. Neither mentions automated agents. The approach under consideration has two parts, because they would bind different members.</p>
+    <div class="twrap wrapfirst">
+      <table>
+        <thead><tr><th></th><th>A short change to the Code of Conduct</th><th>An opt-in agent addendum</th></tr></thead>
+        <tbody>
+          <tr><td>Would cover</td><td>Two confidentiality points. What an agent retains is not the unaided memory of a person, which the Code excuses. Training or tuning a model on a partner's case content is not a permitted use of it.</td><td>Operating terms: the member answers for its agent, a partner is told when it is dealing with an agent, either side can require a person, how long partner content is kept, and listing in the directory.</td></tr>
+          <tr><td>Would bind</td><td>Every member, because these points protect the member whose content it is.</td><td>Only members that accept it, before their agents take part.</td></tr>
+          <tr><td>Adopted by</td><td>The Board, under the Bylaws, with notice to members before it takes effect.</td><td>The Board, then accepted by each member that wants it.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note"><strong>Neither has been drafted, reviewed by counsel or put to the Board.</strong> This describes an approach, not a decision. A member whose agent calls the REST API today acts under the agreements it has already accepted. <span class="pill warn">PROPOSED</span></div>
+
     <figure>
       <div class="diagram">
         <svg viewBox="0 0 1000 240" style="min-width:880px" role="img" aria-label="Proposed shape. The submitting member's agent holds task one with a TSANet exchange. The exchange keeps the Connect case as the record. It holds task two with the receiving member's agent, or delivers the case as today to a receiver with no agent.">
@@ -334,7 +349,7 @@
           <tr><td>Which sign-in mode reaches a working call from each platform against a hosted Connect MCP server</td><td>Whether one server serves every platform, and where it has to run</td></tr>
           <tr><td>Whether platform agents can send A2A structured data and activate a custom extension, or only text</td><td>Whether a support extension is usable from those platforms or only from in-house agents</td></tr>
           <tr><td>Which transitions Connect allows between case statuses</td><td>The lifecycle mapping above</td></tr>
-          <tr><td>Whether the Code of Conduct needs a change or an addendum to cover actions taken by an agent</td><td>Everything beyond a tool server. This is a membership question, not an engineering one</td></tr>
+          <tr><td>Whether the two confidentiality points clarify the Code of Conduct or change it, and how an opt-in agent addendum is adopted</td><td>The terms agents work under, and everything beyond a tool server. A question for counsel and the Board, not engineering</td></tr>
           <tr><td>Whether members want this yet</td><td>The order of the three pieces, and whether to build them at all</td></tr>
         </tbody>
       </table>
@@ -360,7 +375,7 @@
           <tr><td>2026-11-10</td><td>Fin: <a href="https://fin.ai/help/en/articles/13976067-add-mcp-connectors-for-popular-apps-or-custom-mcps">add MCP connectors</a></td><td>Sign-in types for a custom MCP server</td></tr>
           <tr><td>2026-11-10</td><td>Third-party write-ups and search summaries</td><td>Zendesk's MCP client; Fin's MCP server and client roles. Marked secondary where used</td></tr>
           <tr><td>2026-11-10</td><td>The Connect API specification (private repository)</td><td>Case statuses</td></tr>
-          <tr><td>2026-11-11</td><td>TSANet <a href="https://www.tsanet.org/legal-documents/">legal documents</a>: the Code of Conduct and the relationship addenda</td><td>What members agree to today</td></tr>
+          <tr><td>2026-11-11</td><td>TSANet <a href="https://www.tsanet.org/legal-documents/">legal documents</a>: the Code of Conduct, the relationship addenda and the Bylaws</td><td>What members agree to today, and how the Code is changed</td></tr>
           <tr><td>not probed</td><td>Any TSANet component registered in any agent platform; inbound A2A on Copilot Studio; Connect's status transitions; structured data and extensions from platform agents</td><td>Each is marked where it appears</td></tr>
         </tbody>
       </table>

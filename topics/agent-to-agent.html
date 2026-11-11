@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent-to-Agent Support with TSANet — TSANet Connect Developer Hub</title>
+<link rel="icon" href="../assets/tsanet-favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/hub.css?v=20260914c">
+<style>
+  .status-band{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--orange);border-radius:12px;padding:24px 26px;margin-top:26px}
+  .status-band h2{font-size:20px;margin-bottom:10px}
+  .status-band p{max-width:76ch}
+  .status-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:18px}
+  .status-item{border:1px solid var(--line);border-radius:9px;padding:13px 15px;background:var(--paper)}
+  .status-item b{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--slate);margin-bottom:5px}
+  .status-item span{font-size:13.5px;color:var(--ink)}
+  .legend-key{display:flex;gap:20px;flex-wrap:wrap;margin:18px 0 0;font-size:13px;color:var(--slate)}
+  .twrap td:first-child{white-space:nowrap;font-weight:600;color:var(--ink)}
+  .twrap.wrapfirst td:first-child{white-space:normal}
+  h3.sub{font-family:var(--disp);font-size:17px;font-weight:700;letter-spacing:-.01em;margin:26px 0 8px}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-in">
+    <a class="brand" href="../index.html"><img class="brand-img" src="../assets/tsanet-devhub-horizontal.png" alt="TSANet Developer Hub"></a>
+    <div class="nav-links">
+      <a href="../build/index.html">Build</a>
+      <a href="../connectors/index.html">Existing Solutions</a>
+      <a href="../api/index.html">API</a>
+      <a href="../docs/index.html">Design Docs</a>
+      <a href="../topics/index.html" aria-current="page">Topics</a>
+      <a href="../tools/index.html">Tools</a>
+      <a href="../community/index.html">Community</a>
+    </div>
+  </div>
+</nav>
+
+<header class="pagehead">
+  <div class="wrap">
+    <div class="crumb"><a href="../index.html">Hub</a> / <a href="index.html">Topics</a> / Agent-to-agent support</div>
+    <h1>Agent-to-Agent Support with TSANet</h1>
+    <p class="lede">Support platforms now ship AI agents that can call outside tools and, increasingly, other companies' agents. Two open protocols carry that traffic. Neither says who an outside agent belongs to, what agreement covers the exchange, or which partner agent handles a given product, and those are the questions TSANet already answers for people. This page sets out what the protocols and the platforms support today, where a neutral member organization fits, the direction TSANet is considering, and what you can do with an agent and Connect right now. Nothing on the agent-to-agent side is built, and every claim says how it was checked.</p>
+    <div class="meta-row">
+      <span><b>Topic</b> Agents working partner cases across companies</span>
+      <span><b>Grounded in</b> The A2A and MCP specifications, vendor documentation, the Connect API specification</span>
+      <span><b>Status</b> Direction under consideration; nothing built</span>
+      <span><b>Updated</b> 2026-11-11</span>
+    </div>
+    <div class="toc">
+      <a href="#status">Where this stands</a>
+      <a href="#gap">What the protocols leave open</a>
+      <a href="#protocols">The two protocols</a>
+      <a href="#platforms">What platforms support</a>
+      <a href="#direction">Direction</a>
+      <a href="#lifecycle">A case as a task</a>
+      <a href="#today">What you can do today</a>
+      <a href="#open">Open questions</a>
+      <a href="#sources">Verified against</a>
+    </div>
+  </div>
+</header>
+
+<section id="status">
+  <div class="wrap">
+    <div class="status-band">
+      <h2>Read This Before You Rely on Anything Below</h2>
+      <p>This page describes a direction, not a product. The protocol and platform facts were read from the sources in the <a href="#sources">Verified against</a> table on the dates shown there. The TSANet pieces are proposals: none is approved, scheduled or built, and none has been tried against a member's agent platform. What works today is the Connect REST API, which any agent can already call.</p>
+      <div class="status-grid">
+        <div class="status-item"><b>Connect REST API</b><span>Live. Callable by any agent with a member's credentials. <span class="pill ok">SHIPPED</span></span></div>
+        <div class="status-item"><b>MCP server for Connect</b><span>None exists. Under consideration. <span class="pill warn">PROPOSED</span></span></div>
+        <div class="status-item"><b>A2A endpoint and support extension</b><span>None exists. Under consideration. <span class="pill warn">PROPOSED</span></span></div>
+        <div class="status-item"><b>Member agent directory</b><span>None exists. Under consideration. <span class="pill warn">PROPOSED</span></span></div>
+      </div>
+      <div class="legend-key">
+        <span><span class="pill ok">PRIMARY</span> read in the specification or the vendor's own documentation</span>
+        <span><span class="pill info">SECONDARY</span> read in a third-party write-up or a search summary of the vendor's page</span>
+        <span><span class="pill warn">NEEDS PROBE</span> not verified, and known not to be</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="gap">
+  <div class="wrap">
+    <p class="eyebrow">The gap</p>
+    <h2>What the Protocols Leave Open</h2>
+    <p>The protocols make it technically cheap for one company's agent to reach another's. They solve the connection. They do not solve four things that two support organizations have to settle before their agents can work a mutual customer's problem:</p>
+    <div class="twrap wrapfirst">
+      <table>
+        <thead><tr><th>Question</th><th>What the protocols say</th><th>What TSANet does today, for people</th></tr></thead>
+        <tbody>
+          <tr><td>Who is this agent, and which company answers for it?</td><td>A2A lets an agent sign its own card. Verifying that the signer is who it claims to be is left to whoever runs a registry. No cross-company agent identity standard has been ratified.</td><td>Vets members before they can open or receive a case.</td></tr>
+          <tr><td>What agreement covers what the two agents exchange?</td><td>Out of scope for both protocols.</td><td>One membership agreement in place of a contract between every pair of members.</td></tr>
+          <tr><td>Which partner agent handles this product, and what does it need to start?</td><td>A2A describes curated registries but does not define one.</td><td>The partner directory, and each partner's process form with its required fields.</td></tr>
+          <tr><td>What happened on the case, and who is accountable?</td><td>Each side keeps its own task history.</td><td>One case record that both members see, with a respond-by time.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <figure>
+      <div class="diagram">
+        <svg viewBox="0 0 1000 330" style="min-width:880px" role="img" aria-label="Three layers. At the top, the trust layer across companies, which is where TSANet sits: who is this agent, what covers the exchange, who handles this product, and who answers for it. In the middle, the open protocols: A2A for agent to agent and MCP for agent to tool. At the bottom, vendor platforms, each governing agents inside one company's boundary: Agentforce, ServiceNow, Copilot Studio, Zendesk, Fin and in-house agents.">
+          <text class="tl" x="20" y="28">Trust across companies: where TSANet sits</text>
+          <rect class="bx-grn" x="20" y="42" width="225" height="70" rx="12"/>
+          <text class="tt" x="132" y="72" text-anchor="middle">Who is this agent?</text>
+          <text class="ts" x="132" y="94" text-anchor="middle">member vetting, a directory</text>
+          <rect class="bx-grn" x="265" y="42" width="225" height="70" rx="12"/>
+          <text class="tt" x="377" y="72" text-anchor="middle">What covers it?</text>
+          <text class="ts" x="377" y="94" text-anchor="middle">the membership agreement</text>
+          <rect class="bx-grn" x="510" y="42" width="225" height="70" rx="12"/>
+          <text class="tt" x="622" y="72" text-anchor="middle">Who handles this?</text>
+          <text class="ts" x="622" y="94" text-anchor="middle">partner directory, forms</text>
+          <rect class="bx-grn" x="755" y="42" width="225" height="70" rx="12"/>
+          <text class="tt" x="867" y="72" text-anchor="middle">Who answers for it?</text>
+          <text class="ts" x="867" y="94" text-anchor="middle">one case record</text>
+
+          <text class="tl" x="20" y="148">Open protocols: one vendor-neutral foundation</text>
+          <rect class="bx-acc" x="20" y="162" width="470" height="60" rx="12"/>
+          <text class="tt" x="255" y="188" text-anchor="middle">A2A: agent to agent</text>
+          <text class="ts" x="255" y="208" text-anchor="middle">tasks, signed agent cards, extensions</text>
+          <rect class="bx-acc" x="510" y="162" width="470" height="60" rx="12"/>
+          <text class="tt" x="745" y="188" text-anchor="middle">MCP: agent to tool</text>
+          <text class="ts" x="745" y="208" text-anchor="middle">tools and resources</text>
+
+          <text class="tl" x="20" y="258">Vendor platforms: each governs agents inside one company's boundary</text>
+          <rect class="bx-ext" x="20" y="270" width="150" height="44" rx="10"/>
+          <text class="tt" x="95" y="297" text-anchor="middle">Agentforce</text>
+          <rect class="bx-ext" x="183" y="270" width="150" height="44" rx="10"/>
+          <text class="tt" x="258" y="297" text-anchor="middle">ServiceNow</text>
+          <rect class="bx-ext" x="346" y="270" width="150" height="44" rx="10"/>
+          <text class="tt" x="421" y="297" text-anchor="middle">Copilot Studio</text>
+          <rect class="bx-ext" x="510" y="270" width="150" height="44" rx="10"/>
+          <text class="tt" x="585" y="297" text-anchor="middle">Zendesk</text>
+          <rect class="bx-ext" x="673" y="270" width="150" height="44" rx="10"/>
+          <text class="tt" x="748" y="297" text-anchor="middle">Fin</text>
+          <rect class="bx-ext" x="836" y="270" width="150" height="44" rx="10"/>
+          <text class="tt" x="911" y="297" text-anchor="middle">In-house</text>
+        </svg>
+      </div>
+      <figcaption>The bottom two layers exist and are converging. The top layer is the part no protocol or platform fills, and it is the part TSANet already operates for human support teams.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="protocols">
+  <div class="wrap">
+    <p class="eyebrow">As read</p>
+    <h2>The Two Protocols</h2>
+    <div class="twrap wrapfirst">
+      <table>
+        <thead><tr><th></th><th>MCP</th><th>A2A</th></tr></thead>
+        <tbody>
+          <tr><td>What it connects</td><td>An agent to a tool or data source.</td><td>An agent to another agent, which takes on a task.</td></tr>
+          <tr><td>Governance</td><td>The Agentic AI Foundation, under the Linux Foundation. <span class="pill ok">PRIMARY</span></td><td>The same foundation. <span class="pill ok">PRIMARY</span></td></tr>
+          <tr><td>Version read</td><td>Specification 2026-07-28. <span class="pill ok">PRIMARY</span></td><td>Specification 1.0.0. <span class="pill ok">PRIMARY</span></td></tr>
+          <tr><td>What matters here</td><td>A server must accept only tokens issued for itself and must not pass them on to another service. Sessions are gone: each request stands alone. Machine-to-machine sign-in is an optional extension, not part of the core.</td><td>An agent describes itself in a card that can be signed. Registries of cards are described but deliberately not standardized. A formal extension mechanism lets a group add rules for one use case without changing the protocol.</td></tr>
+          <tr><td>What it does not cover</td><td>Shared memory or context between agents.</td><td>Shared memory, and trust between organizations.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note"><strong>Extensions cannot change the protocol's core objects.</strong> An A2A extension may add structured data and metadata. It may not add fields to core objects or new task states. Any support-specific design therefore has to carry Connect's own case status beside the A2A task state, not in place of it. <span class="pill ok">PRIMARY</span></div>
+  </div>
+</section>
+
+<section id="platforms">
+  <div class="wrap">
+    <p class="eyebrow">Comparison</p>
+    <h2>What Members' Platforms Support</h2>
+    <p>Every platform below can reach an outside MCP server. Fewer speak A2A. The column that decides whether a hosted server is usable is the third one: how the platform is able to sign in to it.</p>
+    <div class="twrap wrapfirst">
+      <table>
+        <thead><tr><th>Platform</th><th>MCP</th><th>A2A</th><th>Sign-in it offers to an outside MCP server</th><th>Evidence</th></tr></thead>
+        <tbody>
+          <tr><td>Salesforce Agentforce</td><td>Client and server</td><td>Inbound and outbound; an administrator registers each outside agent</td><td>None, or OAuth client credentials</td><td><span class="pill ok">PRIMARY</span></td></tr>
+          <tr><td>ServiceNow</td><td>Client and server</td><td>Client and receiver</td><td>None, an API key, or OAuth</td><td><span class="pill ok">PRIMARY</span> vendor community and documentation</td></tr>
+          <tr><td>Microsoft Copilot Studio</td><td>Client</td><td>Calling other agents is generally available. Whether an outside agent can call in is <span class="pill warn">NEEDS PROBE</span></td><td>None, an API key, or OAuth with a signed-in user</td><td><span class="pill ok">PRIMARY</span> see <a href="agentic-usage.html">Agentic usage</a></td></tr>
+          <tr><td>Microsoft Dynamics 365 Customer Service</td><td>Server, open to non-Microsoft clients</td><td>None found</td><td>Not applicable: it is a server</td><td><span class="pill ok">PRIMARY</span></td></tr>
+          <tr><td>Zendesk</td><td>Client; no server confirmed</td><td>None found</td><td>Not read</td><td><span class="pill info">SECONDARY</span></td></tr>
+          <tr><td>Fin</td><td>Client and server</td><td>None found</td><td>A fixed bearer token, or OAuth</td><td><span class="pill ok">PRIMARY</span> for sign-in; <span class="pill info">SECONDARY</span> for the rest</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Three things follow from the table.</p>
+    <ul class="tight">
+      <li><strong>MCP is the common ground today.</strong> A single MCP server could be registered in every platform listed. A2A reaches three of them.</li>
+      <li><strong>The platforms disagree about sign-in.</strong> Some offer machine-to-machine credentials, some a fixed token, some only a signed-in user. One server has to satisfy all of them or leave some out. This is the same gap the <a href="agentic-usage.html">Agentic usage</a> topic found between hosted agent builders and code-first ones.</li>
+      <li><strong>Platform agent identity stops at the company boundary.</strong> Microsoft's architecture guidance states that agent identities are single-tenant, and describes only one organization with several tenants. <span class="pill ok">PRIMARY</span></li>
+    </ul>
+    <div class="note"><strong>Nothing here has been probed.</strong> No TSANet component has been registered in any of these platforms, and no primary source was found describing a cross-vendor support escalation running agent to agent in production. Treat the table as a reading list, not a compatibility matrix.</div>
+  </div>
+</section>
+
+<section id="direction">
+  <div class="wrap">
+    <p class="eyebrow">Direction</p>
+    <h2>Three Pieces Under Consideration, None Built</h2>
+    <p>The direction is to extend what TSANet already does for people to agents, on top of the open protocols, and not to invent a protocol or operate agents. Members' agents stay the members' own, on whatever platform and model they choose.</p>
+    <div class="grid g3">
+      <div class="card">
+        <span class="chip">Proposed</span>
+        <h3>An MCP Server for Connect</h3>
+        <p>A hosted server a member registers once in its agent platform. Its tools find a partner, read the partner's process form, open a case, respond, add notes and close, under the member's own Connect credentials. It holds no cases; Connect stays the record.</p>
+      </div>
+      <div class="card">
+        <span class="chip">Proposed</span>
+        <h3>An A2A Support Extension</h3>
+        <p>A published extension that says how a collaboration case travels as an A2A task: the fields a partner's form requires, how Connect's case status maps to task states, and how either side asks for a person to take over.</p>
+      </div>
+      <div class="card">
+        <span class="chip">Proposed</span>
+        <h3>A Member Agent Directory</h3>
+        <p>A curated registry of members' support agents, in which TSANet attests that each agent belongs to a member in good standing. A2A leaves registries to implementers; the attestation is the part a membership body can supply.</p>
+      </div>
+    </div>
+
+    <h3 class="sub">Design rules the direction holds to</h3>
+    <ul class="tight">
+      <li><strong>A person approves what a partner sees.</strong> Opening a case, responding and closing are partner-visible. The design assumes a human checkpoint on each by default.</li>
+      <li><strong>A partner agent's output is untrusted input.</strong> Text from another company's agent can carry instructions aimed at the agent reading it. Case text is data and is never acted on as instruction.</li>
+      <li><strong>TSANet carries the envelope, not the content.</strong> Where a member uses <a href="end-to-end-encryption.html">end-to-end encryption</a>, the platform cannot read case text, so any content checks run on the member's side.</li>
+      <li><strong>Works when only one side has an agent.</strong> A partner without an agent receives the case exactly as it does today.</li>
+      <li><strong>Off until a member turns it on, and Beta first.</strong></li>
+    </ul>
+
+    <figure>
+      <div class="diagram">
+        <svg viewBox="0 0 1000 240" style="min-width:880px" role="img" aria-label="Proposed shape. The submitting member's agent holds task one with a TSANet exchange. The exchange keeps the Connect case as the record. It holds task two with the receiving member's agent, or delivers the case as today to a receiver with no agent.">
+          <rect class="bx" x="20" y="80" width="200" height="80" rx="12"/>
+          <text class="tt" x="120" y="114" text-anchor="middle">Submitter's agent</text>
+          <text class="ts" x="120" y="136" text-anchor="middle">any platform or model</text>
+
+          <rect class="bx-acc" x="330" y="40" width="340" height="160" rx="12"/>
+          <text class="tt" x="500" y="76" text-anchor="middle">TSANet exchange (proposed)</text>
+          <text class="ts" x="500" y="106" text-anchor="middle">checks who the agent belongs to</text>
+          <text class="ts" x="500" y="130" text-anchor="middle">keeps the Connect case as the record:</text>
+          <text class="ts" x="500" y="150" text-anchor="middle">status, respond-by time, notes</text>
+
+          <rect class="bx" x="780" y="30" width="200" height="70" rx="12"/>
+          <text class="tt" x="880" y="60" text-anchor="middle">Receiver's agent</text>
+          <text class="ts" x="880" y="82" text-anchor="middle">if the partner has one</text>
+
+          <rect class="bx-ext" x="780" y="140" width="200" height="70" rx="12"/>
+          <text class="tt" x="880" y="170" text-anchor="middle">Receiver, no agent</text>
+          <text class="ts" x="880" y="192" text-anchor="middle">connector or web app</text>
+
+          <path class="lnA" d="M 220 120 L 322 120"/>
+          <polygon points="330,120 320,115 320,125" fill="var(--blue)"/>
+          <text class="ts" x="275" y="108" text-anchor="middle">task 1</text>
+
+          <path class="lnA" d="M 670 65 L 772 65"/>
+          <polygon points="780,65 770,60 770,70" fill="var(--blue)"/>
+          <text class="ts" x="725" y="53" text-anchor="middle">task 2</text>
+
+          <path class="ln" d="M 670 175 L 772 175"/>
+          <polygon points="780,175 770,170 770,180" fill="var(--slate)"/>
+          <text class="ts" x="725" y="163" text-anchor="middle">as today</text>
+        </svg>
+      </div>
+      <figcaption>One case, two tasks. Agents do not talk to each other directly in this shape: each talks to TSANet, and the Connect case joins the two sides. That keeps one record and one respond-by time, and it means the submitter does not need to know whether the partner has an agent.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="lifecycle">
+  <div class="wrap">
+    <p class="eyebrow">Mapping</p>
+    <h2>A Collaboration Case as an A2A Task</h2>
+    <p>Connect's case statuses line up with A2A's task states closely enough that a case can be carried as a task. The statuses below are from the Connect API specification. The mapping is a first pass, and which transitions Connect allows between them has not been checked on Beta.</p>
+    <div class="twrap">
+      <table>
+        <thead><tr><th>Connect case status</th><th>A2A task state</th><th>Note</th></tr></thead>
+        <tbody>
+          <tr><td><code>OPEN</code></td><td>Submitted or working</td><td>Waiting for the receiving member to respond.</td></tr>
+          <tr><td><code>INFORMATION</code></td><td>Input required</td><td>The receiver has asked the submitter for more.</td></tr>
+          <tr><td><code>ACCEPTED</code></td><td>Working</td><td>An engineer is engaged on the receiving side.</td></tr>
+          <tr><td><code>REJECTED</code></td><td>Rejected</td><td>Final on both sides.</td></tr>
+          <tr><td><code>CLOSED</code></td><td>Completed</td><td>Final on both sides. Connect has no reopen.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>A2A's states are coarser than Connect's, so the Connect status would travel in the task's metadata and remain the authority. Notes map to task messages. <span class="pill warn">NEEDS PROBE</span></p>
+  </div>
+</section>
+
+<section id="today">
+  <div class="wrap">
+    <p class="eyebrow">Now</p>
+    <h2>What You Can Do Today</h2>
+    <p>None of the proposed pieces is needed to put an agent to work on partner cases. The REST API is the same for an agent as for a connector.</p>
+    <div class="grid g3">
+      <a class="card" href="../api/index.html">
+        <span class="chip">Live</span>
+        <h3>Call the API from Your Agent</h3>
+        <p>Give your agent tools that wrap the Connect operations it needs. The API page covers the behavior that is easy to get wrong, and how a member issues its own client secret.</p>
+        <span class="card-foot">Working with the API →</span>
+      </a>
+      <a class="card" href="agentic-usage.html">
+        <span class="chip">Shipped</span>
+        <h3>Load the Agent Skills</h3>
+        <p>The skills TSANet ships teach an assistant the Connect semantics, and the topic compares what each provider's agent framework needs from the API.</p>
+        <span class="card-foot">Agentic usage →</span>
+      </a>
+      <a class="card" href="../connectors/connect-sdk.html">
+        <span class="chip">Shipped</span>
+        <h3>Or Build on the SDK</h3>
+        <p>If your agent's tools run on the JVM, the SDK already carries authentication, the case lifecycle and the local cache.</p>
+        <span class="card-foot">Connect SDK →</span>
+      </a>
+    </div>
+    <h3 class="sub">Rules worth adopting now, whatever is built later</h3>
+    <ul class="tight">
+      <li><strong>Keep a person on partner-visible actions.</strong> Accepting a case tells a partner that an engineer is engaged. The <a href="entitlement-automation.html">acceptance topic</a> explains why a false acceptance is worse than a slow one.</li>
+      <li><strong>Show the exact text before it is sent.</strong> Have the agent draft, show the partner-visible text to a person, and send only what was approved.</li>
+      <li><strong>Make a retry safe.</strong> Model-driven clients repeat calls. Put your own case number on every case you open and look for it before opening another.</li>
+      <li><strong>Treat everything a partner sends as data.</strong> Do not let case text or notes steer the agent.</li>
+      <li><strong>Use test submissions on Beta</strong> until a person has watched the agent work a full case.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="open">
+  <div class="wrap">
+    <p class="eyebrow">Unknowns</p>
+    <h2>Open Questions</h2>
+    <div class="twrap wrapfirst">
+      <table>
+        <thead><tr><th>Question</th><th>What it decides</th></tr></thead>
+        <tbody>
+          <tr><td>Which sign-in mode reaches a working call from each platform against a hosted Connect MCP server</td><td>Whether one server serves every platform, and where it has to run</td></tr>
+          <tr><td>Whether platform agents can send A2A structured data and activate a custom extension, or only text</td><td>Whether a support extension is usable from those platforms or only from in-house agents</td></tr>
+          <tr><td>Which transitions Connect allows between case statuses</td><td>The lifecycle mapping above</td></tr>
+          <tr><td>Whether the membership agreement needs changes to cover actions taken by an agent</td><td>Everything beyond a tool server. This is a membership question, not an engineering one</td></tr>
+          <tr><td>Whether members want this yet</td><td>The order of the three pieces, and whether to build them at all</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note"><strong>If you are building an agent that works partner cases, say so.</strong> The most useful input is which platform your agent runs on and how it is able to sign in to an outside service. Send feedback to <a href="mailto:membership@tsanet.org">membership@tsanet.org</a>.</div>
+  </div>
+</section>
+
+<section id="sources">
+  <div class="wrap">
+    <p class="eyebrow">Verified against</p>
+    <h2>Sources, with the Dates That Were Read</h2>
+    <div class="twrap wrapfirst">
+      <table>
+        <thead><tr><th>Read on</th><th>Source</th><th>Used for</th></tr></thead>
+        <tbody>
+          <tr><td>2026-11-10</td><td><a href="https://a2a-protocol.org/latest/specification/">A2A specification</a> 1.0.0, <a href="https://a2a-protocol.org/latest/topics/agent-discovery/">agent discovery</a> and <a href="https://a2a-protocol.org/latest/topics/extensions/">extensions</a></td><td>Task states, signed agent cards, registries left unstandardized, what an extension may and may not change</td></tr>
+          <tr><td>2026-11-10</td><td>MCP specification 2026-07-28: <a href="https://modelcontextprotocol.io/specification/latest/basic/authorization">authorization</a> and <a href="https://modelcontextprotocol.io/specification/latest/changelog">key changes</a></td><td>Token audience rule, no token forwarding, removal of sessions, machine-to-machine sign-in as an extension</td></tr>
+          <tr><td>2026-11-10</td><td><a href="https://aaif.io/about">Agentic AI Foundation</a></td><td>Both protocols hosted by one foundation</td></tr>
+          <tr><td>2026-11-10</td><td>Salesforce: <a href="https://www.salesforce.com/agentforce/resources/interoperability-guide/">Agentforce interoperability guide</a>, <a href="https://developer.salesforce.com/docs/platform/api-catalog-connectapi/guide/manage-external-mcp-servers.html">register an external MCP server</a></td><td>A2A inbound and outbound, MCP registration and its sign-in types</td></tr>
+          <tr><td>2026-11-10</td><td>ServiceNow: <a href="https://www.servicenow.com/community/now-assist-articles/enable-mcp-and-a2a-for-your-agentic-workflows-with-faqs-updated/ta-p/3373907">enable MCP and A2A (FAQ)</a>, <a href="https://www.servicenow.com/platform/action-fabric.html">Action Fabric</a></td><td>MCP client and server, A2A roles, sign-in types</td></tr>
+          <tr><td>2026-11-10</td><td>Microsoft: <a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/whats-new">What's new in Copilot Studio</a>, <a href="https://www.microsoft.com/en-us/dynamics-365/blog/it-professional/2026/07/30/dynamics-365-customer-service-mcp-server-ga/">Dynamics 365 Customer Service MCP server</a>, <a href="https://techcommunity.microsoft.com/blog/azurearchitectureblog/build-and-govern-ai-agents-across-a-multitenant-organization/4559921">agents across a multitenant organization</a></td><td>A2A general availability, the MCP server and its clients, single-tenant agent identities</td></tr>
+          <tr><td>2026-11-10</td><td>Fin: <a href="https://fin.ai/help/en/articles/13976067-add-mcp-connectors-for-popular-apps-or-custom-mcps">add MCP connectors</a></td><td>Sign-in types for a custom MCP server</td></tr>
+          <tr><td>2026-11-10</td><td>Third-party write-ups and search summaries</td><td>Zendesk's MCP client; Fin's MCP server and client roles. Marked secondary where used</td></tr>
+          <tr><td>2026-11-10</td><td>The Connect API specification (private repository)</td><td>Case statuses</td></tr>
+          <tr><td>not probed</td><td>Any TSANet component registered in any agent platform; inbound A2A on Copilot Studio; Connect's status transitions; structured data and extensions from platform agents</td><td>Each is marked where it appears</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-top"><img src="../assets/tsanet-logo-white.png" alt="TSANet" style="width:110px;height:auto;display:block;margin-bottom:12px">TSANet · a not-for-profit member organization<br><span class="mono">developer.tsanet.org</span></div>
+    <div class="foot-cols">
+      <nav class="foot-col" aria-label="Developers">
+        <h4>Developers</h4>
+        <a href="../build/index.html">Build a New Integration</a>
+        <a href="../connectors/index.html">Existing Solutions</a>
+        <a href="../api/index.html">Working with the API</a>
+        <a href="../docs/index.html">Design Documents</a>
+        <a href="../topics/index.html">Topics</a>
+        <a href="../tools/index.html">Tools</a>
+        <a href="../community/index.html">Community</a>
+      </nav>
+      <div class="foot-col">
+        <h4>Members</h4>
+        <a href="https://www.tsanet.org/members/">Member List</a>
+        <a href="https://tsanet.gitbook.io/connect">Platform Documentation</a>
+        <a href="https://tsanet.gitbook.io/connect/help-center">Member Support</a>
+      </div>
+      <div class="foot-col">
+        <h4>About</h4>
+        <a href="https://www.tsanet.org/about-us/">About Us</a>
+        <a href="https://www.tsanet.org/board-of-directors/">Board of Directors</a>
+        <a href="https://www.tsanet.org/news-events/">News and Events</a>
+      </div>
+    </div>
+    <div class="foot-bottom mono">
+      <span>© TSANet Inc. All Rights Reserved</span>
+      <a href="https://www.tsanet.org/legal-policy/">Privacy Policy</a>
+      <a href="https://github.com/tsanetgit">github.com/tsanetgit</a>
+      <a href="mailto:membership@tsanet.org">membership@tsanet.org</a>
+      <span class="foot-social" aria-label="TSANet on social media">
+        <a href="https://twitter.com/TSANetTweet" aria-label="TSANet on X" title="X"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg></a>
+        <a href="https://www.linkedin.com/company/tsanet" aria-label="TSANet on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+        <a href="https://www.youtube.com/@tsanet8120" aria-label="TSANet on YouTube" title="YouTube"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+        <a href="https://github.com/tsanetgit" aria-label="TSANet on GitHub" title="GitHub"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+      </span>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/assistant.js?v=20260913" defer></script>
+</body>
+</html>

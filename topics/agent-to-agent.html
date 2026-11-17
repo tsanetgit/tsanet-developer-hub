@@ -188,7 +188,7 @@
     </div>
     <p>Three things follow from the table.</p>
     <ul class="tight">
-      <li><strong>MCP is the common ground today.</strong> A single MCP server could be registered in every platform listed, provided it still accepts clients on older protocol revisions, such as ServiceNow's on 2025-06-18. A2A reaches three of them, and not all on the same version.</li>
+      <li><strong>MCP is the common ground today.</strong> A single MCP server could be registered in every platform above that acts as an MCP client (all but Dynamics 365 Customer Service, which is itself a server), provided it still accepts clients on older protocol revisions, such as ServiceNow's on 2025-06-18. A2A reaches three of them, and not all on the same version.</li>
       <li><strong>The platforms disagree about sign-in.</strong> Some offer machine-to-machine credentials, some a fixed token, some only a signed-in user. One server has to satisfy all of them or leave some out. This is the same gap the <a href="agentic-usage.html">Agentic usage</a> topic found between hosted agent builders and code-first ones.</li>
       <li><strong>Platform agent identity stops at the company boundary.</strong> Microsoft's architecture guidance states that agent identities are single-tenant, and describes only one organization with several tenants. <span class="pill ok">PRIMARY</span></li>
     </ul>

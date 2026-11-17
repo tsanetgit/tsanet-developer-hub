@@ -40,8 +40,8 @@
     <h1>Case Attachments and the Direct-Push Model</h1>
     <p class="abstract">File transfer on TSANet Connect is a direct push between members: the platform brokers the exchange but never stores the file. That single design choice determines everything an integrator has to build, and it is the reason attachments require setup on both sides before they work at all. This document specifies the model, the responsibilities it leaves to the connector, and what to expect while enablement is still rolling out.</p>
     <div class="meta-table">
-      <div class="meta-cell"><b>Date</b><span>2026-10-28</span></div>
-      <div class="meta-cell"><b>Version</b><span>0.5</span></div>
+      <div class="meta-cell"><b>Date</b><span>2026-11-17</span></div>
+      <div class="meta-cell"><b>Version</b><span>0.6</span></div>
       <div class="meta-cell"><b>Audience</b><span>Member integrators</span></div>
       <div class="meta-cell"><b>Verified against</b><span>Connect API OpenAPI spec as served by Production and Beta, 2026-10-28 (byte-identical; Production's last modified 2026-10-26), and 2026-10-20; forward-call behaviour source-read</span></div>
     </div>
@@ -159,7 +159,7 @@
     </ul>
 
     <h3>5.1 In Development: Direct-to-Storage Delivery (Alpha)</h3>
-    <p>The specification describes a second model, Attachment V2, with every operation marked <code>x-stability-level: alpha</code>. Beta served it first. Since 2026-10-26 Production serves the same specification, alpha markers included, though V2 has been exercised on Beta only. Instead of relaying the bytes, the platform issues the sender a short-lived grant to upload straight into the receiver's own storage (S3, Azure Blob or Google Cloud Storage per the specification) and confirms completion. The file still never comes to rest at TSANet, so the model in section 1 holds. Two things change that are worth knowing now:</p>
+    <p>The specification describes a second model, Attachment V2, with every operation marked <code>x-stability-level: alpha</code>. Beta served it first. Since 2026-10-26 Production serves the same specification, alpha markers included, though V2 has been exercised on Beta only. Instead of relaying the bytes, the platform issues the sender a short-lived grant to upload straight into the receiver's own storage (S3 or Azure Blob; the specification also describes Google Cloud Storage but marks it not available in the current release) and confirms completion. The file still never comes to rest at TSANet, so the model in section 1 holds. Two things change that are worth knowing now:</p>
     <ul>
       <li>A receiver that has registered V2 storage can refuse the v1 forward with <strong>409</strong> <code>attachment-direct-path-required</code>. Both environments' specifications document it, so a sender should handle it wherever it forwards.</li>
       <li>The grants on a case can be listed. That is the first server-side record of attachment activity, though it is not a store of the files.</li>
@@ -169,6 +169,7 @@
     <h2><span class="sec-no">6</span>Revision History</h2>
     <table class="doc">
       <tr><th>Version</th><th>Date</th><th>Change</th></tr>
+      <tr><td>0.6</td><td>2026-11-17</td><td>Section 5.1: Google Cloud Storage is described in the specification but not available in the current release; the 0.5 note misread it.</td></tr>
       <tr><td>0.5</td><td>2026-10-28</td><td>Section 5.1: V2 is in Production's served specification since 2026-10-26, still alpha (spec-read; exercised on Beta only); the specification also names Google Cloud Storage as a receiver store.</td></tr>
       <tr><td>0.4</td><td>2026-10-20</td><td>Add the always-200 constraint on the forward call (section 3) and the source-read single-attempt delivery; mark the reference drift resolved; add section 5.1 on the alpha, Beta-only direct-to-storage model; Verified-against names both environments.</td></tr>
       <tr><td>0.3</td><td>2026-09-13</td><td>Add the <em>Verified against</em> cell in place of a second status cell; state that token-scoped configuration is the per-case override over the per-member registration; cross-reference TSANET-2026-001.</td></tr>

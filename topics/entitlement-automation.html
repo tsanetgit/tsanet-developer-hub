@@ -51,7 +51,7 @@
       <span><b>Topic</b> Inbound automation</span>
       <span><b>Grounded in</b> Four connectors</span>
       <span><b>Audience</b> Anyone configuring inbound</span>
-      <span><b>Updated</b> 2026-10-24</span>
+      <span><b>Updated</b> 2026-11-17</span>
     </div>
     <div class="toc">
       <a href="#commitment">What acceptance commits you to</a>
@@ -90,20 +90,20 @@
     <div class="grid g2" style="margin-bottom:24px">
       <div class="posture p1">
         <h3>Accept Everything</h3>
-        <div class="who">Zendesk — app setting</div>
-        <p>Every inbound case is accepted the moment it arrives. No condition, no lookup, no check that the request is one you can act on. Ships as a built-in setting, off by default.</p>
+        <div class="who">Zendesk — app setting · Salesforce — Auto Accept template</div>
+        <p>Every inbound case is accepted the moment it arrives. No condition, no lookup, no check that the request is one you can act on. Zendesk ships it as a built-in setting, off by default; Salesforce ships it as a flow template, inactive until you activate it.</p>
         <p class="trade">Buys: the SLA can never be breached. Spends: every case is a promise, including the ones that turn out not to be yours.</p>
       </div>
       <div class="posture p2">
         <h3>Accept What Matches Existing Work</h3>
         <div class="who">Dynamics — auto-routing</div>
-        <p>Look for a case that already exists for the partner's case number; fall back to the customer name. On a match, create and relate the local case and accept.</p>
-        <p class="trade">Buys: re-collaboration on a known issue attaches to the right place instead of opening a duplicate. Spends: says nothing about entitlement.</p>
+        <p>Look for one of your own cases whose number the partner quoted on the form, and relate to it. Failing that, find the customer contact by email and open a new case under their account. Either way, accept.</p>
+        <p class="trade">Buys: re-collaboration on a known issue attaches to the right place instead of opening a duplicate. Spends: says nothing about entitlement, and the email fallback accepts new work from any known contact.</p>
       </div>
       <div class="posture p3">
         <h3>Accept What You Can Verify</h3>
-        <div class="who">Salesforce — asset match</div>
-        <p>Resolve the request to an asset you actually have a record of. On a match, create the case and accept. <strong>On no match, ask the partner for more information</strong> instead of accepting.</p>
+        <div class="who">Salesforce — asset match, as designed in 2.13</div>
+        <p>Resolve the request to an asset you actually have a record of. On a match, create the case and accept. <strong>On no match, ask the partner for more information</strong> instead of accepting. In the 2.14 package the lookup is no longer wired in; see below.</p>
         <p class="trade">Buys: acceptance means something checkable. Spends: needs clean asset data, and an unmatched request waits on the partner's answer while the clock runs.</p>
       </div>
       <div class="posture p4">
@@ -130,12 +130,12 @@
 
           <text class="ts" x="180" y="104" text-anchor="middle">Zendesk setting</text>
           <text class="ts" x="420" y="104" text-anchor="middle">Dynamics routing</text>
-          <text class="ts" x="660" y="104" text-anchor="middle">Salesforce asset</text>
+          <text class="ts" x="660" y="104" text-anchor="middle">Salesforce asset (2.13)</text>
           <text class="ts" x="880" y="104" text-anchor="middle">Fin guardrail</text>
 
           <text class="tl" x="16" y="146">Asserted</text>
           <text class="ts" x="180" y="146" text-anchor="middle">nothing</text>
-          <text class="ts" x="420" y="146" text-anchor="middle">we know this issue</text>
+          <text class="ts" x="420" y="146" text-anchor="middle">known issue or contact</text>
           <text class="ts" x="660" y="146" text-anchor="middle">we support this thing</text>
           <text class="ts" x="880" y="146" text-anchor="middle">a person decided</text>
 
@@ -168,7 +168,7 @@
     <div class="note">The published guide is honest about the cost: auto-accept commits you instantly, and the triage options are skipped for auto-accepted cases. If some cases should still be looked at first, use the trigger path and put those conditions in the trigger. <a href="https://tsanet.gitbook.io/connect/documentation/zendesk-app/auto-accepting-inbound-cases">Setup guide →</a></div>
 
     <h3>Salesforce: Verify, Then Accept — Or Ask</h3>
-    <p>The shipped template, <em>Trigger Handler (Asset)</em>, is the most opinionated of the four. It ships deactivated, for you to clone and activate. It fires on TSANet Case creation where direction is inbound and no local case is linked:</p>
+    <p>The template <em>Trigger Handler (Asset)</em> is the most opinionated of the four, as it was built. It ships deactivated, for you to clone and activate. It fires on TSANet Case creation where direction is inbound and no local case is linked. In 2.13 it ran like this:</p>
     <pre><code>Get Asset                            <span class="c">as shipped, Asset Name = the case's email field</span>
   └─ no match  <span class="c">→ send the partner an information request</span>
   └─ match     <span class="c">→ continue</span>
@@ -177,11 +177,13 @@ Link it to the TSANet Case
 Approve the collaboration request
 Notify the case owner</code></pre>
     <p>Asking on no match is the entitlement check in its softer form. A partner escalating about something you have no record of does not become a case your team owns. It gets a question back straight away instead of a silent wait.</p>
-    <div class="note"><strong>The published guide says this branch rejects. The shipped flow does not.</strong> Verified against the package source at <code>Release-v2.13</code> and 2.14: the no-match branch calls the Request Information automation. If rejection is your policy, it is a one-element change in your clone. Replace the lookup while you are there, because matching an Asset Name against an email field is a placeholder. Details on the <a href="../connectors/salesforce.html#flows">Salesforce page</a>.</div>
+    <div class="note"><strong>Three sources, three behaviours.</strong> The published guide says the no-match branch rejects. In the package source at <code>Release-v2.13</code>, it asks the partner for information. In 2.14 (the <code>TSANetConnect-2.14-Release</code> tag and <code>main</code>), the flow's start goes straight to creating the Salesforce Case and accepting: the asset lookup and the information-request branch are still in the file but nothing leads to them, so the activated template accepts every inbound case, like the plain trigger handler. No issue tracks the change, so treat it as unexplained rather than intended. Source-read on 2026-11-17, not run in an org. If you want the entitlement check, reconnect the start to <em>Get Asset</em> in your clone; if rejection is your policy, change the no-match branch; and replace the lookup either way, because matching an Asset Name against an email field is a placeholder. Details on the <a href="../connectors/salesforce.html#flows">Salesforce page</a>.</div>
+    <p>Salesforce also ships two simpler pieces. <em>Auto Accept Collaboration Request</em> is an inactive template that accepts every inbound case. <em>Find Parent Case</em> ships active and links an inbound case to an existing Salesforce Case whose number the partner quoted; because the trigger handlers only fire when no case is linked, a matched request is left for a person.</p>
 
     <h3>Dynamics: Attach to Work That Already Exists</h3>
-    <p>Auto-routing is a feature toggle rather than a flow to activate, and it solves a different problem: not "should we take this" but "where does this belong". It searches for an existing case by the partner's case number, falls back to a customer-name lookup, and on a match creates and relates the local case before approving.</p>
-    <p>Matching on the partner's own case number first is what makes re-collaboration on a continuing issue attach to the same case rather than opening a duplicate. That is worth having even if you never intend to auto-accept.</p>
+    <p>Auto-routing is a feature toggle rather than a flow to activate, and it answers "where does this belong" before it answers "should we take this". It reads two fields from the partner's request form, <em>Customer Case #</em> and <em>Customer Email</em>, so it only works if your form has fields with exactly those names. It first looks for one of <em>your</em> cases whose ticket number matches the quoted case number, and relates the collaboration to it. Failing that, it finds a contact with the quoted email and, if the contact belongs to an account, opens a new case under that account. In both branches it then approves the collaboration with "An engineer has been assigned and will contact you."</p>
+    <p>So this is acceptance, not just routing. Matching on your own case number is what makes re-collaboration on a continuing issue attach to the same case rather than opening a duplicate. The email fallback goes further: it accepts any request from a known customer contact, which is new work. In the solution source, the flow ships active and its toggle, <code>ap_AutoRoutingofnewCase</code>, defaults to <em>yes</em>; check your installed solution rather than assuming it is off. Source-read, not checked against an installed v2.14.0.0.</p>
+    <p>Dynamics also has the first automatic <em>rejection</em> in any connector, though not a release: since 2026-11-11 on <code>main</code>, the end-to-end encryption PoC rejects a received encrypted case that fails verification. It is covered on the <a href="end-to-end-encryption.html#edges">end-to-end encryption topic</a>.</p>
 
     <h3>Fin / Intercom: Draft Automatically, Commit Deliberately</h3>
     <p>The <a href="connector-classes.html">gateway-class</a> connector takes the opposite position and states the reasoning explicitly: accepting, declining and requesting information are <strong>contractual commitments to another vendor, made under a service-level clock</strong>. Automation composes the answer; a person makes the commitment.</p>
@@ -193,7 +195,7 @@ Notify the case owner</code></pre>
   <div class="wrap">
     <p class="eyebrow">Designing yours</p>
     <h2>Building a Rule That Asserts Something True</h2>
-    <p>The Salesforce flow is the useful template even on other platforms, because its shape generalises: <em>resolve an identifier, branch on whether you found it, and decide what no match means.</em> What varies is the identifier.</p>
+    <p>The Salesforce flow, as designed in 2.13, is the useful template even on other platforms, because its shape generalises: <em>resolve an identifier, branch on whether you found it, and decide what no match means.</em> What varies is the identifier.</p>
     <div class="twrap">
       <table>
         <thead><tr><th>Match on</th><th>Asserts</th><th>Fails when</th></tr></thead>
@@ -208,7 +210,7 @@ Notify the case owner</code></pre>
     </div>
     <p>Two design rules worth adopting whichever identifier you pick:</p>
     <ul class="tight">
-      <li><strong>Decide what "no match" means before you build.</strong> There are three answers. Rejecting is a real answer, and kinder than silence, but only if your matching is good enough that a rejection is usually correct. Asking for information, which is what the Salesforce template does, is safer when the partner may just have quoted a different identifier. Leaving the case open for a human is the fallback when you are unsure. Rejecting wrongly is worse than not automating.</li>
+      <li><strong>Decide what "no match" means before you build.</strong> There are three answers. Rejecting is a real answer, and kinder than silence, but only if your matching is good enough that a rejection is usually correct. Asking for information, which is what the Salesforce template did in 2.13, is safer when the partner may just have quoted a different identifier. Leaving the case open for a human is the fallback when you are unsure. Rejecting wrongly is worse than not automating.</li>
       <li><strong>Start scoped, then widen.</strong> One partner, or one product line, with everything else falling through to normal triage. Every connector that automates acceptance supports a conditional form, and it converts a policy question into an observation: run it narrow for a month and count how often the rule was right.</li>
     </ul>
   </div>
@@ -225,7 +227,7 @@ Notify the case owner</code></pre>
       <li><strong>Status divergence.</strong> Your side auto-accepts and shows a case as owned, while the partner's connector shows only "Accepted" with no engineer name they recognise. Both are technically right. Agree with your frequent partners what acceptance means operationally, because the API does not define it for you.</li>
       <li><strong>The rule outliving its reason.</strong> A scoped trigger added for one partner during one incident is still accepting everything from them two years later. Anything that commits automatically deserves a review date.</li>
     </ul>
-    <div class="note">If you are unsure where to start: turn on <a href="../connectors/dynamics.html#automation">match-to-existing-work</a> routing, which reduces duplicates without asserting anything you cannot back, and leave acceptance manual until you have a matching rule you would defend to a partner.</div>
+    <div class="note">If you are unsure where to start: leave acceptance manual until you have a matching rule you would defend to a partner, and check that nothing is already accepting for you. On Dynamics, <a href="../connectors/dynamics.html#automation">auto-routing</a> accepts as well as routes, and may be on by default; on Salesforce 2.14, an activated asset template accepts everything.</div>
   </div>
 </section>
 

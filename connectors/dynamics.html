@@ -313,7 +313,7 @@
     <p>With <em>Auto Routing of New Case</em> enabled, an arriving collaboration tries to attach itself to work that already exists before creating anything new:</p>
     <figure>
       <div class="diagram">
-        <svg viewBox="0 0 1060 250" style="min-width:940px" role="img" aria-label="Auto-routing: an inbound TSA case is matched first by customer case number, then by customer name; a match auto-creates and relates a Dynamics case and approves the collaboration, while no match leaves the case for manual handling.">
+        <svg viewBox="0 0 1060 250" style="min-width:940px" role="img" aria-label="Auto-routing: an inbound TSA case is matched first on the Customer Case # it quotes against your own ticket numbers, then on its Customer Email against your contacts; a case-number hit relates the existing case, a contact hit creates a new case under the contact's account, and either way the collaboration is approved, while no match leaves the case for manual handling.">
           <defs><marker id="arA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--slate)"/></marker></defs>
 
           <rect class="bx-ext" x="16" y="92" width="160" height="56" rx="7"/>
@@ -323,21 +323,21 @@
           <path class="ln" d="M176,120 H228" marker-end="url(#arA)"/>
 
           <rect class="bx" x="234" y="92" width="190" height="56" rx="7"/>
-          <text class="ts" x="248" y="114">match on Customer</text>
-          <text class="ts" x="248" y="130">Case Number</text>
+          <text class="ts" x="248" y="114">Customer Case # vs</text>
+          <text class="ts" x="248" y="130">your ticket numbers</text>
 
           <path class="ln" d="M424,120 H478" marker-end="url(#arA)"/>
           <text class="tl" x="451" y="112" text-anchor="middle">no hit</text>
 
           <rect class="bx" x="484" y="92" width="190" height="56" rx="7"/>
-          <text class="ts" x="498" y="114">fall back to customer</text>
-          <text class="ts" x="498" y="130">name lookup</text>
+          <text class="ts" x="498" y="114">fall back to a contact</text>
+          <text class="ts" x="498" y="130">by Customer Email</text>
 
           <path class="ln" d="M674,108 C712,96 720,60 748,54" marker-end="url(#arA)"/>
           <text class="tl" x="700" y="86">match</text>
           <rect class="bx-grn" x="754" y="26" width="290" height="58" rx="7"/>
-          <text class="ts" x="768" y="48">auto-create + relate the Dynamics Case</text>
-          <text class="ts" x="768" y="64">then auto-approve the collaboration</text>
+          <text class="ts" x="768" y="48">relate the matched case, or create</text>
+          <text class="ts" x="768" y="64">one for the account; then approve</text>
 
           <path class="ln" d="M674,132 C712,144 720,180 748,186" marker-end="url(#arA)"/>
           <text class="tl" x="694" y="176">no match</text>
@@ -346,7 +346,7 @@
           <text class="tl" x="768" y="198">the agent decides where it belongs</text>
         </svg>
       </div>
-      <figcaption>Matching on the partner's own case number first is what makes re-collaboration on an existing issue attach to the same Dynamics case rather than opening a duplicate. The matching logic lives in the <em>On Create Case — Auto Route</em> flow and is the intended place to customise: swap the match on entitlement, contract or account tier and the rest is unchanged.</figcaption>
+      <figcaption>The flow reads two form fields, <em>Customer Case #</em> and <em>Customer Email</em>, so your request form needs fields with exactly those names. Matching the quoted case number against your own ticket numbers first is what makes re-collaboration on an existing issue attach to the same Dynamics case rather than opening a duplicate. The email fallback accepts new work from any known contact, and both branches approve, so this is automatic acceptance. In the solution source the flow ships active and the toggle defaults to yes (source-read 2026-11-17). The matching logic lives in the <em>On Create Case — Auto Route</em> flow and is the intended place to customise: swap the match on entitlement, contract or account tier and the rest is unchanged.</figcaption>
     </figure>
   </div>
 </section>

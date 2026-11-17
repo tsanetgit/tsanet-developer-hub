@@ -415,7 +415,7 @@
         <ul class="tight">
           <li><strong>Auto Accept Collaboration Request</strong> — record-triggered on TSANet Case creation, accepts with no human step. Since 2.14 it runs asynchronously, so activating it no longer fails on a callout in the same transaction. If you activated and modified the old one, the release notes say to replace it with this one</li>
           <li><strong>Collaboration Request Trigger Handler</strong> — creates the Salesforce Case and links it back to the TSANet Case</li>
-          <li><strong>Trigger Handler (Asset)</strong> — the entitlement variant: matches on an asset, and on no match sends the partner an information request (see below)</li>
+          <li><strong>Trigger Handler (Asset)</strong> — the entitlement variant: in 2.13 it matches on an asset and on no match sends the partner an information request; in 2.14 the lookup is no longer reached (see below)</li>
           <li><strong>Find Parent Case (Template)</strong> — matching logic for attaching a collaboration to an existing case, branching on direction across the receiver and submitter case numbers</li>
           <li><strong>Case Owner Change Handler</strong> — propagates a Salesforce owner change to TSANet</li>
         </ul>
@@ -423,12 +423,12 @@
     </div>
 
     <h3>Matching on an Asset</h3>
-    <p>The pattern most worth copying, and a good template for your own policy. Two versions exist, and they differ. The shipped template, <em>Trigger Handler (Asset)</em>, fires when a TSANet Case is created with direction inbound and no Salesforce Case linked:</p>
+    <p>The pattern most worth copying, and a good template for your own policy. The template, <em>Trigger Handler (Asset)</em>, fires when a TSANet Case is created with direction inbound and no Salesforce Case linked. As shipped in 2.13:</p>
     <pre><code>Get Asset                       <span class="c">→ as shipped: Asset Name = the TSANet Case's Email field</span>
   └─ found      <span class="c">→ create the Salesforce Case, link it, accept, notify the owner</span>
   └─ not found  <span class="c">→ Request Information (Automation): ask the partner, do not reject</span></code></pre>
     <p>The installation guide also walks through a custom handler you build yourself, which looks up the Asset by serial number and then a Contact by the customer's email before it creates the Case and approves. That one only runs when a serial number is present, and the guide describes no branch for a missing asset.</p>
-    <div class="note"><strong>The guide and the shipped flow disagree about the no-match branch.</strong> The guide says the Asset template "triggers an automation to reject the collaboration request" when no asset is found. In the package source at both <code>Release-v2.13</code> and 2.14, that branch calls <em>TSANet Request Info (Automation)</em>, which asks the partner for more information. Nothing in the flow rejects. If rejection is the policy you want, change that branch in your clone, and change the lookup too: matching Asset Name against an email field is a placeholder, not an entitlement check.</div>
+    <div class="note"><strong>The guide, 2.13 and 2.14 all disagree.</strong> The guide says the Asset template "triggers an automation to reject the collaboration request" when no asset is found. In the package source at <code>Release-v2.13</code>, that branch calls <em>TSANet Request Info (Automation)</em>, which asks the partner for more information. In 2.14 (<code>TSANetConnect-2.14-Release</code> and <code>main</code>), the flow's start connects straight to creating the Case and accepting; <em>Get Asset</em> and the information-request branch remain in the file with nothing leading to them, so the activated template accepts every inbound case. No issue tracks the change. Source-read 2026-11-17, not run in an org. To restore the check, reconnect the start to <em>Get Asset</em> in your clone. If rejection is the policy you want, change that branch in your clone, and change the lookup too: matching Asset Name against an email field is a placeholder, not an entitlement check.</div>
     <div class="note">Custom flows that send notifications need a Custom Notification Type to exist first; the shipped flows reference one named <code>TSANet_Notification</code>. A flow that silently does nothing at the notification step is usually a missing notification type.</div>
   </div>
 </section>

@@ -98,7 +98,7 @@
   <div class="wrap">
     <p class="eyebrow">In build</p>
     <h2>What TSANet Is Building</h2>
-    <p>TSANet's ServiceNow connector is being built in the open, in <a href="https://github.com/tsanetgit/ServiceNow_app"><code>tsanetgit/ServiceNow_app</code></a> (created 2026-10-22). It is a scoped app made with the ServiceNow SDK (Fluent), and it takes the in-tenant answer to the question this page used to leave open: the whole connector runs inside the member's instance. Everything in this section was read in the repository's source on 2026-11-17, at commit <code>527b813</code> on <code>main</code>. None of it has been run against a live instance for this page. <span class="tag src">source-read</span></p>
+    <p>TSANet's ServiceNow connector is being built in the open, in <a href="https://github.com/tsanetgit/ServiceNow_app"><code>tsanetgit/ServiceNow_app</code></a> (created 2026-10-22). It is a scoped app made with the ServiceNow SDK (Fluent), and it takes the in-tenant answer to the question this page used to leave open: the whole connector runs inside the member's instance. The table was read in the repository's source on 2026-11-17, at commit <code>527b813</code> on <code>main</code>; the status notes under it come from the repository's issues and its releases list, read the same day. None of it has been run against a live instance for this page. <span class="tag src">source-read</span></p>
     <div class="twrap">
       <table>
         <thead><tr><th>Part</th><th>What the source shows</th></tr></thead>
@@ -113,8 +113,8 @@
       </table>
     </div>
     <ul class="tight">
-      <li><strong>Not released.</strong> The repository has no GitHub releases. <a href="https://github.com/tsanetgit/ServiceNow_app/issues/11">Issue #11</a> tracks the first release, a limited early-access pilot planned for TSANet's December 2026 release. That is a plan, not a date to build against. <span class="tag src">source-read</span></li>
-      <li><strong>Not for install outside TSANet yet.</strong> <a href="https://github.com/tsanetgit/ServiceNow_app/issues/3">Issue #3</a> (open) moves the app's scope to TSANet's vendor prefix before any install outside TSANet's own instances. As the issue notes, a scope cannot be renamed once an app is installed, so this gates the pilot. <span class="tag src">source-read</span></li>
+      <li><strong>Not released.</strong> The repository has no GitHub releases. <a href="https://github.com/tsanetgit/ServiceNow_app/issues/11">Issue #11</a> tracks the first release, a limited early-access pilot planned for TSANet's December 2026 release. That is a plan, not a date to build against.</li>
+      <li><strong>Not for install outside TSANet yet.</strong> <a href="https://github.com/tsanetgit/ServiceNow_app/issues/3">Issue #3</a> (open) moves the app's scope to TSANet's vendor prefix before any install outside TSANet's own instances. As the issue notes, a scope cannot be renamed once an app is installed, so this gates the pilot.</li>
       <li><strong>The rest of this page still applies.</strong> The build sidesteps some of the open questions below and answers none of the probes: every <span class="tag probe">needs probe</span> stands. The tenancy section's server-to-server auth, an OAuth client registered in the member's instance, describes calls <em>into</em> the instance, which the polling build does not make; it would return if webhooks replace polling.</li>
     </ul>
   </div>

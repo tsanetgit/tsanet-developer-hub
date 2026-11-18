@@ -68,7 +68,7 @@
   <div class="wrap">
     <p class="eyebrow">Connector class</p>
     <h2>Zendesk Sits Between the Two Connector Classes</h2>
-    <p>TSANet connectors divide by one question: will the platform run your code inside the member's own tenant? <a href="salesforce.html">Salesforce</a> and <a href="dynamics.html">Dynamics</a> will, and <a href="servicenow.html">ServiceNow</a> would, though nothing is built there yet. <a href="fin-intercom.html">Intercom will not</a>, which is why that one is a hosted gateway. Zendesk is the interesting middle case — and understanding which half you are in explains most of the design below.</p>
+    <p>TSANet connectors divide by one question: will the platform run your code inside the member's own tenant? <a href="salesforce.html">Salesforce</a> and <a href="dynamics.html">Dynamics</a> will, and so will <a href="servicenow.html">ServiceNow</a>, whose connector is in build and not released. <a href="fin-intercom.html">Intercom will not</a>, which is why that one is a hosted gateway. Zendesk is the interesting middle case — and understanding which half you are in explains most of the design below.</p>
     <div class="twrap">
       <table>
         <caption>Everything in this connector runs in the member's account, so a broken install affects one member. The Connect API remains a shared dependency: a platform outage stops collaboration here as it does everywhere.</caption>

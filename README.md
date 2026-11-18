@@ -66,8 +66,8 @@ The hub's value is that it is accurate about things that are easy to get wrong. 
 
 - **Verify against the source; say what you verified against.** Design documents have a *Verified against* cell for this. "Read the OpenAPI spec" and "probed live on Beta" are useful; memory is not.
 - **Where two sources disagree, say so on the page** rather than quietly picking one. The webhook retry policy is the live example: `openapi.yaml` and `webhook-asyncapi.yaml` state different policies, and the API page reports the contradiction instead of resolving it.
-- **Tag evidence level where nothing has been probed.** The ServiceNow assessment marks every claim `documented` (somebody read it) or `needs probe` (known unknown).
-- **Don't publish what isn't built.** ServiceNow is an assessment, not a connector page. Placeholder content that looks real — invented document numbers, invented discussion threads — was removed from this repo once already; don't reintroduce it.
+- **Tag evidence level where nothing has been probed.** The ServiceNow assessment marks every claim `documented` (somebody read it in vendor sources), `source-read` (read in the app's own source) or `needs probe` (known unknown).
+- **Don't publish what isn't built.** ServiceNow is an assessment, not a connector page: its app is in build (`tsanetgit/ServiceNow_app`) but not released, so the page adds a source-read build section rather than becoming a connector page. Convert it when a release and an install path exist. Placeholder content that looks real — invented document numbers, invented discussion threads — was removed from this repo once already; don't reintroduce it.
 - **Check status claims against reality.** Several cards originally overstated: a "beta connector" that did not exist, a "GA" SDK that is v0.1.0.
 
 ### Redaction

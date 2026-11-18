@@ -13,7 +13,7 @@
   pre{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--ink);margin:16px 0}
   pre code{background:none;padding:0;font-size:inherit}
   .c{color:var(--mute)}
-  /* status banner — this page documents something that does not exist yet */
+  /* status banner — this page documents something that is not released */
   .status-band{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--orange);border-radius:12px;padding:24px 26px;margin-top:26px}
   .status-band h2{font-size:20px;margin-bottom:10px}
   .status-band p{max-width:76ch}
@@ -25,6 +25,7 @@
   .tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;border-radius:4px;padding:2px 6px;white-space:nowrap;margin-left:4px;display:inline-block;vertical-align:1px}
   .tag.doc{color:var(--deep);background:rgba(0,91,130,.07);border:1px solid rgba(0,91,130,.22)}
   .tag.probe{color:var(--orange);background:rgba(204,78,11,.08);border:1px solid rgba(204,78,11,.3)}
+  .tag.src{color:var(--green);background:rgba(31,157,107,.09);border:1px solid rgba(31,157,107,.28)}
   .legend-key{display:flex;gap:20px;flex-wrap:wrap;margin:18px 0 0;font-size:13px;color:var(--slate)}
 </style>
 </head>
@@ -49,15 +50,17 @@
   <div class="wrap">
     <div class="crumb"><a href="../index.html">Hub</a> / <a href="index.html">Existing Solutions</a> / ServiceNow</div>
     <h1>ServiceNow</h1>
-    <p class="lede">A platform assessment, not a connector page. TSANet has committed to begin development in 2026; nothing is built yet and nothing here has been tested against a live instance. This is what the platform looks like to an integrator, gathered so the work starts from a map rather than a blank page.</p>
+    <p class="lede">A platform assessment, not a connector page. TSANet is building a ServiceNow connector in the open, as a scoped app that runs in the member's own instance. It is not released, and nothing here has been tested against a live instance. The assessment is what the platform looks like to an integrator, written before the app's repository existed; the build section says what the app's source does today.</p>
     <div class="meta-row">
-      <span><b>Status</b> Not yet built</span>
-      <span><b>Evidence</b> Vendor documentation only</span>
+      <span><b>Status</b> In build, not released</span>
+      <span><b>Evidence</b> Vendor documentation; the app's source</span>
       <span><b>Live-verified</b> Nothing</span>
       <span><b>Assessed</b> 2026-08-12</span>
+      <span><b>Source-read</b> 2026-11-17</span>
     </div>
     <div class="toc">
       <a href="#status">Where this stands</a>
+      <a href="#build">What is being built</a>
       <a href="#shape">Why it is different</a>
       <a href="#surface">Agent surfaces</a>
       <a href="#api">Table API traps</a>
@@ -74,19 +77,46 @@
   <div class="wrap">
     <div class="status-band">
       <h2>Read This Before You Use Anything Below</h2>
-      <p>Every claim on this page is <strong>documented, not observed</strong> — somebody read it in vendor documentation or a community thread, not that anybody watched it work. That distinction has mattered before: on the most recent platform TSANet assessed, published documentation turned out to be wrong or silent on the majority of the findings that ended up shaping the design.</p>
+      <p>Every claim on this page is <strong>read, not observed</strong>. The assessment was read in vendor documentation or community threads; the build section was read in the app's source. Nobody has watched any of it work on a live instance for this page. That distinction has mattered before: on the most recent platform TSANet assessed, published documentation turned out to be wrong or silent on the majority of the findings that ended up shaping the design.</p>
       <p style="margin-top:12px">Treat this as a research map with citations. Anything marked <span class="tag probe">needs probe</span> is a known unknown rather than an oversight, and the first verified fact on this page will be the first one worth designing against.</p>
       <div class="status-grid">
-        <div class="status-item"><b>Connector</b><span>Not built. Development committed for 2026.</span></div>
-        <div class="status-item"><b>Architecture</b><span>Open. Not settled publicly or internally.</span></div>
-        <div class="status-item"><b>Probe</b><span>None run. No live instance tested.</span></div>
-        <div class="status-item"><b>Getting involved</b><span>Early access enquiries to <code>membership@tsanet.org</code></span></div>
+        <div class="status-item"><b>Connector</b><span>In build, not released. A limited early-access pilot is planned for December 2026 (issue #11).</span></div>
+        <div class="status-item"><b>Architecture</b><span>In-tenant in the current build: the whole connector in a scoped app, polling Connect. Its source says the polling is for the pilot only.</span></div>
+        <div class="status-item"><b>Probe</b><span>None run by the hub. No live instance tested.</span></div>
+        <div class="status-item"><b>Getting involved</b><span>Pilot enquiries to <code>membership@tsanet.org</code>; issues on the app's <a href="https://github.com/tsanetgit/ServiceNow_app/issues">public tracker</a></span></div>
       </div>
       <div class="legend-key">
+        <span><span class="tag src">source-read</span> read in the app's public source, not run</span>
         <span><span class="tag doc">documented</span> read in vendor docs or community sources</span>
         <span><span class="tag probe">needs probe</span> unverified, and known to be unverified</span>
       </div>
     </div>
+  </div>
+</section>
+
+<section id="build">
+  <div class="wrap">
+    <p class="eyebrow">In build</p>
+    <h2>What TSANet Is Building</h2>
+    <p>TSANet's ServiceNow connector is being built in the open, in <a href="https://github.com/tsanetgit/ServiceNow_app"><code>tsanetgit/ServiceNow_app</code></a> (created 2026-10-22). It is a scoped app made with the ServiceNow SDK (Fluent), and it takes the in-tenant answer to the question this page used to leave open: the whole connector runs inside the member's instance. The table was read in the repository's source on 2026-11-17, at commit <code>527b813</code> on <code>main</code>; the status notes under it come from the repository's issues and its releases list, read the same day. None of it has been run against a live instance for this page. <span class="tag src">source-read</span></p>
+    <div class="twrap">
+      <table>
+        <thead><tr><th>Part</th><th>What the source shows</th></tr></thead>
+        <tbody>
+          <tr><td>Where state lives</td><td>The app's own TSANet Case, TSANet Note and TSANet Response tables, which do not extend <code>task</code>. A TSANet Case can reference the member's CSM case or incident; which of the two is a setting</td></tr>
+          <tr><td>Agent surface</td><td>A Create TSANet Case UI page, opened from a case's ⋯ menu in the CSM/FSM Configurable Workspace; TSANet Cases as a related list on the case and as lists in the workspace's Lists menu; Accept and Reject actions on an inbound TSANet Case. The Create page is served by the instance and opens in a workspace modal frame (<code>g_modal.showFrame</code>); nothing is served from outside the instance</td></tr>
+          <tr><td>Inbound delivery</td><td>A scheduled job that reads changed requests from <code>/v2/collaboration-requests/list</code> every minute. Its source comment says the polling is for the pilot only, until the app receives TSANet's webhooks. Creating a member case for an inbound request is a setting, off by default</td></tr>
+          <tr><td>Calls to Connect</td><td>Server scripts using <code>RESTMessageV2</code>, the base-platform path the <a href="#events">events section</a> recommends rather than IntegrationHub. The instance calls out to Connect; the source has no endpoint for Connect to call</td></tr>
+          <tr><td>Credentials</td><td>OAuth client credentials in a Connection &amp; Credential alias in the instance. The member's admin enters the client id and secret TSANet issued; the source's comments say the platform stores the secret and renews the token, and that nothing secret ships with the app</td></tr>
+          <tr><td>Outside the instance</td><td>Nothing but Connect itself. The source has no TSANet-hosted adapter or gateway</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul class="tight">
+      <li><strong>Not released.</strong> The repository has no GitHub releases. <a href="https://github.com/tsanetgit/ServiceNow_app/issues/11">Issue #11</a> tracks the first release, a limited early-access pilot planned for TSANet's December 2026 release. That is a plan, not a date to build against.</li>
+      <li><strong>Not for install outside TSANet yet.</strong> <a href="https://github.com/tsanetgit/ServiceNow_app/issues/3">Issue #3</a> (open) moves the app's scope to TSANet's vendor prefix before any install outside TSANet's own instances. As the issue notes, a scope cannot be renamed once an app is installed, so this gates the pilot.</li>
+      <li><strong>The rest of this page still applies.</strong> The build sidesteps some of the open questions below and answers none of the probes: every <span class="tag probe">needs probe</span> stands. The tenancy section's server-to-server auth, an OAuth client registered in the member's instance, describes calls <em>into</em> the instance, which the polling build does not make; it would return if webhooks replace polling.</li>
+    </ul>
   </div>
 </section>
 
@@ -98,7 +128,7 @@
     <p>ServiceNow answers <strong>both at once</strong>, and that is the whole difficulty. It will happily run installed code — scoped applications are the native extension model. But it hosts <em>none</em> of the UI for you and provides <em>no</em> native webhooks. There is no Canvas Kit and no ZAF analogue: if an agent is to see anything, it is either code installed in their instance or a page served from somewhere else and framed in.</p>
     <figure>
       <div class="diagram">
-        <svg viewBox="0 0 1020 340" style="min-width:900px" role="img" aria-label="What ServiceNow provides and does not provide: it offers scoped applications, a Table API, UI Actions and UI Builder components, and outbound REST from business rules; it does not offer a vendor-hosted UI surface, native webhooks, or native HMAC signing on outbound calls.">
+        <svg viewBox="0 0 1020 340" style="min-width:900px" role="img" aria-label="What ServiceNow provides and does not provide: it offers scoped applications, a Table API, UI Actions and UI Builder components, and outbound REST from business rules; it does not offer a vendor-hosted UI surface, native webhooks, or native HMAC signing on outbound calls. So some code must be installed in every member's instance. The app in build answers how much for its pilot: all of it, with a job that polls Connect in place of webhooks.">
           <defs><marker id="snA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--slate)"/></marker></defs>
 
           <text class="tt" x="20" y="28" style="fill:var(--green)">The platform gives you</text>
@@ -130,15 +160,15 @@
           <path class="ln" d="M668,182 H736" marker-end="url(#snA)"/>
 
           <rect class="bx" x="742" y="112" width="258" height="140" rx="8" style="stroke:var(--blue);stroke-dasharray:5 4"/>
-          <text class="tt" x="756" y="136" style="fill:var(--blue)">The open question</text>
-          <text class="ts" x="756" y="158">Not "app or no app".</text>
-          <text class="ts" x="756" y="178">It is what lives inside the app:</text>
-          <text class="ts" x="756" y="198">the whole connector, or a thin</text>
-          <text class="ts" x="756" y="216">shell over a hosted service.</text>
-          <text class="tl" x="756" y="238">undecided — see Open questions</text>
+          <text class="tt" x="756" y="136" style="fill:var(--blue)">The answer, for the pilot</text>
+          <text class="ts" x="756" y="158">Not "app or no app", but how</text>
+          <text class="ts" x="756" y="178">much lives in it. The build</text>
+          <text class="ts" x="756" y="198">says all of it, with a job that</text>
+          <text class="ts" x="756" y="216">polls Connect for now.</text>
+          <text class="tl" x="756" y="238">in build, not released</text>
         </svg>
       </div>
-      <figcaption>The platform settles the first question and leaves the second open. Because an installed component is unavoidable either way, the architecture decision does not change <em>whether</em> a member installs something — only how much of the integration lives in there, and therefore how often they have to upgrade it.</figcaption>
+      <figcaption>The platform settles the first question and leaves the second open. Because an installed component is unavoidable either way, the architecture decision does not change <em>whether</em> a member installs something — only how much of the integration lives in there, and therefore how often they have to upgrade it. The <a href="#build">app in build</a> answers it for its pilot by putting the whole connector in the app, so every connector change is an app upgrade for each member.</figcaption>
     </figure>
   </div>
 </section>
@@ -267,23 +297,23 @@
   <div class="wrap">
     <p class="eyebrow">Open questions</p>
     <h2>What Has to Be Answered, and What Each One Blocks</h2>
-    <p>These are listed because they are unresolved, not because they are hard. Each blocks real design work downstream.</p>
+    <p>These were listed because they were unresolved, not because they are hard. Each blocks real design work downstream. The last column says where the <a href="#build">app in build</a> leaves each one, read from its source; none of them has been probed.</p>
     <div class="twrap">
       <table>
-        <thead><tr><th>Question</th><th>Blocks</th></tr></thead>
+        <thead><tr><th>Question</th><th>Blocks</th><th>Where the build leaves it</th></tr></thead>
         <tbody>
-          <tr><td>How much of the connector lives in the installed app</td><td>Everything. It decides what a member installs and how often they upgrade it</td></tr>
-          <tr><td>Does <code>now-iframe</code> render on the Incident and Case record pages an agent actually works</td><td>The agent surface, and therefore the entire outbound flow design</td></tr>
-          <tr><td>Is the unknown-field silent-ignore real on the Table API</td><td>Whether read-back-and-assert is mandatory on every write</td></tr>
-          <tr><td>Which object holds a case, per member</td><td>Object mapping, token placement, status mapping</td></tr>
-          <tr><td>Is the correlation field efficiently searchable</td><td>How load-bearing an integration's own link table has to be</td></tr>
-          <tr><td>Per-member ingress: can an external service reach the instance, or must the instance poll out</td><td>Inbound topology — and it may differ member to member</td></tr>
-          <tr><td>Secret rotation mechanics for an instance-registered OAuth client</td><td>Credential lifecycle and the operational runbook</td></tr>
-          <tr><td>Whether any member's own policy requires a Store-certified app</td><td>Distribution path and the cost model</td></tr>
+          <tr><td>How much of the connector lives in the installed app</td><td>Everything. It decides what a member installs and how often they upgrade it</td><td>Answered for the pilot: all of it. The planned move from polling to webhooks may reopen it</td></tr>
+          <tr><td>Does <code>now-iframe</code> render on the Incident and Case record pages an agent actually works</td><td>The agent surface, and therefore the entire outbound flow design</td><td>Sidestepped for this build: no <code>now-iframe</code> on the record page. The Create page is an instance-served UI page in a workspace modal frame. Still unprobed</td></tr>
+          <tr><td>Is the unknown-field silent-ignore real on the Table API</td><td>Whether read-back-and-assert is mandatory on every write</td><td>Unchanged</td></tr>
+          <tr><td>Which object holds a case, per member</td><td>Object mapping, token placement, status mapping</td><td>The app's own TSANet Case table, linked to a CSM case or an incident; the host table is a setting</td></tr>
+          <tr><td>Is the correlation field efficiently searchable</td><td>How load-bearing an integration's own link table has to be</td><td>Sidestepped: the build links through its own reference field, not <code>correlation_id</code></td></tr>
+          <tr><td>Per-member ingress: can an external service reach the instance, or must the instance poll out</td><td>Inbound topology — and it may differ member to member</td><td>Sidestepped for the pilot: the instance polls out. It would return if webhooks replace polling</td></tr>
+          <tr><td>Secret rotation mechanics for an instance-registered OAuth client</td><td>Credential lifecycle and the operational runbook</td><td>Not needed while Connect does not call in. Rotating TSANet's client secret in the credential alias is the runbook question now</td></tr>
+          <tr><td>Whether any member's own policy requires a Store-certified app</td><td>Distribution path and the cost model</td><td>Unchanged. The vendor-prefix move (issue #3) comes first on either path, and the repository tracks a Store pre-submission checklist (issue #1)</td></tr>
         </tbody>
       </table>
     </div>
-    <div class="note"><strong>Interested in shaping this?</strong> ServiceNow members who want to influence the design — or to be a pilot instance once a spike has run — should contact <code>membership@tsanet.org</code>. A member willing to lend a real instance and a real workflow is worth more at this stage than any amount of further desk research.</div>
+    <div class="note"><strong>Interested in the pilot?</strong> ServiceNow members who want to take part in the early-access pilot, or to influence the design, should contact <code>membership@tsanet.org</code>. Bugs and feature requests on the app itself go to its <a href="https://github.com/tsanetgit/ServiceNow_app/issues">public issue tracker</a>.</div>
   </div>
 </section>
 

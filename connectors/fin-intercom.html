@@ -79,7 +79,7 @@
   <div class="wrap">
     <p class="eyebrow">Connector class</p>
     <h2>Why This Connector Is Shaped Differently</h2>
-    <p>Every connector TSANet shipped before this one assumes code can run inside the member's own system. <a href="salesforce.html">Salesforce</a> and <a href="dynamics.html">Dynamics</a> allow it; <a href="zendesk.html">Zendesk</a> partly; <a href="servicenow.html">ServiceNow</a> would, though nothing is built there yet. Intercom does not — and neither will most of the platforms behind it. That single constraint means the integration has to run as a service somewhere outside the platform, and someone has to <em>operate</em> it: TSANet, or the member in its own environment. Which one is the member's choice; <a href="#hosting">hosting options</a> compares the two.</p>
+    <p>Every connector TSANet shipped before this one assumes code can run inside the member's own system. <a href="salesforce.html">Salesforce</a> and <a href="dynamics.html">Dynamics</a> allow it; <a href="zendesk.html">Zendesk</a> partly; <a href="servicenow.html">ServiceNow</a> allows it too, and its connector is in build, not released. Intercom does not — and neither will most of the platforms behind it. That single constraint means the integration has to run as a service somewhere outside the platform, and someone has to <em>operate</em> it: TSANet, or the member in its own environment. Which one is the member's choice; <a href="#hosting">hosting options</a> compares the two.</p>
 
     <div class="twrap">
       <table>
@@ -88,7 +88,7 @@
           <tr><th scope="col">&nbsp;</th><th scope="col">In-tenant connector</th><th scope="col" class="next">Gateway adapter</th></tr>
         </thead>
         <tbody>
-          <tr><th scope="row">Platforms</th><td>Salesforce, Dynamics (ServiceNow would fit here; not built)</td><td class="next">Intercom&nbsp;/&nbsp;Fin, Pylon, DevRev, Wolken</td></tr>
+          <tr><th scope="row">Platforms</th><td>Salesforce, Dynamics (ServiceNow in build; not released)</td><td class="next">Intercom&nbsp;/&nbsp;Fin, Pylon, DevRev, Wolken</td></tr>
           <tr><th scope="row">Where code runs</th><td>Inside the member's own tenant</td><td class="next">A service outside the platform, hosted by TSANet or in the member's own cloud</td></tr>
           <tr><th scope="row">Who operates it</th><td>The member</td><td class="next">Whoever hosts it: TSANet, or the member</td></tr>
           <tr><th scope="row">Credentials live</th><td>In the member's tenant</td><td class="next">With whoever hosts the service, one set per member</td></tr>

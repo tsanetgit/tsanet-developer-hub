@@ -51,7 +51,7 @@
       <span><b>Topic</b> Integration architecture</span>
       <span><b>Grounded in</b> Five platforms</span>
       <span><b>Audience</b> Anyone scoping an integration</span>
-      <span><b>Updated</b> 2026-10-24</span>
+      <span><b>Updated</b> 2026-11-17</span>
     </div>
     <div class="toc">
       <a href="#question">The question</a>
@@ -105,7 +105,7 @@
       <div class="classcard gateway">
         <h3>Gateway</h3>
         <div class="who">Fin / Intercom</div>
-        <p>The platform hosts no third-party code at all. Panels are pages served from elsewhere and framed in; there is no installed package — the member connects an app in their workspace (for Fin / Intercom, a connected Intercom app) and the rest runs as a service outside the platform, which TSANet can host or the member can run in its own cloud. The shared machinery this class runs on is the <a href="../connectors/connect-gateway.html">Connect Gateway</a>.</p>
+        <p>The platform hosts no third-party code at all. Panels are rendered from a service elsewhere (for Intercom, Canvas Kit components returned by the adapter); there is no installed package — the member connects an app in their workspace (for Fin / Intercom, a connected Intercom app) and the rest runs as a service outside the platform, which TSANet can host or the member can run in its own cloud. The shared machinery this class runs on is the <a href="../connectors/connect-gateway.html">Connect Gateway</a>.</p>
         <ul>
           <li>TSANet operates it, or the member self-hosts it</li>
           <li>Credentials sit with whoever hosts it, one set per member</li>
@@ -162,7 +162,7 @@
           <path d="M867,70 H940" stroke="var(--orange)" stroke-width="3"/>
         </svg>
       </div>
-      <figcaption>The trade is symmetric, which is what makes it a real decision rather than a ranking. In-tenant distributes both the operating burden and the failure domain; a gateway centralises both. Neither is better in the abstract.</figcaption>
+      <figcaption>The trade is symmetric, which is what makes it a real decision rather than a ranking. In-tenant distributes both the operating burden and the failure domain; a TSANet-hosted gateway centralises both, and a self-hosted one hands both back to the member. Neither is better in the abstract.</figcaption>
     </figure>
   </div>
 </section>
@@ -181,7 +181,7 @@
           <tr><th scope="row">Inbound delivery</th><td>An endpoint inside the tenant, or the platform's own event machinery</td><td class="next">Your endpoint, your signature verification, your dedupe</td></tr>
           <tr><th scope="row">Deployment</th><td>A package a member installs and later upgrades</td><td class="next">A service someone deploys, TSANet or the member; the platform side is a connected app</td></tr>
           <tr><th scope="row">Data residency</th><td>Case content never leaves the member's tenant</td><td class="next">Case content transits whichever infrastructure hosts the service: TSANet's, or the member's own</td></tr>
-          <tr><th scope="row">Connector faults</th><td>Independent — one member's misconfiguration cannot affect another</td><td class="next">Correlated across members on the gateway — one shared service, which is what its durability and rollout design exists to manage</td></tr>
+          <tr><th scope="row">Connector faults</th><td>Independent — one member's misconfiguration cannot affect another</td><td class="next">Correlated across members on a TSANet-hosted gateway, one shared service; a self-hosted adapter's faults are its member's alone</td></tr>
           <tr><th scope="row">Platform outage</th><td colspan="2" style="text-align:center">Affects everyone, in every class — the Connect API is a shared dependency regardless of where connector code runs</td></tr>
           <tr><th scope="row">Release cadence</th><td>Gated by member upgrade appetite and any store review</td><td class="next">As fast as you can deploy safely</td></tr>
         </tbody>
@@ -190,8 +190,8 @@
     <p>The row that most often gets under-weighted at scoping time is <strong>data residency</strong>, because it is a procurement question rather than an engineering one. A member whose policy says case content stays on their infrastructure has ruled out a TSANet-hosted gateway before the first design meeting, though not the gateway class: the same adapter can run in the member's own cloud. Either way they will say so late, after review, unless someone asks early.</p>
     <p>The two failure rows are the ones most often reasoned about badly, including by us — an earlier version of this page got them wrong, so it is worth being precise.</p>
     <p><strong>Every class already shares a dependency.</strong> The Connect API is the shared floor: a platform outage stops collaboration for every member regardless of where their connector code runs. An in-tenant Salesforce package does not keep working when the platform is down. So "in-tenant means one member is affected" is only ever true of faults <em>in the connector itself</em>, and stating it without that qualifier flatters the in-tenant column.</p>
-    <p><strong>What the gateway changes is correlation, not fragility.</strong> It adds one more component shared by the members on it, so a fault there is correlated rather than independent. That is a design input, not a verdict: correlation is what durability, recovery and staged rollout exist to manage, and a gateway built that way targets availability in the same range members expect from the platform itself. The honest comparison is that in-tenant distributes connector faults across members while a gateway concentrates them into something engineered — and operated — to a higher standard than any individual member's install.</p>
-    <p>Where that genuinely bites is not uptime but <em>change</em>. A bad release to the gateway still reaches everyone on it at once, which is why deployment discipline matters more there than in a world where each member upgrades on their own schedule.</p>
+    <p><strong>What the gateway changes is correlation, not fragility.</strong> It adds one more component shared by the members on it, so a fault there is correlated rather than independent. That is a design input, not a verdict: correlation is what durability, recovery and staged rollout exist to manage, and a gateway built that way can target availability in the same range members expect from the platform itself. That is the design target, not today's shape: the current deployment runs one replica, on a single-file store backed up every five minutes, with no staged rollout, and the <a href="https://github.com/tsanetgit/Fin-Intercom_App">Fin / Intercom</a> deployment documents say production availability waits on the storage decision. The honest comparison is that in-tenant distributes connector faults across members while a hosted gateway concentrates them into one service, which then has to be engineered and operated to a higher standard than any individual member's install.</p>
+    <p>Where that genuinely bites is not uptime but <em>change</em>. A bad release to a TSANet-hosted gateway still reaches everyone on it at once, which is why deployment discipline matters more there than in a world where each member upgrades on their own schedule.</p>
     <p>Two consequences of the class are worked through on their own pages: what it means for <a href="entitlement-automation.html">accepting cases automatically</a>, and for <a href="file-sharing.html">receiving files</a>.</p>
   </div>
 </section>
@@ -207,7 +207,7 @@
       <li><strong>Are there native outbound events?</strong> No webhooks means either something installed emits them, or you poll. Both are real answers; polling is not a failure.</li>
       <li><strong>Where can durable state live?</strong> If the platform gives you no first-class object to hold case linkage, something you operate has to hold it — and that thing becomes precious.</li>
     </ol>
-    <div class="note"><strong>Ask a fifth question of the member, not the platform:</strong> does their policy allow case content to transit infrastructure they do not operate? For an in-tenant platform, a "no" is already satisfied. For a gateway-class platform, it decides hosting rather than class: the member runs the adapter in its own environment instead of TSANet hosting it. Either way it is cheaper to hear at scoping than at security review.</div>
+    <div class="note"><strong>Ask a fifth question of the member, not the platform:</strong> does their policy allow case content to transit infrastructure they do not operate? For an in-tenant platform, a "no" is already satisfied. For a gateway-class platform, it decides hosting rather than class: the member runs the adapter in its own environment instead of TSANet hosting it. So does a wish for <a href="end-to-end-encryption.html">end-to-end encryption</a>: the gateway engine supports it for self-hosted deployments only, until TSANet decides whether it may hold a member's private keys. Self-hosting is documented in the gateway's member-hosting guide but has not yet been run by a member as written; the <a href="../connectors/fin-intercom.html">Fin / Intercom</a> page carries the details. Either way it is cheaper to hear at scoping than at security review.</div>
     <h3>Where the Shipped Connectors Landed</h3>
     <div class="twrap">
       <table>
@@ -216,8 +216,8 @@
           <tr><td><a href="../connectors/salesforce.html">Salesforce</a></td><td>In-tenant</td><td>Apex is real server-side code running under the member's governance</td></tr>
           <tr><td><a href="../connectors/dynamics.html">Dynamics</a></td><td>In-tenant</td><td>Plugin assembly plus Power Automate, all in the member's environment</td></tr>
           <tr><td><a href="../connectors/zendesk.html">Zendesk</a></td><td>Partial</td><td>Sandboxed client app and hosted declarative flows, but no arbitrary server code</td></tr>
-          <tr><td><a href="../connectors/fin-intercom.html">Fin / Intercom</a></td><td>Gateway</td><td>No third-party code hosting and no native webhooks, so the service must be elsewhere</td></tr>
-          <tr><td><a href="../connectors/servicenow.html">ServiceNow</a></td><td>Undecided</td><td>Answers both ways: it runs installed code, but hosts no UI and has no native webhooks</td></tr>
+          <tr><td><a href="../connectors/fin-intercom.html">Fin / Intercom</a></td><td>Gateway</td><td>No third-party code hosting, so the service must be elsewhere. Intercom has webhooks; the adapter subscribes to none</td></tr>
+          <tr><td><a href="../connectors/servicenow.html">ServiceNow</a></td><td>In-tenant, in build</td><td>A scoped app in the member's instance carries the whole connector: its own tables, a UI page and workspace actions, and a scheduled job that polls Connect every minute in place of webhooks. Not released; an early-access pilot is planned for December</td></tr>
         </tbody>
       </table>
     </div>
@@ -228,12 +228,12 @@
   <div class="wrap">
     <p class="eyebrow">The awkward case</p>
     <h2>When the Platform Answers "Sort Of"</h2>
-    <p>Two of the five platforms above do not answer cleanly, and they are instructive in different ways.</p>
+    <p>Two of the five platforms above did not answer cleanly, and they are instructive in different ways.</p>
     <h3>Zendesk: Yes to Installation, No to a Server</h3>
     <p>Code installs and runs — but the app is a browser sandbox with no storage and no server, and the flow engine is declarative. So background work lives in a page that exists only while an agent has a tab open, and anything the flow language cannot express has nowhere to go. The class question resolves to <em>Partial</em> — in-tenant, within limits — and the limits are the design.</p>
-    <h3>ServiceNow: Yes to Installation, No to Hosting</h3>
-    <p>Installed scoped applications are the native extension model, so code can certainly run in the member's instance. But the platform hosts no UI surface for you and provides no native webhooks — so something must be installed <em>and</em> something must be served from elsewhere. The remaining decision is not "app or no app"; it is how much of the connector lives inside that app, and therefore how often members have to upgrade it.</p>
-    <div class="note">That reframing is the practical value of the taxonomy. When a platform answers ambiguously, the question stops being <em>which class is this</em> and becomes <em>what is the smallest thing that has to be installed</em> — because that is what determines the upgrade burden you are signing members up for. See the <a href="../connectors/servicenow.html">ServiceNow assessment</a> for that worked through in detail.</div>
+    <h3>ServiceNow: Yes to Installation, and Now Everything Installed</h3>
+    <p>Installed scoped applications are the native extension model, so code can certainly run in the member's instance. What ServiceNow lacks is a vendor-hosted panel framework like Zendesk's or Intercom's, and a way for Connect's webhooks to reach an app without more setup. This page used to leave the class open on that basis: something installed, and perhaps something served from elsewhere. The connector TSANet is now building, <a href="https://github.com/tsanetgit/ServiceNow_app"><code>ServiceNow_app</code></a> (public since 2026-10-22), answers it by putting all of it in the app: its own case, note and response tables, a UI page for creating a case, workspace lists and accept and reject actions, and a scheduled job that polls Connect every minute. The polling is explicitly a pilot measure until the app receives webhooks. Nothing runs outside the member's instance. It is not released: the app scope still has to move to TSANet's vendor prefix before any install outside TSANet's own instances, and the first release is planned as a limited early-access pilot in December. Source-read, not probed. <span class="pill warn">in build</span></p>
+    <div class="note">That reframing is the practical value of the taxonomy. When a platform answers ambiguously, the question stops being <em>which class is this</em> and becomes <em>what is the smallest thing that has to be installed</em> — because that is what determines the upgrade burden you are signing members up for. ServiceNow's answer turned out to be "all of it", which means every connector change is an app upgrade for each member. See the <a href="../connectors/servicenow.html">ServiceNow assessment</a> for the reasoning that preceded the build.</div>
   </div>
 </section>
 

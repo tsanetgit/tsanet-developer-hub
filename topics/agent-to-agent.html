@@ -49,7 +49,7 @@
       <span><b>Topic</b> Agents working partner cases across companies</span>
       <span><b>Grounded in</b> The A2A and MCP specifications, vendor documentation, the Connect API specification</span>
       <span><b>Status</b> Direction under consideration; nothing built</span>
-      <span><b>Updated</b> 2026-11-11</span>
+      <span><b>Updated</b> 2026-11-17</span>
     </div>
     <div class="toc">
       <a href="#status">Where this stands</a>
@@ -178,17 +178,17 @@
         <thead><tr><th>Platform</th><th>MCP</th><th>A2A</th><th>Sign-in it offers to an outside MCP server</th><th>Evidence</th></tr></thead>
         <tbody>
           <tr><td>Salesforce Agentforce</td><td>Client and server</td><td>Inbound and outbound; an administrator registers each outside agent</td><td>None, or OAuth client credentials</td><td><span class="pill ok">PRIMARY</span></td></tr>
-          <tr><td>ServiceNow</td><td>Client and server</td><td>Client and receiver</td><td>None, an API key, or OAuth</td><td><span class="pill ok">PRIMARY</span> vendor community and documentation</td></tr>
-          <tr><td>Microsoft Copilot Studio</td><td>Client</td><td>Calling other agents is generally available. Whether an outside agent can call in is <span class="pill warn">NEEDS PROBE</span></td><td>None, an API key, or OAuth with a signed-in user</td><td><span class="pill ok">PRIMARY</span> see <a href="agentic-usage.html">Agentic usage</a></td></tr>
+          <tr><td>ServiceNow</td><td>Client and server; its client speaks MCP 2025-06-18</td><td>Client and receiver, on A2A v0.3 rather than 1.0; no streaming, parallel tasks or artifacts yet</td><td>None, an API key, or OAuth</td><td><span class="pill ok">PRIMARY</span> vendor community and documentation</td></tr>
+          <tr><td>Microsoft Copilot Studio</td><td>Client; server in preview</td><td>Calling other agents is generally available. Being called is in preview, in early-release environments only, for a signed-in user of the agent's own tenant. Whether another company's agent can call in is <span class="pill warn">NEEDS PROBE</span></td><td>None, an API key, or OAuth with a signed-in user</td><td><span class="pill ok">PRIMARY</span> see <a href="agentic-usage.html">Agentic usage</a></td></tr>
           <tr><td>Microsoft Dynamics 365 Customer Service</td><td>Server, open to non-Microsoft clients</td><td>None found</td><td>Not applicable: it is a server</td><td><span class="pill ok">PRIMARY</span></td></tr>
           <tr><td>Zendesk</td><td>Client; no server confirmed</td><td>None found</td><td>Not read</td><td><span class="pill info">SECONDARY</span></td></tr>
-          <tr><td>Fin</td><td>Client and server</td><td>None found</td><td>A fixed bearer token, or OAuth</td><td><span class="pill ok">PRIMARY</span> for sign-in; <span class="pill info">SECONDARY</span> for the rest</td></tr>
+          <tr><td>Fin</td><td>Client and server</td><td>None found</td><td>A fixed token, or OAuth through one connection shared by the whole workspace; no per-user sign-in</td><td><span class="pill ok">PRIMARY</span> for sign-in; <span class="pill info">SECONDARY</span> for the rest</td></tr>
         </tbody>
       </table>
     </div>
     <p>Three things follow from the table.</p>
     <ul class="tight">
-      <li><strong>MCP is the common ground today.</strong> A single MCP server could be registered in every platform listed. A2A reaches three of them.</li>
+      <li><strong>MCP is the common ground today.</strong> A single MCP server could be registered in every platform above that acts as an MCP client (all but Dynamics 365 Customer Service, which is itself a server), provided it still accepts clients on older protocol revisions, such as ServiceNow's on 2025-06-18. A2A reaches three of them, and not all on the same version.</li>
       <li><strong>The platforms disagree about sign-in.</strong> Some offer machine-to-machine credentials, some a fixed token, some only a signed-in user. One server has to satisfy all of them or leave some out. This is the same gap the <a href="agentic-usage.html">Agentic usage</a> topic found between hosted agent builders and code-first ones.</li>
       <li><strong>Platform agent identity stops at the company boundary.</strong> Microsoft's architecture guidance states that agent identities are single-tenant, and describes only one organization with several tenants. <span class="pill ok">PRIMARY</span></li>
     </ul>
@@ -370,13 +370,13 @@
           <tr><td>2026-11-10</td><td>MCP specification 2026-07-28: <a href="https://modelcontextprotocol.io/specification/latest/basic/authorization">authorization</a> and <a href="https://modelcontextprotocol.io/specification/latest/changelog">key changes</a></td><td>Token audience rule, no token forwarding, removal of sessions, machine-to-machine sign-in as an extension</td></tr>
           <tr><td>2026-11-10</td><td><a href="https://aaif.io/about">Agentic AI Foundation</a></td><td>Both protocols hosted by one foundation</td></tr>
           <tr><td>2026-11-10</td><td>Salesforce: <a href="https://www.salesforce.com/agentforce/resources/interoperability-guide/">Agentforce interoperability guide</a>, <a href="https://developer.salesforce.com/docs/platform/api-catalog-connectapi/guide/manage-external-mcp-servers.html">register an external MCP server</a></td><td>A2A inbound and outbound, MCP registration and its sign-in types</td></tr>
-          <tr><td>2026-11-10</td><td>ServiceNow: <a href="https://www.servicenow.com/community/now-assist-articles/enable-mcp-and-a2a-for-your-agentic-workflows-with-faqs-updated/ta-p/3373907">enable MCP and A2A (FAQ)</a>, <a href="https://www.servicenow.com/platform/action-fabric.html">Action Fabric</a></td><td>MCP client and server, A2A roles, sign-in types</td></tr>
-          <tr><td>2026-11-10</td><td>Microsoft: <a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/whats-new">What's new in Copilot Studio</a>, <a href="https://www.microsoft.com/en-us/dynamics-365/blog/it-professional/2026/07/30/dynamics-365-customer-service-mcp-server-ga/">Dynamics 365 Customer Service MCP server</a>, <a href="https://techcommunity.microsoft.com/blog/azurearchitectureblog/build-and-govern-ai-agents-across-a-multitenant-organization/4559921">agents across a multitenant organization</a></td><td>A2A general availability, the MCP server and its clients, single-tenant agent identities</td></tr>
-          <tr><td>2026-11-10</td><td>Fin: <a href="https://fin.ai/help/en/articles/13976067-add-mcp-connectors-for-popular-apps-or-custom-mcps">add MCP connectors</a></td><td>Sign-in types for a custom MCP server</td></tr>
+          <tr><td>2026-11-10</td><td>ServiceNow: <a href="https://www.servicenow.com/community/now-assist-articles/enable-mcp-and-a2a-for-your-agentic-workflows-with-faqs-updated/ta-p/3373907">enable MCP and A2A (FAQ)</a>, <a href="https://www.servicenow.com/platform/action-fabric.html">Action Fabric</a></td><td>MCP client and server, A2A roles, sign-in types; re-read 2026-11-17 for the A2A and MCP versions (page last updated 2026-09-04)</td></tr>
+          <tr><td>2026-11-10</td><td>Microsoft: <a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/whats-new">What's new in Copilot Studio</a>, <a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/agents-experience/publication-channels-mcp-agent-to-agent">MCP and A2A channels (preview)</a> (read 2026-11-17), <a href="https://www.microsoft.com/en-us/dynamics-365/blog/it-professional/2026/07/30/dynamics-365-customer-service-mcp-server-ga/">Dynamics 365 Customer Service MCP server</a>, <a href="https://techcommunity.microsoft.com/blog/azurearchitectureblog/build-and-govern-ai-agents-across-a-multitenant-organization/4559921">agents across a multitenant organization</a></td><td>A2A general availability, inbound MCP and A2A in preview and their sign-in, the MCP server and its clients, single-tenant agent identities</td></tr>
+          <tr><td>2026-11-10</td><td>Fin: <a href="https://fin.ai/help/en/articles/13976067-add-mcp-connectors-for-popular-apps-or-custom-mcps">add MCP connectors</a></td><td>Sign-in types for a custom MCP server; re-read 2026-11-17 for the shared OAuth connection</td></tr>
           <tr><td>2026-11-10</td><td>Third-party write-ups and search summaries</td><td>Zendesk's MCP client; Fin's MCP server and client roles. Marked secondary where used</td></tr>
           <tr><td>2026-11-10</td><td>The Connect API specification (private repository)</td><td>Case statuses</td></tr>
           <tr><td>2026-11-11</td><td>TSANet <a href="https://www.tsanet.org/legal-documents/">legal documents</a>: the Code of Conduct, the relationship addenda and the Bylaws</td><td>What members agree to today, and how the Code is changed</td></tr>
-          <tr><td>not probed</td><td>Any TSANet component registered in any agent platform; inbound A2A on Copilot Studio; Connect's status transitions; structured data and extensions from platform agents</td><td>Each is marked where it appears</td></tr>
+          <tr><td>not probed</td><td>Any TSANet component registered in any agent platform; inbound A2A on Copilot Studio from another company's tenant; Connect's status transitions; structured data and extensions from platform agents</td><td>Each is marked where it appears</td></tr>
         </tbody>
       </table>
     </div>
